@@ -1,0 +1,20 @@
+have_fun: false
+code_review:
+  disable: false
+  comment_severity_threshold: LOW
+  max_review_comments: -1
+  pull_request_opened:
+    help: false
+    summary: true
+    code_review: true
+ignore_patterns:
+  - "*.g.dart"           # Generated files
+  - "*.freezed.dart"     # Freezed generated files
+  - "*.mocks.dart"       # Mock files
+  - "build/**"           # Build directory
+  - "ios/**"             # iOS platform files
+  - "android/**"         # Android platform files
+  - "web/**"             # Web platform files
+  - "test/fixtures/**"   # Test fixtures
+  - "assets/**"          # Asset files
+  - ".dart_tool/**"      # Dart tool files
