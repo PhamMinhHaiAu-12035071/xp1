@@ -1,7 +1,22 @@
 include: package:very_good_analysis/analysis_options.yaml
+
 analyzer:
   exclude:
-    - lib/l10n/gen/*
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - "**/firebase_options.dart"
+    - "build/**"
+    - "coverage/**"
+    - "lib/l10n/gen/*"
+
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+# Very Good Analysis đã include hầu hết rules tốt nhất
+# Chỉ override khi thực sự cần thiết
 linter:
   rules:
-    public_member_api_docs: false
+    # lines_longer_than_80_chars: false  # Nếu cần dòng dài hơn

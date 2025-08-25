@@ -1,26 +1,54 @@
-# Flutter Coding Standards & Best Practices Guide
+`# Flutter Coding Standards - Very Good Analysis
 
 ## Introduction
 
 This style guide outlines the coding conventions for Flutter applications developed in our organization.
-It's based on the official Flutter and Dart style guides, but with some modifications to address specific needs and
-preferences within our development team. This guide ensures consistency, maintainability, and high-quality code
-across all Flutter projects.
+It's based on **very_good_analysis** - a comprehensive linting package designed by Very Good Ventures with 130+ strict lint rules.
+This guide ensures consistency, maintainability, and high-quality code across all Flutter projects while following industry best practices.
 
 ## Key Principles
 
+* **Very Good Ventures Standards**: Tuân thủ nghiêm ngặt các quy tắc của `very_good_analysis`
 * **Optimized for Readability**: Code phải dễ đọc và hiểu ngay cả với người lần đầu đọc
-* **Detailed Documentation**: Viết documentation chi tiết cho tất cả public APIs
+* **Comprehensive Documentation**: Viết documentation chi tiết cho tất cả public APIs (bắt buộc với very_good_analysis)
 * **Maintainability**: Code dễ bảo trì, mở rộng và debug
-* **Performance First**: Tối ưu hiệu suất từ khi thiết kế
+* **Performance First**: Tối ưu hiệu suất từ khi thiết kế với const usage bắt buộc
 * **Consistency**: Tuân thủ nhất quán trong toàn bộ codebase
+
+## Very Good Analysis Configuration
+
+### Analysis Options (analysis_options.yaml)
+```yaml
+include: package:very_good_analysis/analysis_options.yaml
+
+analyzer:
+  exclude:
+    - "**/*.g.dart"
+    - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - "**/firebase_options.dart"
+    - "build/**"
+    - "coverage/**"
+  
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+# Very Good Analysis đã include hầu hết rules tốt nhất
+# Chỉ override khi thực sự cần thiết
+linter:
+  rules:
+    # Override rules nếu cần (không khuyến khích)
+    # lines_longer_than_80_chars: false  # Nếu cần dòng dài hơn
+```
 
 ## Deviations from Official Flutter/Dart Standards
 
 ### Line Length
-* **Maximum line length:** 100 characters (instead of Dart's default 80).
-    * Modern screens allow for wider lines, improving code readability in many cases.
-    * Flutter widgets often have long parameter lists that benefit from wider lines.
+* **Maximum line length:** 80 characters (Very Good standard).
+    * Enforces consistent code formatting across the team.
+    * Improves code readability and maintainability.
 
 ### Import Organization
 * **Group imports in this order:**
@@ -31,17 +59,17 @@ across all Flutter projects.
 * **Use relative imports** for files within the same package for better maintainability.
 
 ### Documentation Style
-* **Use triple slash (`///`) for documentation comments** instead of triple quotes.
+* **Use triple slash (`///`) for documentation comments** (bắt buộc với very_good_analysis).
 * **Include usage examples** in documentation for complex widgets and methods.
-* **Document all public APIs** with detailed parameter descriptions.
+* **Document all public APIs** with detailed parameter descriptions (bắt buộc).
 
-## Naming Conventions
+## Naming Conventions (Very Good Analysis Standards)
 
 ### Classes, Enums, Typedefs, Extensions
 ```dart
 // ✅ Tốt - UpperCamelCase
-class UserProfileScreen extends StatelessWidget {}
-class PaymentRepository {}
+class UserRepository extends Repository<User> {}
+class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {}
 enum ConnectionState { connected, disconnected }
 typedef UserCallback = void Function(User user);
 extension StringExtensions on String {}
@@ -67,31 +95,44 @@ final String UserName = 'john_doe'; // UpperCamelCase
 ### Files và Directories
 ```dart
 // ✅ Tốt - snake_case
-user_profile_screen.dart
-payment_repository.dart
+user_repository.dart
+payment_bloc.dart
+home_page.dart
 lib/features/authentication/
 
 // ❌ Tránh
-UserProfileScreen.dart // UpperCamelCase
-user-profile-screen.dart // kebab-case
+UserRepository.dart // UpperCamelCase
+user-repository.dart // kebab-case
 ```
 
-### Constants
+### Constants (Very Good Analysis Update)
 ```dart
-// ✅ Tốt - lowerCamelCase cho const
+// ✅ Tốt - lowerCamelCase cho const (không phải SCREAMING_SNAKE_CASE)
 const double defaultPadding = 16.0;
 const Color primaryColor = Colors.blue;
 
-// ✅ Tốt - SCREAMING_SNAKE_CASE cho static const
+// ✅ Tốt - lowerCamelCase cho static const
+static const String apiBaseUrl = 'https://api.example.com';
+static const int maxRetryCount = 3;
+
+// ❌ Tránh - SCREAMING_SNAKE_CASE không được khuyến khích
 static const String API_BASE_URL = 'https://api.example.com';
 static const int MAX_RETRY_COUNT = 3;
+```
+
+### Private Members
+```dart
+// ✅ Tốt - underscore prefix cho private members
+class _HomePageState extends State<HomePage> {}
+final String _privateField = 'private';
+void _privateMethod() {}
 ```
 
 ## Code Formatting & Structure
 
 ### Indentation và Line Length
 ```dart
-// ✅ Sử dụng 2 spaces cho indentation
+// ✅ Sử dụng 2 spaces cho indentation (Very Good standard)
 class ExampleWidget extends StatelessWidget {
   const ExampleWidget({super.key});
 
@@ -101,8 +142,8 @@ class ExampleWidget extends StatelessWidget {
       padding: const EdgeInsets.all(16.0),
       child: Column(
         children: [
-          Text('Example'),
-          SizedBox(height: 8.0),
+          const Text('Example'),
+          const SizedBox(height: 8.0),
         ],
       ),
     );
@@ -116,14 +157,14 @@ class ExampleWidget extends StatelessWidget {
 Widget build(BuildContext context) {
   return Column(
     children: [
-      Text('First item'),
-      Text('Second item'), // trailing comma
+      const Text('First item'),
+      const Text('Second item'), // trailing comma
     ], // trailing comma
   );
 }
 
 // ✅ Tốt - Không cần trailing comma với single parameter
-Text('Simple text')
+const Text('Simple text')
 ```
 
 ### Import Organization
@@ -148,32 +189,80 @@ import '../repositories/user_repository.dart';
 import 'widgets/user_card.dart';
 ```
 
-## Widget Best Practices
+## Widget Best Practices (Very Good Analysis)
 
 ### StatelessWidget Template
 ```dart
+/// Widget hiển thị thông tin người dùng với avatar và tên.
+/// 
+/// Widget này tự động load avatar từ URL và hiển thị placeholder
+/// nếu load thất bại. Hỗ trợ callback khi user tap vào.
+/// 
+/// ## Usage
+/// 
+/// ```dart
+/// UserInfoCard(
+///   user: User(
+///     name: 'John Doe',
+///     email: 'john@example.com',
+///     avatarUrl: 'https://example.com/avatar.jpg',
+///   ),
+///   onTap: () => Navigator.push(context, UserDetailScreen.route()),
+///   showAvatar: true,
+/// )
+/// ```
 class UserInfoCard extends StatelessWidget {
+  /// Tạo [UserInfoCard].
+  /// 
+  /// [user] là required và không được null.
+  /// [onTap] là optional callback khi user tap.
+  /// [showAvatar] mặc định là true.
   const UserInfoCard({
-    super.key,
     required this.user,
     this.onTap,
     this.showAvatar = true,
+    super.key,
   });
 
+  /// User data để hiển thị.
   final User user;
+  
+  /// Callback được gọi khi user tap vào card.
   final VoidCallback? onTap;
+  
+  /// Có hiển thị avatar hay không.
   final bool showAvatar;
 
   @override
   Widget build(BuildContext context) {
+    final theme = Theme.of(context);
+    
     return Card(
-      child: ListTile(
-        leading: showAvatar ? CircleAvatar(
-          backgroundImage: NetworkImage(user.avatarUrl),
-        ) : null,
-        title: Text(user.name),
-        subtitle: Text(user.email),
+      child: InkWell(
         onTap: onTap,
+        child: Padding(
+          padding: const EdgeInsets.all(16),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              if (showAvatar) ...[
+                CircleAvatar(
+                  backgroundImage: NetworkImage(user.avatarUrl),
+                ),
+                const SizedBox(height: 8),
+              ],
+              Text(
+                user.name,
+                style: theme.textTheme.titleMedium,
+              ),
+              const SizedBox(height: 8),
+              Text(
+                user.email,
+                style: theme.textTheme.bodyMedium,
+              ),
+            ],
+          ),
+        ),
       ),
     );
   }
@@ -182,14 +271,24 @@ class UserInfoCard extends StatelessWidget {
 
 ### StatefulWidget Template
 ```dart
+/// Widget counter với state management.
+/// 
+/// Hỗ trợ initial value và callback khi giá trị thay đổi.
 class CounterWidget extends StatefulWidget {
+  /// Tạo [CounterWidget].
+  /// 
+  /// [initialValue] mặc định là 0.
+  /// [onChanged] là optional callback khi giá trị thay đổi.
   const CounterWidget({
-    super.key,
     this.initialValue = 0,
     this.onChanged,
+    super.key,
   });
 
+  /// Giá trị ban đầu của counter.
   final int initialValue;
+  
+  /// Callback được gọi khi giá trị thay đổi.
   final ValueChanged<int>? onChanged;
 
   @override
@@ -219,7 +318,7 @@ class _CounterWidgetState extends State<CounterWidget> {
         Text('Count: $_count'),
         IconButton(
           onPressed: _increment,
-          icon: Icon(Icons.add),
+          icon: const Icon(Icons.add),
         ),
       ],
     );
@@ -227,16 +326,23 @@ class _CounterWidgetState extends State<CounterWidget> {
 }
 ```
 
-## Performance Optimization
+## Performance Optimization (Very Good Analysis Requirements)
 
-### Const Constructors
+### Const Usage (Bắt buộc)
 ```dart
-// ✅ Tốt - Sử dụng const khi có thể
+// ✅ Bắt buộc - const constructors
 const Text('Static text')
 const SizedBox(height: 16.0)
 const Icon(Icons.home)
 
-// ✅ Tốt - Const constructor
+// ✅ Const collections
+const <String>['item1', 'item2']
+const {
+  'key1': 'value1',
+  'key2': 'value2',
+}
+
+// ✅ Const constructor
 class AppColors {
   static const Color primary = Color(0xFF2196F3);
   static const Color secondary = Color(0xFF03DAC6);
@@ -246,41 +352,33 @@ class AppColors {
 ### Widget Extraction
 ```dart
 // ✅ Tốt - Extract widgets để tránh rebuilds không cần thiết
-class ProfileScreen extends StatelessWidget {
+class HomePage extends StatelessWidget {
+  const HomePage({super.key});
+
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(title: Text('Profile')),
-      body: Column(
+      appBar: AppBar(title: const Text('Home')),
+      body: const Column(
         children: [
-          _buildHeader(), // Extract thành method riêng
-          _ProfileInfoSection(), // Extract thành widget riêng
+          _Header(), // Extract thành widget riêng
+          Expanded(child: _Content()),
         ],
       ),
     );
   }
-
-  Widget _buildHeader() {
-    return Container(
-      height: 200,
-      color: Colors.blue,
-      child: Center(child: Text('Header')),
-    );
-  }
 }
 
-class _ProfileInfoSection extends StatelessWidget {
+class _Header extends StatelessWidget {
+  const _Header();
+
   @override
   Widget build(BuildContext context) {
-    return Card(
-      child: Padding(
-        padding: EdgeInsets.all(16.0),
-        child: Column(
-          children: [
-            Text('User Information'),
-            // More widgets...
-          ],
-        ),
+    return Container(
+      height: 100,
+      color: Colors.blue,
+      child: const Center(
+        child: Text('Header'),
       ),
     );
   }
@@ -306,11 +404,11 @@ ListView.builder(
 ListView.separated(
   itemCount: items.length,
   itemBuilder: (context, index) => ItemCard(item: items[index]),
-  separatorBuilder: (context, index) => Divider(),
+  separatorBuilder: (context, index) => const Divider(),
 )
 ```
 
-## Error Handling & Null Safety
+## Error Handling & Null Safety (Very Good Analysis)
 
 ### Safe Navigation
 ```dart
@@ -329,195 +427,201 @@ final user = data as User; // Có thể throw exception
 final user = data is User ? data : null;
 ```
 
-### Exception Handling
+### Exception Handling (Very Good Pattern)
 ```dart
-// ✅ Tốt - Specific exception handling
-Future<User> fetchUser(String userId) async {
-  try {
-    final response = await http.get(Uri.parse('/api/users/$userId'));
-    
-    if (response.statusCode == 200) {
-      return User.fromJson(jsonDecode(response.body));
-    } else {
-      throw ApiException('Failed to fetch user: ${response.statusCode}');
-    }
-  } on SocketException {
-    throw NetworkException('No internet connection');
-  } on FormatException {
-    throw DataParsingException('Invalid response format');
-  } on ApiException {
-    rethrow;
-  } catch (e) {
-    throw UnknownException('Unexpected error: $e');
-  }
-}
-```
-
-## State Management Patterns
-
-### Provider Pattern
-```dart
-class UserProvider extends ChangeNotifier {
-  User? _user;
-  bool _isLoading = false;
-  String? _error;
-
-  User? get user => _user;
-  bool get isLoading => _isLoading;
-  String? get error => _error;
-
-  Future<void> loadUser(String userId) async {
-    _setLoading(true);
-    _clearError();
-    
-    try {
-      _user = await userRepository.getUser(userId);
-    } catch (e) {
-      _setError(e.toString());
-    } finally {
-      _setLoading(false);
-    }
-  }
-
-  void _setLoading(bool loading) {
-    _isLoading = loading;
-    notifyListeners();
-  }
-
-  void _setError(String error) {
-    _error = error;
-    notifyListeners();
-  }
-
-  void _clearError() {
-    _error = null;
-  }
-}
-```
-
-### BLoC Pattern
-```dart
-// Event
-abstract class UserEvent extends Equatable {
-  const UserEvent();
+// ✅ Very Good pattern - specific exceptions
+class UserNotFoundException implements Exception {
+  const UserNotFoundException(this.userId);
+  final String userId;
   
   @override
-  List<Object> get props => [];
+  String toString() => 'UserNotFoundException: User with ID $userId not found';
 }
 
-class LoadUser extends UserEvent {
-  const LoadUser(this.userId);
+class ApiException implements Exception {
+  const ApiException(this.message, this.statusCode);
+  final String message;
+  final int statusCode;
   
+  @override
+  String toString() => 'ApiException: $message (Status: $statusCode)';
+}
+
+// ✅ Repository implementation
+class UserRepositoryImpl implements UserRepository {
+  @override
+  Future<User> getUser(String id) async {
+    try {
+      final response = await http.get(Uri.parse('/api/users/$id'));
+      
+      if (response.statusCode == 200) {
+        return User.fromJson(jsonDecode(response.body));
+      } else if (response.statusCode == 404) {
+        throw UserNotFoundException(id);
+      } else {
+        throw ApiException('Failed to fetch user', response.statusCode);
+      }
+    } on SocketException {
+      throw NetworkException('No internet connection');
+    } on FormatException {
+      throw DataParsingException('Invalid response format');
+    } on UserNotFoundException {
+      rethrow;
+    } catch (e) {
+      throw UnknownException('Unexpected error: $e');
+    }
+  }
+}
+```
+
+## State Management Patterns (Very Good Analysis)
+
+### BLoC Pattern (Very Good Style)
+```dart
+// Event
+sealed class UserEvent extends Equatable {
+  const UserEvent();
+}
+
+final class UserRequested extends UserEvent {
+  const UserRequested(this.userId);
   final String userId;
   
   @override
   List<Object> get props => [userId];
 }
 
-// State
-abstract class UserState extends Equatable {
-  const UserState();
-  
-  @override
-  List<Object?> get props => [];
-}
-
-class UserInitial extends UserState {}
-
-class UserLoading extends UserState {}
-
-class UserLoaded extends UserState {
-  const UserLoaded(this.user);
-  
+final class UserUpdated extends UserEvent {
+  const UserUpdated(this.user);
   final User user;
   
   @override
   List<Object> get props => [user];
 }
 
-class UserError extends UserState {
-  const UserError(this.message);
-  
-  final String message;
+// State
+sealed class UserState extends Equatable {
+  const UserState();
+}
+
+final class UserInitial extends UserState {
+  @override
+  List<Object> get props => [];
+}
+
+final class UserLoading extends UserState {
+  @override
+  List<Object> get props => [];
+}
+
+final class UserSuccess extends UserState {
+  const UserSuccess(this.user);
+  final User user;
   
   @override
-  List<Object> get props => [message];
+  List<Object> get props => [user];
+}
+
+final class UserFailure extends UserState {
+  const UserFailure(this.error);
+  final String error;
+  
+  @override
+  List<Object> get props => [error];
 }
 
 // BLoC
 class UserBloc extends Bloc<UserEvent, UserState> {
-  UserBloc({required this.userRepository}) : super(UserInitial()) {
-    on<LoadUser>(_onLoadUser);
+  UserBloc({required UserRepository userRepository})
+      : _userRepository = userRepository,
+        super(UserInitial()) {
+    on<UserRequested>(_onUserRequested);
+    on<UserUpdated>(_onUserUpdated);
   }
 
-  final UserRepository userRepository;
+  final UserRepository _userRepository;
 
-  Future<void> _onLoadUser(LoadUser event, Emitter<UserState> emit) async {
+  Future<void> _onUserRequested(
+    UserRequested event,
+    Emitter<UserState> emit,
+  ) async {
     emit(UserLoading());
     
     try {
-      final user = await userRepository.getUser(event.userId);
-      emit(UserLoaded(user));
-    } catch (e) {
-      emit(UserError(e.toString()));
+      final user = await _userRepository.getUser(event.userId);
+      emit(UserSuccess(user));
+    } catch (error) {
+      emit(UserFailure(error.toString()));
+    }
+  }
+
+  Future<void> _onUserUpdated(
+    UserUpdated event,
+    Emitter<UserState> emit,
+  ) async {
+    try {
+      await _userRepository.saveUser(event.user);
+      emit(UserSuccess(event.user));
+    } catch (error) {
+      emit(UserFailure(error.toString()));
     }
   }
 }
 ```
 
-## Documentation Standards
+## Documentation Standards (Very Good Analysis Requirements)
 
 ### Class Documentation
 ```dart
-/// Widget hiển thị thông tin người dùng với avatar và tên.
+/// Repository để quản lý user data.
 /// 
-/// Widget này tự động load avatar từ URL và hiển thị placeholder
-/// nếu load thất bại. Hỗ trợ callback khi user tap vào.
+/// Cung cấp methods để CRUD operations với user entities
+/// thông qua local database và remote API.
 /// 
 /// ## Usage
 /// 
 /// ```dart
-/// UserInfoCard(
-///   user: User(
-///     name: 'John Doe',
-///     email: 'john@example.com',
-///     avatarUrl: 'https://example.com/avatar.jpg',
-///   ),
-///   onTap: () => Navigator.push(context, UserDetailScreen.route()),
-///   showAvatar: true,
-/// )
+/// final repository = UserRepository();
+/// final user = await repository.getUser('user123');
 /// ```
 /// 
 /// ## See also
 /// 
 /// * [User], model class cho user data
-/// * [UserDetailScreen], màn hình chi tiết user
-class UserInfoCard extends StatelessWidget {
-  /// Tạo [UserInfoCard].
+/// * [UserBloc], BLoC để quản lý user state
+abstract class UserRepository {
+  /// Lấy user by ID.
   /// 
-  /// [user] là required và không được null.
-  /// [onTap] là optional callback khi user tap.
-  /// [showAvatar] mặc định là true.
-  const UserInfoCard({
-    super.key,
-    required this.user,
-    this.onTap,
-    this.showAvatar = true,
-  });
-
-  /// User data để hiển thị.
-  final User user;
+  /// Throws [UserNotFoundException] nếu không tìm thấy.
+  /// 
+  /// ## Parameters
+  /// 
+  /// * [id] - User ID cần lấy
+  /// 
+  /// ## Returns
+  /// 
+  /// Future<User> - User data
+  /// 
+  /// ## Throws
+  /// 
+  /// * [UserNotFoundException] - Khi user không tồn tại
+  /// * [ApiException] - Khi API call thất bại
+  Future<User> getUser(String id);
   
-  /// Callback được gọi khi user tap vào card.
-  final VoidCallback? onTap;
-  
-  /// Có hiển thị avatar hay không.
-  final bool showAvatar;
-
-  @override
-  Widget build(BuildContext context) {
-    // Implementation...
-  }
+  /// Lưu hoặc update user.
+  /// 
+  /// ## Parameters
+  /// 
+  /// * [user] - User data cần lưu
+  /// 
+  /// ## Returns
+  /// 
+  /// Future<void> - Hoàn thành khi lưu thành công
+  /// 
+  /// ## Throws
+  /// 
+  /// * [ApiException] - Khi API call thất bại
+  Future<void> saveUser(User user);
 }
 ```
 
@@ -526,6 +630,14 @@ class UserInfoCard extends StatelessWidget {
 /// Validates email address format.
 /// 
 /// Returns `true` if [email] has valid format, `false` otherwise.
+/// 
+/// ## Parameters
+/// 
+/// * [email] - Email address to validate
+/// 
+/// ## Returns
+/// 
+/// bool - True if email is valid, false otherwise
 /// 
 /// ## Examples
 /// 
@@ -538,7 +650,7 @@ bool isValidEmail(String email) {
 }
 ```
 
-## Testing Standards
+## Testing Standards (Very Good Analysis)
 
 ### Unit Test Structure
 ```dart
@@ -556,7 +668,7 @@ void main() {
       test('should return user when API call succeeds', () async {
         // Arrange
         const userId = 'user123';
-        final expectedUser = User(
+        const expectedUser = User(
           id: userId,
           name: 'John Doe',
           email: 'john@example.com',
@@ -573,16 +685,16 @@ void main() {
         verify(() => mockApiClient.getUser(userId)).called(1);
       });
 
-      test('should throw ApiException when API call fails', () async {
+      test('should throw UserNotFoundException when user not found', () async {
         // Arrange
         const userId = 'user123';
         when(() => mockApiClient.getUser(userId))
-            .thenThrow(ApiException('User not found'));
+            .thenThrow(const UserNotFoundException(userId));
 
         // Act & Assert
         expect(
           () => userRepository.getUser(userId),
-          throwsA(isA<ApiException>()),
+          throwsA(isA<UserNotFoundException>()),
         );
       });
     });
@@ -597,7 +709,7 @@ void main() {
     late User testUser;
 
     setUp(() {
-      testUser = User(
+      testUser = const User(
         id: '1',
         name: 'John Doe', 
         email: 'john@example.com',
@@ -645,55 +757,103 @@ void main() {
 }
 ```
 
-## Project Structure
+## Project Structure (Very Good CLI Default)
 
 ```
 lib/
-├── core/                    # Core utilities, constants, themes
-│   ├── constants/
-│   ├── themes/
-│   ├── utils/
-│   └── extensions/
-├── data/                    # Data layer
-│   ├── models/
-│   ├── repositories/
-│   ├── datasources/
-│   └── services/
-├── domain/                  # Business logic
-│   ├── entities/
-│   ├── repositories/
-│   └── usecases/
-├── presentation/            # UI layer
-│   ├── pages/
-│   ├── widgets/
-│   ├── providers/ (hoặc bloc/)
-│   └── routes/
-├── shared/                  # Shared utilities
-│   ├── widgets/
-│   └── utils/
+├── app/                     # App-level configuration
+│   ├── app.dart
+│   └── view/
+│       └── app.dart
+├── counter/                 # Feature modules
+│   ├── counter.dart
+│   ├── cubit/
+│   └── view/
+├── l10n/                    # Localization
+│   └── arb/
 └── main.dart
+```
+
+## Development Workflow
+
+### 1. Pre-commit setup với very_good_cli
+```bash
+# Cài lefthook (đã include trong very_good_cli)
+very_good packages get
+
+# lefthook.yml sẽ tự động được tạo với:
+```
+
+```yaml
+# lefthook.yml (auto-generated)
+pre-commit:
+  commands:
+    analyze:
+      glob: "*.dart"
+      run: flutter analyze --fatal-infos
+    format:
+      glob: "*.dart"  
+      run: dart format --set-exit-if-changed {staged_files}
+    test:
+      glob: "*.dart"
+      run: flutter test --optimization --coverage --test-randomize-ordering-seed random
+```
+
+### 2. Scripts commands
+```bash
+# Format code
+dart format .
+
+# Analyze with very_good_analysis
+flutter analyze --fatal-infos
+
+# Run tests với coverage
+flutter test --coverage --test-randomize-ordering-seed random
+
+# Generate coverage report
+genhtml coverage/lcov.info -o coverage/html
+```
+
+### 3. VS Code settings cho Very Good
+```json
+{
+  "dart.lineLength": 80,  // Very Good standard
+  "dart.enableSdkFormatter": true,
+  "editor.formatOnSave": true,
+  "editor.rulers": [80],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": true,
+    "source.organizeImports": true
+  },
+  "[dart]": {
+    "editor.formatOnSave": true,
+    "editor.selectionHighlight": false
+  }
+}
 ```
 
 ## Code Review Checklist
 
-- [ ] Naming conventions được tuân thủ
+- [ ] Naming conventions được tuân thủ (Very Good Analysis)
 - [ ] Code được format đúng (dart format)
 - [ ] Không có unused imports hoặc variables
-- [ ] Sử dụng const constructors khi có thể
-- [ ] Error handling được implement đầy đủ
+- [ ] Sử dụng const constructors khi có thể (bắt buộc)
+- [ ] Error handling được implement đầy đủ với specific exceptions
 - [ ] Null safety được xử lý đúng cách
-- [ ] Documentation đầy đủ cho public APIs
+- [ ] Documentation đầy đủ cho public APIs (bắt buộc)
 - [ ] Unit tests cover các use cases chính
 - [ ] Performance considerations được xem xét
 - [ ] UI responsive trên các screen sizes khác nhau
+- [ ] Tuân thủ very_good_analysis rules (130+ rules)
 
 ## Tooling
 
 ### Recommended packages
 ```yaml
 dev_dependencies:
-  flutter_lints: ^4.0.0      # Official linting rules
-  very_good_analysis: ^9.0.0 # Stricter linting rules
+  very_good_analysis: ^9.0.0  # Stricter linting rules
+  mocktail: ^1.0.3            # Mocking for tests
+  test: ^1.25.2               # Testing framework
 ```
 
 ### Analysis options
@@ -705,15 +865,45 @@ analyzer:
   exclude:
     - "**/*.g.dart"
     - "**/*.freezed.dart"
+    - "**/*.mocks.dart"
+    - "**/firebase_options.dart"
+    - "build/**"
+    - "coverage/**"
   
+  language:
+    strict-casts: true
+    strict-inference: true
+    strict-raw-types: true
+
+# Very Good Analysis đã include hầu hết rules tốt nhất
+# Chỉ override khi thực sự cần thiết
 linter:
   rules:
-    # Additional custom rules
-    avoid_print: true
-    prefer_const_constructors: true
-    prefer_const_literals_to_create_immutables: true
-    sort_constructors_first: true
-    sort_unnamed_constructors_first: true
+    # Override rules nếu cần (không khuyến khích)
+    # lines_longer_than_80_chars: false  # Nếu cần dòng dài hơn
+```
+
+## Integration với Gemini Code Assist
+
+### Updated config.yaml
+```yaml
+have_fun: false
+code_review:
+  disable: false
+  comment_severity_threshold: HIGH  # Stricter vì đã có very_good_analysis
+  max_review_comments: 10
+pull_request_opened:
+  help: false
+  summary: true
+  code_review: true
+
+ignore_patterns:
+  - "**/*.g.dart"
+  - "**/*.freezed.dart"
+  - "**/*.mocks.dart"
+  - "build/**"
+  - "coverage/**"
+  - "test/.test_coverage.dart"
 ```
 
 ## Flutter-Specific Best Practices
@@ -754,9 +944,9 @@ Container(
 LayoutBuilder(
   builder: (context, constraints) {
     if (constraints.maxWidth > 600) {
-      return DesktopLayout();
+      return const DesktopLayout();
     } else {
-      return MobileLayout();
+      return const MobileLayout();
     }
   },
 )
@@ -768,6 +958,9 @@ LayoutBuilder(
 ```dart
 // ✅ Tốt - Validate user input
 class UserInputValidator {
+  /// Validates email address format.
+  /// 
+  /// Returns `true` if [email] has valid format, `false` otherwise.
   static String? validateEmail(String? email) {
     if (email == null || email.isEmpty) {
       return 'Email is required';
@@ -794,7 +987,7 @@ await storage.write(key: 'auth_token', value: token);
 // ✅ Tốt - Thêm semantic labels cho accessibility
 IconButton(
   onPressed: () {},
-  icon: Icon(Icons.close),
+  icon: const Icon(Icons.close),
   tooltip: 'Close dialog',
   semanticsLabel: 'Close dialog button',
 )
@@ -824,7 +1017,7 @@ Gemini Code Assist sẽ tự động review code theo 5 categories chính:
 
 ## Complete Example
 
-The following example demonstrates a complete Flutter application that follows all the principles outlined in this style guide:
+The following example demonstrates a complete Flutter application that follows all the Very Good Analysis principles outlined in this style guide:
 
 ```dart
 /// Main application entry point.
@@ -903,8 +1096,8 @@ class _UserListBody extends StatelessWidget {
         return switch (state) {
           UserInitial() => const _LoadingWidget(),
           UserLoading() => const _LoadingWidget(),
-          UserLoaded() => _UserListView(users: state.users),
-          UserError() => _ErrorWidget(message: state.message),
+          UserSuccess() => _UserListView(users: state.users),
+          UserFailure() => _ErrorWidget(message: state.error),
         };
       },
     );
@@ -1085,7 +1278,7 @@ class _AddUserDialogState extends State<AddUserDialog> {
         avatarUrl: 'https://via.placeholder.com/150',
       );
       
-      context.read<UserBloc>().add(AddUser(user));
+      context.read<UserBloc>().add(UserUpdated(user));
       Navigator.of(context).pop();
     }
   }
