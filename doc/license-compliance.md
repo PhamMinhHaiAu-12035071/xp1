@@ -1,15 +1,15 @@
 # License Compliance Guide
 
-Hướng dẫn sử dụng hệ thống kiểm tra license để đảm bảo chỉ sử dụng các
-license an toàn về mặt pháp lý trong dự án Flutter.
+A comprehensive guide for using the license checking system to ensure
+only legally safe licenses are used in Flutter projects.
 
-## 🎯 Mục tiêu
+## 🎯 Objectives
 
-- **Chỉ sử dụng permissive licenses** (MIT, BSD, Apache)
-- **Tránh copyleft licenses** (GPL, LGPL, AGPL)
-- **Phát hiện unknown/problematic licenses**
-- **Tự động enforcement** qua git hooks
-- **Business-safe compliance** cho commercial use
+- **Use only permissive licenses** (MIT, BSD, Apache)
+- **Avoid copyleft licenses** (GPL, LGPL, AGPL)
+- **Detect unknown/problematic licenses**
+- **Automated enforcement** through git hooks
+- **Business-safe compliance** for commercial use
 
 ## 🔐 License Categories
 
@@ -76,16 +76,16 @@ make license-ci            # CI/CD friendly check
 
 ### Pre-Commit Hook
 
-- **Trigger**: Khi `pubspec.yaml` thay đổi
-- **Action**: Quick license check cho main dependencies
+- **Trigger**: When `pubspec.yaml` changes
+- **Action**: Quick license check for main dependencies
 - **Command**: `make license-validate-main`
 
 ### Pre-Push Hook
 
-- **Trigger**: Trước mỗi lần push
+- **Trigger**: Before each push
 - **Action**: Full license compliance check
 - **Command**: `make license-check`
-- **Behavior**: Block push nếu có license issues
+- **Behavior**: Block push if there are license issues
 
 ### Manual License Management
 
@@ -220,13 +220,13 @@ npm test -- test/license-integration.bats
 
 ## 🎯 Benefits
 
-| Benefit                   | Description                                           |
-| ------------------------- | ----------------------------------------------------- |
-| **Legal Safety**          | Chỉ sử dụng permissive licenses, tránh rủi ro pháp lý |
-| **Automated Enforcement** | Tự động block commits/pushes vi phạm policy           |
-| **Early Detection**       | Phát hiện license issues ngay khi add dependencies    |
-| **Documentation**         | License report tracking theo thời gian                |
-| **Team Compliance**       | Toàn team follow cùng license policy                  |
+| Benefit                   | Description                                         |
+| ------------------------- | --------------------------------------------------- |
+| **Legal Safety**          | Use only permissive licenses, avoid legal risks     |
+| **Automated Enforcement** | Automatically block commits/pushes violating policy |
+| **Early Detection**       | Detect license issues immediately when adding deps  |
+| **Documentation**         | License report tracking over time                   |
+| **Team Compliance**       | Entire team follows the same license policy         |
 
 ## 📚 Resources
 
@@ -237,5 +237,5 @@ npm test -- test/license-integration.bats
 
 ---
 
-**⚠️ Important**: Luôn tham khảo ý kiến legal team cho business-critical
-decisions về licensing, đặc biệt khi có doubts về specific licenses.
+**⚠️ Important**: Always consult with the legal team for business-critical
+licensing decisions, especially when there are doubts about specific licenses.
