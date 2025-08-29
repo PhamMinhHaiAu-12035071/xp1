@@ -32,7 +32,7 @@ EOF
 
     # Assert
     assert_success
-    assert_output --partial "✅ All licenses are business-safe"
+    assert_output --partial "🎉 All packages use business-safe licenses!"
 }
 
 @test "should fail on GPL licenses" {
@@ -44,7 +44,7 @@ EOF
 
     # Assert
     assert_failure
-    assert_output --partial "❌ Found forbidden licenses"
+    assert_output --partial "🚨 LICENSE COMPLIANCE FAILURE"
 }
 
 @test "should fail on unknown licenses" {
@@ -56,7 +56,7 @@ EOF
 
     # Assert
     assert_failure
-    assert_output --partial "❌ Found forbidden licenses"
+    assert_output --partial "🚨 LICENSE COMPLIANCE FAILURE"
 }
 
 @test "should pass license audit with detailed report" {
@@ -64,11 +64,11 @@ EOF
     create_mock_command "very_good" "✓ Retrieved 3 licenses: MIT (2), BSD-3-Clause (1)"
 
     # Act
-    run make license-audit
+    run make license-report
 
     # Assert
     assert_success
-    assert_output --partial "📊 License audit completed"
+    assert_output --partial "📊 Generating License Report"
 }
 
 @test "should check main dependencies only" {

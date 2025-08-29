@@ -25,12 +25,12 @@ teardown() {
     # Arrange - Mock GPL dependency
     create_mock_command "very_good" "❌ 1 dependency has banned license: some_package (GPL-3.0)" 1
 
-    # Act
-    run lefthook run pre-push
+    # Act - Test license-check directly instead of through lefthook to avoid recursion
+    run make license-check
 
     # Assert
     assert_failure
-    assert_output --partial "LICENSE COMPLIANCE FAILURE"
+    assert_output --partial "🚨 LICENSE COMPLIANCE FAILURE"
 }
 
 @test "should generate license report file" {
