@@ -125,7 +125,7 @@ void main(List<String> args) {
       } else {
         Console.error('❌ Cannot determine PR title');
         Console.error(
-          '💡 Usage: dart run tools/validate_pr_title.dart '
+          '💡 Usage: dart run tool/validate_pr_title.dart '
           '<pr_title>',
         );
         exit(1);
@@ -133,7 +133,7 @@ void main(List<String> args) {
     } on Exception catch (e) {
       Console.error('❌ Cannot determine PR title: $e');
       Console.error(
-        '💡 Usage: dart run tools/validate_pr_title.dart '
+        '💡 Usage: dart run tool/validate_pr_title.dart '
         '<pr_title>',
       );
       exit(1);

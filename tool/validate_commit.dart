@@ -92,7 +92,7 @@ void main(List<String> args) {
   if (args.isEmpty) {
     Console.error('❌ Missing commit message or file path');
     Console.error(
-      '💡 Usage: dart run tools/validate_commit.dart <message_or_file>',
+      '💡 Usage: dart run tool/validate_commit.dart <message_or_file>',
     );
     exit(1);
   }

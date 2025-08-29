@@ -30,11 +30,11 @@ scripts:
 
   # Team setup commands
   setup: "flutter pub get && lefthook install"
-  setup-full: "flutter clean && flutter pub get && lefthook install && dart run tools/validate_commit.dart --help || echo 'Commit validator ready'"
+  setup-full: "flutter clean && flutter pub get && lefthook install && dart run tool/validate_commit.dart --help || echo 'Commit validator ready'"
 
   # Git hooks management
   hooks-install: "lefthook install"
   hooks-uninstall: "lefthook uninstall"
 
   # Test commit validation
-  test-commit-validation: "echo 'feat(test): add validation example' > .tmp/test_commit && dart run tools/validate_commit.dart .tmp/test_commit && rm .tmp/test_commit"
+  test-commit-validation: "echo 'feat(test): add validation example' > .tmp/test_commit && dart run tool/validate_commit.dart .tmp/test_commit && rm .tmp/test_commit"

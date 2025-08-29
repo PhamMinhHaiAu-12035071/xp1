@@ -49,4 +49,4 @@ pre-push:
 commit-msg:
   commands:
     conventional-commit:
-      run: fvm dart run tools/validate_commit.dart {1}
+      run: fvm dart run tool/validate_commit.dart {1}
