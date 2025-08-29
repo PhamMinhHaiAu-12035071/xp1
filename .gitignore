@@ -8,6 +8,9 @@
 .buildlog/
 .history
 .svn/
+
+# License reports (generated files)
+license-report.txt
 migrate_working_dir/
 
 # IntelliJ related
@@ -85,6 +88,10 @@ unlinked_spec.ds
 
 # Coverage
 coverage/
+
+# BATS testing framework temporary files  
+test/tmp/
+*.bats.tmp
 
 # Submodules
 packages/**/pubspec.lock

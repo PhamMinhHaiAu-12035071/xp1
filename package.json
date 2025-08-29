@@ -10,7 +10,16 @@
   },
   "scripts": {
     "prepare": "lefthook install",
-    "test": "echo \"Error: no test specified\" && exit 1"
+    "test": "bats test/",
+    "test:watch": "find test/ scripts/ -name '*.bats' -o -name '*.sh' | entr -c npm test",
+    "test:semantic": "bats test/semantic-check.bats",
+    "test:flutter": "bats test/flutter-ci.bats",
+    "test:spell": "bats test/spell-check.bats",
+    "test:local-ci": "bats test/local-ci.bats",
+    "test:license": "bats test/license-check.bats test/license-integration.bats",
+    "test:edge-cases": "bats test/license-edge-cases.bats",
+    "test:debug": "BATS_DEBUG=1 bats test/",
+    "test:perf": "time npm test"
   },
   "repository": {
     "type": "git",
@@ -20,7 +29,11 @@
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "lefthook": "^1.8.0",
-    "cspell": "^8.0.0"
+    "bats": "1.12.0",
+    "bats-assert": "github:ztombol/bats-assert#9f88b42",
+    "bats-file": "github:bats-core/bats-file#c0bb8ef",
+    "bats-support": "github:ztombol/bats-support#004e707",
+    "cspell": "8.0.0",
+    "lefthook": "1.8.0"
   }
 }
