@@ -18,8 +18,17 @@ class Console {
 /// Simple and focused commit message validator
 class CommitValidator {
   static const allowedTypes = [
-    'feat', 'fix', 'docs', 'style', 'refactor',
-    'perf', 'test', 'chore', 'ci', 'build', 'revert'
+    'feat',
+    'fix',
+    'docs',
+    'style',
+    'refactor',
+    'perf',
+    'test',
+    'chore',
+    'ci',
+    'build',
+    'revert',
   ];
 
   static final _commitPattern = RegExp(
@@ -30,7 +39,7 @@ class CommitValidator {
   /// Validates commit message according to Conventional Commits spec
   static bool validate(String commitMessage) {
     // Skip validation for merge/revert commits
-    if (commitMessage.startsWith('Merge ') || 
+    if (commitMessage.startsWith('Merge ') ||
         commitMessage.startsWith('Revert ')) {
       Console.success('✅ Special commit type detected, skipping validation');
       return true;
@@ -52,7 +61,7 @@ class CommitValidator {
     if (parts.length >= 2) {
       final typeScope = parts[0];
       final description = parts.sublist(1).join(': ');
-      
+
       final scopeMatch = RegExp(r'(\w+)(\((.+)\))?').firstMatch(typeScope);
       if (scopeMatch != null) {
         Console.info('   Type: ${scopeMatch.group(1)}');
