@@ -8,6 +8,15 @@
 
 ## Getting Started 🚀
 
+### Prerequisites
+
+Before running this project, ensure you have the following system dependencies installed:
+
+- **lcov**: Required for generating HTML coverage reports
+  - **macOS**: `brew install lcov`
+  - **Ubuntu/Debian**: `sudo apt-get install lcov`
+  - **Windows**: Install via [Chocolatey](https://chocolatey.org/) with `choco install lcov` or download from [lcov releases](https://github.com/linux-test-project/lcov/releases)
+
 This project contains 3 flavors:
 
 - development

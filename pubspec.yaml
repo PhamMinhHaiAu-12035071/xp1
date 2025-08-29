@@ -1,7 +1,8 @@
 name: xp1
 description: A Very Good Project created by Very Good CLI.
 version: 1.0.0+1
-publish_to: none
+homepage: https://github.com/PhamMinhHaiAu-12035071/xp1
+repository: https://github.com/PhamMinhHaiAu-12035071/xp1.git
 
 environment:
   sdk: ^3.8.0
@@ -17,9 +18,11 @@ dependencies:
 
 dev_dependencies:
   bloc_test: ^10.0.0
+  conventional_commit: ^0.6.1+1
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4
+  rps: ^0.9.1
   very_good_analysis: ^9.0.0
 
 flutter:

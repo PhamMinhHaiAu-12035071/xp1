@@ -1,0 +1,238 @@
+---
+alwaysApply: true
+description: Coding style rules for maintaining 80-character line limits and consistent formatting
+---
+
+# Coding Style Guidelines
+
+## Line Length Rules
+
+- **STRICT 80-character line limit** - All code lines must not exceed 80 characters
+- Break long lines appropriately to maintain readability
+- Use proper indentation when breaking lines
+
+## Line Breaking Strategies
+
+### Dart/Flutter Specific
+
+```dart
+// BAD: Line too long
+/// The main application widget that sets up the Material app with theme and localization.
+
+// GOOD: Properly broken
+/// The main application widget that sets up the Material app with theme and
+/// localization.
+
+// BAD: Long parameter lists
+Widget build(BuildContext context, String title, bool isEnabled, Color backgroundColor) {
+
+// GOOD: Break parameters
+Widget build(
+  BuildContext context,
+  String title,
+  bool isEnabled,
+  Color backgroundColor,
+) {
+
+// BAD: Long widget trees
+return Container(child: Column(children: [Text('Hello'), Button('Click me')]));
+
+// GOOD: Break widget trees
+return Container(
+  child: Column(
+    children: [
+      Text('Hello'),
+      Button('Click me'),
+    ],
+  ),
+);
+```
+
+### General Rules
+
+- Break after commas in parameter lists
+- Break before operators when splitting expressions
+- Align related elements vertically when possible
+- Use hanging indents for continuation lines
+- Keep related code together on the same line when under 80 chars
+
+### Documentation Comments
+
+- Break long documentation comments across multiple lines
+- Use `///` on each line for Dart documentation
+- Aim for ~70 characters per line in comments to allow for indentation
+
+## Public Member Documentation Rules
+
+**MANDATORY**: All public members MUST have documentation to avoid linting errors.
+
+### Required Documentation for:
+
+1. **Public Classes**:
+
+```dart
+/// A cubit that manages a counter state with increment and decrement
+/// operations.
+class CounterCubit extends Cubit<int> {
+```
+
+2. **Public Constructors**:
+
+```dart
+/// Creates a CounterCubit with initial state of 0.
+CounterCubit() : super(0);
+```
+
+3. **Public Methods**:
+
+```dart
+/// Increments the counter value by 1.
+void increment() => emit(state + 1);
+```
+
+4. **Public Getters/Properties**:
+
+```dart
+/// Gets the AppLocalizations instance for this context.
+AppLocalizations get l10n => AppLocalizations.of(this);
+```
+
+5. **Extensions**:
+
+```dart
+/// Extension on BuildContext to provide convenient access to localization.
+extension AppLocalizationsX on BuildContext {
+```
+
+### Documentation Best Practices:
+
+- Start with a verb (Creates, Gets, Manages, Displays, etc.)
+- Be concise but descriptive
+- Explain what the member does, not how it works
+- Use present tense for classes/properties, imperative for methods
+- Break long descriptions across multiple lines within 80 chars
+- Document the purpose, not the implementation details
+
+### Common Documentation Patterns:
+
+- Classes: "A [type] that [purpose]"
+- Constructors: "Creates a [ClassName] [with/that] [details]"
+- Methods: "[Action] [object/state] [details]"
+- Getters: "Gets/Returns the [property] [details]"
+- Extensions: "Extension on [Type] to [purpose]"
+
+### Import Statements
+
+- Keep imports on single lines when possible
+- Use `show` and `hide` clauses on new lines if needed
+
+## Formatting Rules
+
+- Always use `editor.formatOnSave: true`
+- Enable `editor.rulers: [80]` for visual guidance
+- Use `source.organizeImports` and `source.fixAll` on save
+- Follow language-specific formatting conventions
+
+## Tools Configuration
+
+Ensure your [.vscode/settings.json](mdc:.vscode/settings.json) includes:
+
+```json
+{
+  "dart.lineLength": 80,
+  "editor.formatOnSave": true,
+  "editor.rulers": [80],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  }
+}
+```
+
+## Console Output & Linter Warnings
+
+### Never Use Band-Aid Solutions
+
+**NEVER** suppress linter warnings with ignore directives unless absolutely necessary:
+
+```dart
+// ❌ BAD: Band-aid solution
+// ignore_for_file: avoid_print
+
+// ❌ BAD: Lazy fix
+// ignore: avoid_print
+print('Some message');
+```
+
+### Proper Console Output for CLI Tools
+
+The `avoid_print` warning exists because `print()` is inappropriate for production code. For CLI tools, implement proper console abstraction:
+
+```dart
+// ✅ GOOD: Proper console abstraction
+/// Console output helper for CLI tools
+class Console {
+  /// Write success message to stdout
+  static void success(String message) {
+    stdout.writeln(message);
+  }
+
+  /// Write info message to stdout
+  static void info(String message) {
+    stdout.writeln(message);
+  }
+
+  /// Write error message to stderr
+  static void error(String message) {
+    stderr.writeln(message);
+  }
+
+  /// Write warning message to stderr
+  static void warning(String message) {
+    stderr.writeln(message);
+  }
+}
+```
+
+### Usage Examples
+
+```dart
+// ❌ BAD: Direct print usage
+print('✅ Validation passed');
+print('❌ Error occurred');
+
+// ✅ GOOD: Proper stream separation
+Console.success('✅ Validation passed');
+Console.error('❌ Error occurred');
+```
+
+### Benefits of Proper Console Handling
+
+1. **Stream Separation**: Errors go to stderr, success to stdout (Unix philosophy)
+2. **Better Debugging**: Can redirect streams independently
+3. **Clear Intent**: `Console.error()` vs `Console.success()` - obvious semantics
+4. **Zero Linter Warnings**: Clean code following Dart standards
+5. **Maintainable**: Centralized console output logic
+
+### When Print() Is Acceptable
+
+Only in these specific cases:
+
+- Debug-only code that will be removed
+- Temporary development logging
+- Example/demo code not intended for production
+
+Even then, prefer proper logging frameworks or debug utilities.
+
+### Linus Philosophy Applied
+
+> "Bad programmers worry about the code. Good programmers worry about data structures and their relationships."
+
+Don't paper over problems with ignore directives. Fix the root cause:
+
+1. **Identify**: Why is the linter complaining?
+2. **Design**: What's the proper abstraction?
+3. **Implement**: Clean solution that eliminates the issue
+4. **Verify**: No warnings, better architecture
+
+Remember: **Readability and consistency are more important than cramming code into fewer lines.**

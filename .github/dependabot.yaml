@@ -8,3 +8,9 @@ updates:
     directory: "/"
     schedule:
       interval: "daily"
+  - package-ecosystem: "npm"
+    directory: "/"
+    schedule:
+      interval: "weekly"
+    # Pin exact versions for security
+    versioning-strategy: "lockfile-only"

@@ -1,0 +1,52 @@
+# lefthook.yml
+# Official git hooks only - custom commands moved to scripts/ and Makefile
+
+# Official git hooks with scripts + Makefile integration
+pre-commit:
+  parallel: true
+  commands:
+    # Format and fix code first (staged files only)
+    rps-pre-commit:
+      glob: "*.dart"
+      run: fvm flutter pub run rps pre-commit
+      stage_fixed: true
+    # Quick spell check on staged files
+    spell-check-quick:
+      glob: "*.md"
+      run: npx cspell --config cspell.json {staged_files} --no-progress || echo "⚠️ Fix spelling issues"
+    # Quick format check (fast)
+    format-check:
+      glob: "*.dart"
+      run: fvm dart format lib/ test/ --set-exit-if-changed --output=none
+    # Quick analysis (staged files only)
+    analyze-quick:
+      glob: "*.dart"
+      run: fvm flutter analyze --fatal-infos
+    # Quick license check cho staged changes
+    license-quick:
+      glob: "pubspec.yaml"
+      run: |
+        if git diff --cached --name-only | grep -q "pubspec.yaml"; then
+          echo "📦 pubspec.yaml changed, checking licenses..."
+          make license-validate-main
+        else
+          echo "📦 No pubspec.yaml changes, skipping license check"
+        fi
+
+pre-push:
+  parallel: false
+  commands:
+    # Run bash script tests first (TDD validation)
+    bash-script-tests:
+      run: npm test
+    # Full license compliance check trước khi push
+    license-compliance:
+      run: make license-check
+    # Run complete CI pipeline via Makefile
+    full-ci-pipeline:
+      run: make local-ci
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: fvm dart run tool/validate_commit.dart {1}
