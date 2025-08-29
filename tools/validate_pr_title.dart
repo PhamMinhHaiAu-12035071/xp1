@@ -33,7 +33,7 @@ class PrTitleValidator {
 
   static final _prTitlePattern = RegExp(
     '^(${allowedTypes.join('|')})'
-    r'(\([^)]+\))!?: .{3,72}$',
+    r'(\([^)]+\))?!?: .{3,72}$',
   );
 
   /// Validates PR title according to Conventional Commits spec
@@ -107,7 +107,14 @@ void main(List<String> args) {
         if (branchName.contains('/')) {
           final parts = branchName.split('/');
           if (parts.length >= 2) {
-            prTitle = parts.sublist(1).join(' ').replaceAll('-', ' ');
+            final type = parts[0];
+            final description = parts.sublist(1).join(' ').replaceAll('-', ' ');
+            // Check if type is valid semantic type
+            if (PrTitleValidator.allowedTypes.contains(type)) {
+              prTitle = '$type: $description';
+            } else {
+              prTitle = parts.sublist(1).join(' ').replaceAll('-', ' ');
+            }
           } else {
             prTitle = branchName.replaceAll('-', ' ');
           }
