@@ -39,11 +39,11 @@ local-ci:
   parallel: false
   commands:
     1-semantic:
-      run: lefthook run semantic-check
+      run: npx lefthook run semantic-check
     2-flutter:
-      run: lefthook run flutter-ci
+      run: npx lefthook run flutter-ci
     3-spell:
-      run: lefthook run spell-check
+      run: npx lefthook run spell-check
 
 # Git hooks (tự động chạy) with comprehensive CI integration
 pre-commit:
@@ -71,11 +71,11 @@ pre-push:
   commands:
     # Full CI pipeline before push (comprehensive)
     1-semantic-full:
-      run: lefthook run semantic-check
+      run: npx lefthook run semantic-check
     2-flutter-ci-full:
-      run: lefthook run flutter-ci  
+      run: npx lefthook run flutter-ci  
     3-spell-check-full:
-      run: lefthook run spell-check
+      run: npx lefthook run spell-check
 
 commit-msg:
   commands:
