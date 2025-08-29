@@ -103,6 +103,6 @@ EOF
     
     # Assert
     assert_success
-    assert_mock_called_with "fvm" "dart run tools/validate_commit.dart"
-    assert_mock_called_with "fvm" "dart run tools/validate_pr_title.dart"
+    assert_mock_called_with "fvm" "dart run tool/validate_commit.dart"
+    assert_mock_called_with "fvm" "dart run tool/validate_pr_title.dart"
 }
