@@ -1,51 +1,7 @@
 # lefthook.yml
-# GitHub Actions equivalent jobs as lefthook scripts
+# Official git hooks only - custom commands moved to scripts/ and Makefile
 
-# Job 1: semantic-pull-request equivalent
-semantic-check:
-  commands:
-    validate-commit:
-      run: fvm dart run tools/validate_commit.dart "$(git log -1 --pretty=%B)"
-    validate-pr-title:
-      run: fvm dart run tools/validate_pr_title.dart
-
-# Job 2: build (flutter package) equivalent
-flutter-ci:
-  parallel: true
-  commands:
-    dependencies:
-      run: fvm flutter pub get
-    analyze:
-      run: fvm flutter analyze --fatal-infos
-    format-check:
-      run: fvm dart format lib/ test/ --set-exit-if-changed --output=none
-    test:
-      run: fvm flutter test
-    publish-check:
-      run: fvm flutter pub publish --dry-run
-
-# Job 3: spell-check equivalent
-spell-check:
-  commands:
-    install-cspell:
-      run: npm list cspell || npm install cspell
-    check-markdown:
-      run: npx cspell "**/*.md" --no-progress --config cspell.json
-    check-docs:
-      run: npx cspell "lib/**/*.dart" "test/**/*.dart" --no-progress --config cspell.json
-
-# Combined CI check (all 3 jobs)
-local-ci:
-  parallel: false
-  commands:
-    1-semantic:
-      run: npx lefthook run semantic-check
-    2-flutter:
-      run: npx lefthook run flutter-ci
-    3-spell:
-      run: npx lefthook run spell-check
-
-# Git hooks (tự động chạy) with comprehensive CI integration
+# Official git hooks with scripts + Makefile integration
 pre-commit:
   parallel: true
   commands:
@@ -54,9 +10,10 @@ pre-commit:
       glob: "*.dart"
       run: fvm flutter pub run rps pre-commit
       stage_fixed: true
-    # Quick semantic checks
-    validate-commit-staged:
-      run: fvm dart run tools/validate_commit.dart "$(git log -1 --pretty=%B)" || echo "⚠️  Fix commit message format"
+    # Quick spell check on staged files 
+    spell-check-quick:
+      glob: "*.md"
+      run: npx cspell --config cspell.json {staged_files} --no-progress || echo "⚠️ Fix spelling issues"
     # Quick format check (fast)
     format-check:
       glob: "*.dart"
@@ -67,15 +24,10 @@ pre-commit:
       run: fvm flutter analyze --fatal-infos
 
 pre-push:
-  parallel: false
   commands:
-    # Full CI pipeline before push (comprehensive)
-    1-semantic-full:
-      run: npx lefthook run semantic-check
-    2-flutter-ci-full:
-      run: npx lefthook run flutter-ci  
-    3-spell-check-full:
-      run: npx lefthook run spell-check
+    # Run complete CI pipeline via Makefile
+    full-ci-pipeline:
+      run: make local-ci
 
 commit-msg:
   commands:
