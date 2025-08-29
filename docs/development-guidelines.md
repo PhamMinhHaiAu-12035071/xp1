@@ -9,6 +9,7 @@ This document outlines the development standards, best practices, and guidelines
 ### BLoC Pattern Implementation
 
 #### Cubit Structure
+
 ```dart
 // ✅ Good: Clean cubit implementation
 class CounterCubit extends Cubit<int> {
@@ -34,6 +35,7 @@ class BadCubit extends Cubit<int> {
 ```
 
 #### Widget Integration
+
 ```dart
 // ✅ Good: Proper BLoC provider usage
 class CounterPage extends StatelessWidget {
@@ -63,6 +65,7 @@ class CounterText extends StatelessWidget {
 ### Feature Organization
 
 #### Directory Structure
+
 ```
 feature_name/
 ├── cubit/
@@ -79,6 +82,7 @@ feature_name/
 ```
 
 #### Barrel Exports
+
 ```dart
 // ✅ Good: Clean barrel export
 export 'cubit/counter_cubit.dart';
@@ -90,6 +94,7 @@ export 'view/counter_page.dart';
 ### Naming Conventions
 
 #### Classes and Files
+
 ```dart
 // ✅ Good: PascalCase for classes
 class CounterCubit extends Cubit<int> {}
@@ -101,6 +106,7 @@ counter_page.dart
 ```
 
 #### Variables and Methods
+
 ```dart
 // ✅ Good: camelCase for variables and methods
 final counterValue = 0;
@@ -111,6 +117,7 @@ final counter_value = 0;
 ```
 
 #### Constants
+
 ```dart
 // ✅ Good: lowerCamelCase for constants (Very Good Analysis standard)
 class AppConstants {
@@ -128,6 +135,7 @@ static const int MAX_COUNTER_VALUE = 100;
 ### Code Formatting
 
 #### Import Organization
+
 ```dart
 // ✅ Good: Organized imports
 import 'dart:async';
@@ -142,6 +150,7 @@ import 'package:xp1/l10n/l10n.dart';
 ```
 
 #### Widget Structure
+
 ```dart
 // ✅ Good: Clean widget structure
 class CounterView extends StatelessWidget {
@@ -150,7 +159,7 @@ class CounterView extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.counterAppBarTitle),
@@ -183,6 +192,7 @@ class CounterView extends StatelessWidget {
 ### Unit Testing (Very Good Analysis Standards)
 
 #### Cubit Testing
+
 ```dart
 // ✅ Good: Comprehensive cubit tests with proper structure
 void main() {
@@ -228,6 +238,7 @@ void main() {
 ```
 
 #### Repository Testing
+
 ```dart
 void main() {
   group('UserRepository', () {
@@ -248,7 +259,7 @@ void main() {
           name: 'John Doe',
           email: 'john@example.com',
         );
-        
+
         when(() => mockApiClient.getUser(userId))
             .thenAnswer((_) async => expectedUser);
 
@@ -278,22 +289,23 @@ void main() {
 ```
 
 #### Widget Testing
+
 ```dart
 // ✅ Good: Widget test with proper setup
 void main() {
   group('CounterPage', () {
     testWidgets('renders CounterView', (tester) async {
       await tester.pumpWidget(const App());
-      
+
       expect(find.byType(CounterView), findsOneWidget);
     });
 
     testWidgets('increments counter when + button is pressed', (tester) async {
       await tester.pumpWidget(const App());
-      
+
       await tester.tap(find.byIcon(Icons.add));
       await tester.pump();
-      
+
       expect(find.text('1'), findsOneWidget);
     });
   });
@@ -301,6 +313,7 @@ void main() {
 ```
 
 ### Test Organization
+
 ```
 test/
 ├── feature_name/
@@ -318,6 +331,7 @@ test/
 ### Adding New Strings
 
 #### ARB File Structure
+
 ```json
 // ✅ Good: Proper ARB structure
 {
@@ -334,6 +348,7 @@ test/
 ```
 
 #### Usage in Code
+
 ```dart
 // ✅ Good: Proper l10n usage
 class CounterPage extends StatelessWidget {
@@ -342,7 +357,7 @@ class CounterPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final l10n = context.l10n;
-    
+
     return Scaffold(
       appBar: AppBar(
         title: Text(l10n.counterAppBarTitle),
@@ -358,6 +373,7 @@ class CounterPage extends StatelessWidget {
 ### Git Workflow
 
 #### Branch Naming
+
 ```bash
 # ✅ Good: Descriptive branch names
 feature/add-user-authentication
@@ -366,6 +382,7 @@ hotfix/critical-security-patch
 ```
 
 #### Commit Messages
+
 ```bash
 # ✅ Good: Conventional commit format
 feat: add user authentication feature
@@ -378,27 +395,29 @@ refactor: improve widget structure
 ### Code Review Checklist (Very Good Analysis Standards)
 
 #### Before Submitting PR
-- [ ] Naming conventions được tuân thủ (Very Good Analysis)
-- [ ] Code được format đúng (dart format)
-- [ ] Không có unused imports hoặc variables
-- [ ] Sử dụng const constructors khi có thể (bắt buộc)
-- [ ] Error handling được implement đầy đủ với specific exceptions
-- [ ] Null safety được xử lý đúng cách
-- [ ] Documentation đầy đủ cho public APIs (bắt buộc)
-- [ ] Unit tests cover các use cases chính
-- [ ] Performance considerations được xem xét
-- [ ] UI responsive trên các screen sizes khác nhau
-- [ ] Tuân thủ very_good_analysis rules (130+ rules)
+
+- [ ] Naming conventions followed (Very Good Analysis)
+- [ ] Code properly formatted (dart format)
+- [ ] No unused imports or variables
+- [ ] Use const constructors when possible (required)
+- [ ] Error handling implemented fully with specific exceptions
+- [ ] Null safety handled properly
+- [ ] Documentation complete for public APIs (required)
+- [ ] Unit tests cover main use cases
+- [ ] Performance considerations addressed
+- [ ] UI responsive across different screen sizes
+- [ ] Follow very_good_analysis rules (130+ rules)
 - [ ] Internationalization strings added
 - [ ] Security considerations addressed
 
 #### Review Process
-- [ ] Architecture alignment với BLoC pattern
-- [ ] Code quality và readability theo Very Good standards
-- [ ] Test coverage adequacy với proper mocking
-- [ ] Security considerations và input validation
+
+- [ ] Architecture alignment with BLoC pattern
+- [ ] Code quality and readability following Very Good standards
+- [ ] Test coverage adequacy with proper mocking
+- [ ] Security considerations and input validation
 - [ ] Performance impact assessment
-- [ ] Documentation completeness và accuracy
+- [ ] Documentation completeness and accuracy
 - [ ] Error handling patterns consistency
 
 ## 🚀 Performance Guidelines
@@ -406,6 +425,7 @@ refactor: improve widget structure
 ### Widget Optimization
 
 #### Efficient Rebuilds
+
 ```dart
 // ✅ Good: Selective rebuilds
 class CounterText extends StatelessWidget {
@@ -431,6 +451,7 @@ class BadCounterText extends StatelessWidget {
 ```
 
 #### Memory Management
+
 ```dart
 // ✅ Good: Proper disposal
 class MyWidget extends StatefulWidget {
@@ -460,6 +481,7 @@ class _MyWidgetState extends State<MyWidget> {
 ## 🔒 Security Guidelines
 
 ### Input Validation
+
 ```dart
 // ✅ Good: Input validation
 class UserInputValidator {
@@ -476,12 +498,13 @@ class UserInputValidator {
 ### Error Handling (Very Good Analysis Standards)
 
 #### Specific Exception Classes
+
 ```dart
 // ✅ Very Good pattern - specific exceptions
 class UserNotFoundException implements Exception {
   const UserNotFoundException(this.userId);
   final String userId;
-  
+
   @override
   String toString() => 'UserNotFoundException: User with ID $userId not found';
 }
@@ -490,7 +513,7 @@ class ApiException implements Exception {
   const ApiException(this.message, this.statusCode);
   final String message;
   final int statusCode;
-  
+
   @override
   String toString() => 'ApiException: $message (Status: $statusCode)';
 }
@@ -498,13 +521,14 @@ class ApiException implements Exception {
 class NetworkException implements Exception {
   const NetworkException(this.message);
   final String message;
-  
+
   @override
   String toString() => 'NetworkException: $message';
 }
 ```
 
 #### Repository Error Handling
+
 ```dart
 // ✅ Repository implementation with proper error handling
 class UserRepositoryImpl implements UserRepository {
@@ -512,7 +536,7 @@ class UserRepositoryImpl implements UserRepository {
   Future<User> getUser(String id) async {
     try {
       final response = await http.get(Uri.parse('/api/users/$id'));
-      
+
       if (response.statusCode == 200) {
         return User.fromJson(jsonDecode(response.body));
       } else if (response.statusCode == 404) {
@@ -534,6 +558,7 @@ class UserRepositoryImpl implements UserRepository {
 ```
 
 #### BLoC Error Handling
+
 ```dart
 // ✅ BLoC with proper error handling
 class UserBloc extends Bloc<UserEvent, UserState> {
@@ -550,7 +575,7 @@ class UserBloc extends Bloc<UserEvent, UserState> {
     Emitter<UserState> emit,
   ) async {
     emit(UserLoading());
-    
+
     try {
       final user = await _userRepository.getUser(event.userId);
       emit(UserSuccess(user));
@@ -569,67 +594,70 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
 ## 📚 Documentation Guidelines (Very Good Analysis Standards)
 
-### Documentation Requirements (Bắt buộc)
-- **Use triple slash (`///`) for documentation comments** (bắt buộc với very_good_analysis)
-- **Document all public APIs** with detailed parameter descriptions (bắt buộc)
+### Documentation Requirements (Required)
+
+- **Use triple slash (`///`) for documentation comments** (required with very_good_analysis)
+- **Document all public APIs** with detailed parameter descriptions (required)
 - **Include usage examples** in documentation for complex widgets and methods
-- **Comprehensive documentation** cho tất cả public APIs
+- **Comprehensive documentation** for all public APIs
 
 ### Class Documentation
-```dart
-/// Repository để quản lý user data.
-/// 
-/// Cung cấp methods để CRUD operations với user entities
-/// thông qua local database và remote API.
-/// 
+
+````dart
+/// Repository for managing user data.
+///
+/// Provides methods for CRUD operations with user entities
+/// through local database and remote API.
+///
 /// ## Usage
-/// 
+///
 /// ```dart
 /// final repository = UserRepository();
 /// final user = await repository.getUser('user123');
 /// ```
-/// 
+///
 /// ## See also
-/// 
-/// * [User], model class cho user data
-/// * [UserBloc], BLoC để quản lý user state
+///
+/// * [User], model class for user data
+/// * [UserBloc], BLoC for managing user state
 abstract class UserRepository {
-  /// Lấy user by ID.
-  /// 
-  /// Throws [UserNotFoundException] nếu không tìm thấy.
-  /// 
+  /// Get user by ID.
+  ///
+  /// Throws [UserNotFoundException] if not found.
+  ///
   /// ## Parameters
-  /// 
-  /// * [id] - User ID cần lấy
-  /// 
+  ///
+  /// * [id] - User ID to retrieve
+  ///
   /// ## Returns
-  /// 
+  ///
   /// Future<User> - User data
-  /// 
+  ///
   /// ## Throws
-  /// 
-  /// * [UserNotFoundException] - Khi user không tồn tại
-  /// * [ApiException] - Khi API call thất bại
+  ///
+  /// * [UserNotFoundException] - When user does not exist
+  /// * [ApiException] - When API call fails
   Future<User> getUser(String id);
 }
-```
+````
 
 ### Method Documentation
-```dart
+
+````dart
 /// Validates email address format.
-/// 
+///
 /// Returns `true` if [email] has valid format, `false` otherwise.
-/// 
+///
 /// ## Parameters
-/// 
+///
 /// * [email] - Email address to validate
-/// 
+///
 /// ## Returns
-/// 
+///
 /// bool - True if email is valid, false otherwise
-/// 
+///
 /// ## Examples
-/// 
+///
 /// ```dart
 /// print(isValidEmail('user@example.com')); // true
 /// print(isValidEmail('invalid-email'));    // false
@@ -637,17 +665,18 @@ abstract class UserRepository {
 bool isValidEmail(String email) {
   return RegExp(r'^[\w-\.]+@([\w-]+\.)+[\w-]{2,4}$').hasMatch(email);
 }
-```
+````
 
 ### Widget Documentation
-```dart
-/// Widget hiển thị thông tin người dùng với avatar và tên.
-/// 
-/// Widget này tự động load avatar từ URL và hiển thị placeholder
-/// nếu load thất bại. Hỗ trợ callback khi user tap vào.
-/// 
+
+````dart
+/// Widget displays user information with avatar and name.
+///
+/// This widget automatically loads avatar from URL and displays placeholder
+/// if loading fails. Supports callback when user taps on it.
+///
 /// ## Usage
-/// 
+///
 /// ```dart
 /// UserInfoCard(
 ///   user: User(
@@ -660,11 +689,11 @@ bool isValidEmail(String email) {
 /// )
 /// ```
 class UserInfoCard extends StatelessWidget {
-  /// Tạo [UserInfoCard].
-  /// 
-  /// [user] là required và không được null.
-  /// [onTap] là optional callback khi user tap.
-  /// [showAvatar] mặc định là true.
+  /// Creates [UserInfoCard].
+  ///
+  /// [user] is required and cannot be null.
+  /// [onTap] is optional callback when user taps.
+  /// [showAvatar] defaults to true.
   const UserInfoCard({
     required this.user,
     this.onTap,
@@ -672,18 +701,19 @@ class UserInfoCard extends StatelessWidget {
     super.key,
   });
 
-  /// User data để hiển thị.
+  /// User data to display.
   final User user;
-  
-  /// Callback được gọi khi user tap vào card.
+
+  /// Callback called when user taps on card.
   final VoidCallback? onTap;
-  
-  /// Có hiển thị avatar hay không.
+
+  /// Whether to show avatar or not.
   final bool showAvatar;
 }
-```
+````
 
 ### README Updates
+
 - Update README when adding new features
 - Include code examples for new functionality
 - Update installation instructions if dependencies change
@@ -692,6 +722,7 @@ class UserInfoCard extends StatelessWidget {
 ## 🛠️ Tool Configuration
 
 ### Analysis Options (Very Good Analysis Configuration)
+
 ```yaml
 # analysis_options.yaml
 include: package:very_good_analysis/analysis_options.yaml
@@ -704,24 +735,25 @@ analyzer:
     - "**/firebase_options.dart"
     - "build/**"
     - "coverage/**"
-  
+
   language:
     strict-casts: true
     strict-inference: true
     strict-raw-types: true
 
-# Very Good Analysis đã include hầu hết rules tốt nhất
-# Chỉ override khi thực sự cần thiết
+# Very Good Analysis already includes most best practices
+# Only override when truly necessary
 linter:
   rules:
-    # Override rules nếu cần (không khuyến khích)
-    # lines_longer_than_80_chars: false  # Nếu cần dòng dài hơn
+    # Override rules if needed (not recommended)
+    # lines_longer_than_80_chars: false  # If longer lines needed
 ```
 
-### VS Code Settings cho Very Good
+### VS Code Settings for Very Good
+
 ```json
 {
-  "dart.lineLength": 80,  // Very Good standard
+  "dart.lineLength": 80, // Very Good standard
   "dart.enableSdkFormatter": true,
   "editor.formatOnSave": true,
   "editor.rulers": [80],
@@ -737,6 +769,7 @@ linter:
 ```
 
 ### IDE Configuration
+
 - Enable Dart analysis
 - Configure auto-format on save
 - Set up linting rules
@@ -745,6 +778,7 @@ linter:
 ## 🔄 Continuous Integration
 
 ### CI/CD Pipeline
+
 ```yaml
 # .github/workflows/ci.yml
 name: CI
@@ -766,6 +800,7 @@ jobs:
 ## 📈 Monitoring and Analytics
 
 ### Error Tracking
+
 ```dart
 // ✅ Good: Error logging
 class AppBlocObserver extends BlocObserver {
@@ -779,6 +814,7 @@ class AppBlocObserver extends BlocObserver {
 ```
 
 ### Performance Monitoring
+
 - Monitor widget rebuilds
 - Track memory usage
 - Monitor app startup time
@@ -786,4 +822,4 @@ class AppBlocObserver extends BlocObserver {
 
 ---
 
-*These guidelines ensure consistent, maintainable, and high-quality code across the Xp1 Flutter project.*
+_These guidelines ensure consistent, maintainable, and high-quality code across the Xp1 Flutter project._

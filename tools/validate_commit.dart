@@ -32,8 +32,8 @@ class CommitValidator {
   ];
 
   static final _commitPattern = RegExp(
-    '^(feat|fix|docs|style|refactor|perf|test|chore|ci|build|revert)'
-    r'(\(.+\))?: .{3,72}$',
+    '^(${allowedTypes.join('|')})'
+    r'(\([^)]+\))?: .{3,72}$',
   );
 
   /// Validates commit message according to Conventional Commits spec
@@ -90,18 +90,27 @@ class CommitValidator {
 
 void main(List<String> args) {
   if (args.isEmpty) {
-    Console.error('❌ Missing commit message file path');
-    Console.error('💡 Usage: dart run tools/validate_commit.dart <file>');
+    Console.error('❌ Missing commit message or file path');
+    Console.error(
+      '💡 Usage: dart run tools/validate_commit.dart <message_or_file>',
+    );
     exit(1);
   }
 
-  final commitMsgFile = File(args[0]);
-  if (!commitMsgFile.existsSync()) {
-    Console.error('❌ Commit message file not found: ${args[0]}');
-    exit(1);
+  String commitMessage;
+
+  // Check if first argument is a file path or direct message
+  final inputArg = args[0];
+  final possibleFile = File(inputArg);
+
+  if (possibleFile.existsSync() && !inputArg.contains(' ')) {
+    // It's a file path
+    commitMessage = possibleFile.readAsStringSync().trim();
+  } else {
+    // It's a direct commit message (join all args in case of spaces)
+    commitMessage = args.join(' ').trim();
   }
 
-  final commitMessage = commitMsgFile.readAsStringSync().trim();
   if (commitMessage.isEmpty) {
     Console.error('❌ Empty commit message');
     exit(1);

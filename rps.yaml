@@ -37,4 +37,4 @@ scripts:
   hooks-uninstall: "lefthook uninstall"
 
   # Test commit validation
-  test-commit-validation: "echo 'feat(test): add validation example' > /tmp/test_commit && dart run tools/validate_commit.dart /tmp/test_commit && rm /tmp/test_commit"
+  test-commit-validation: "echo 'feat(test): add validation example' > .tmp/test_commit && dart run tools/validate_commit.dart .tmp/test_commit && rm .tmp/test_commit"

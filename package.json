@@ -1,7 +1,7 @@
 {
   "name": "xp1",
   "version": "1.0.0",
-  "description": "![coverage][coverage_badge] [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link] [![License: MIT][license_badge]][license_link]",
+  "description": "A Flutter project with comprehensive development tooling, testing, and CI/CD setup.",
   "main": "index.js",
   "directories": {
     "doc": "docs",
@@ -14,12 +14,13 @@
   },
   "repository": {
     "type": "git",
-    "url": "git@github.com-phamau1994x:PhamMinhHaiAu-12035071/xp1.git"
+    "url": "git@github.com:PhamMinhHaiAu-12035071/xp1.git"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "devDependencies": {
-    "lefthook": "^1.8.0"
+    "lefthook": "^1.8.0",
+    "cspell": "^8.0.0"
   }
 }
