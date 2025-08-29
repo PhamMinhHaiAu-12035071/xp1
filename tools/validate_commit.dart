@@ -1,9 +1,29 @@
-// CLI tool requires console output for user feedback
-// ignore_for_file: avoid_print
-
 import 'dart:io';
 
 import 'package:conventional_commit/conventional_commit.dart';
+
+/// Console output helper for CLI tools
+class Console {
+  /// Write success message to stdout
+  static void success(String message) {
+    stdout.writeln(message);
+  }
+
+  /// Write info message to stdout
+  static void info(String message) {
+    stdout.writeln(message);
+  }
+
+  /// Write error message to stderr
+  static void error(String message) {
+    stderr.writeln(message);
+  }
+
+  /// Write warning message to stderr
+  static void warning(String message) {
+    stderr.writeln(message);
+  }
+}
 
 /// Advanced commit message validator for Conventional Commits
 class CommitValidator {
@@ -28,13 +48,13 @@ class CommitValidator {
   static void validate(String commitMessage) {
     // Skip validation for merge commits
     if (commitMessage.startsWith('Merge ')) {
-      print('✅ Merge commit detected, skipping validation');
+      Console.success('✅ Merge commit detected, skipping validation');
       return;
     }
 
     // Skip validation for revert commits
     if (commitMessage.startsWith('Revert ')) {
-      print('✅ Revert commit detected, skipping validation');
+      Console.success('✅ Revert commit detected, skipping validation');
       return;
     }
 
@@ -59,7 +79,7 @@ class CommitValidator {
       // 5. Validate body format (if present)
       _validateBody(commit.body);
 
-      print('✅ Commit message validation passed');
+      Console.success('✅ Commit message validation passed');
       _printCommitInfo(commit);
     } on Exception {
       _printError();
@@ -69,8 +89,8 @@ class CommitValidator {
 
   static void _validateType(String type) {
     if (!allowedTypes.contains(type)) {
-      print('❌ Invalid commit type: $type');
-      print('✅ Allowed types: ${allowedTypes.join(', ')}');
+      Console.error('❌ Invalid commit type: $type');
+      Console.error('✅ Allowed types: ${allowedTypes.join(', ')}');
       exit(1);
     }
   }
@@ -82,33 +102,33 @@ class CommitValidator {
         '${commit.type ?? ''}$scopeStr: ${commit.description ?? ''}';
 
     if (subject.length > maxSubjectLength) {
-      print(
+      Console.error(
         '❌ Subject line too long (${subject.length}/$maxSubjectLength characters)',
       );
-      print('💡 Current: $subject');
+      Console.error('💡 Current: $subject');
       exit(1);
     }
   }
 
   static void _validateDescription(String description) {
     if (description.isEmpty) {
-      print('❌ Description is required');
+      Console.error('❌ Description is required');
       exit(1);
     }
 
     if (description[0] != description[0].toLowerCase()) {
-      print('❌ Description should start with lowercase letter');
+      Console.error('❌ Description should start with lowercase letter');
       exit(1);
     }
 
     if (description.endsWith('.')) {
-      print('❌ Description should not end with period');
+      Console.error('❌ Description should not end with period');
       exit(1);
     }
 
     // Check for minimum description length
     if (description.length < 3) {
-      print('❌ Description too short (minimum 3 characters)');
+      Console.error('❌ Description too short (minimum 3 characters)');
       exit(1);
     }
   }
@@ -116,11 +136,11 @@ class CommitValidator {
   static void _validateScope(List<String> scopes) {
     for (final scope in scopes) {
       if (scope.contains(' ')) {
-        print('❌ Scope should not contain spaces: $scope');
+        Console.error('❌ Scope should not contain spaces: $scope');
         exit(1);
       }
       if (scope.isEmpty) {
-        print('❌ Empty scope is not allowed');
+        Console.error('❌ Empty scope is not allowed');
         exit(1);
       }
     }
@@ -132,10 +152,10 @@ class CommitValidator {
       for (var i = 0; i < lines.length; i++) {
         final line = lines[i];
         if (line.length > maxBodyLineLength) {
-          print(
+          Console.error(
             '❌ Body line ${i + 1} too long (${line.length}/$maxBodyLineLength characters)',
           );
-          print('💡 Line: ${line.substring(0, 50)}...');
+          Console.error('💡 Line: ${line.substring(0, 50)}...');
           exit(1);
         }
       }
@@ -143,65 +163,65 @@ class CommitValidator {
   }
 
   static void _printCommitInfo(ConventionalCommit commit) {
-    print('   Type: ${commit.type ?? 'unknown'}');
+    Console.info('   Type: ${commit.type ?? 'unknown'}');
     final scopes = commit.scopes;
     if (scopes.isNotEmpty) {
-      print('   Scope: ${scopes.join(', ')}');
+      Console.info('   Scope: ${scopes.join(', ')}');
     }
-    print('   Description: ${commit.description ?? ''}');
+    Console.info('   Description: ${commit.description ?? ''}');
     if (commit.isBreakingChange) {
-      print('   ⚠️  Breaking change detected');
+      Console.warning('   ⚠️  Breaking change detected');
     }
     if (commit.body != null && commit.body!.isNotEmpty) {
-      print('   📝 Body: ${commit.body!.split('\n').length} lines');
+      Console.info('   📝 Body: ${commit.body!.split('\n').length} lines');
     }
   }
 
   static void _printError() {
-    print('❌ Invalid conventional commit format');
-    print('');
-    print('✅ Correct format:');
-    print('   type(scope): description');
-    print('   ');
-    print('   [optional body]');
-    print('   ');
-    print('   [optional footer(s)]');
-    print('');
-    print('📝 Examples:');
-    print('   feat(auth): add user registration');
-    print('   fix(ui): resolve button alignment issue');
-    print('   docs: update installation guide');
-    print('   chore(deps): upgrade flutter to 3.24');
-    print('   feat(api)!: remove deprecated endpoints');
-    print('');
-    print('🔧 Available types:');
-    print('   ${allowedTypes.join(', ')}');
-    print('');
-    print('📏 Rules:');
-    print('   • Subject line: max $maxSubjectLength characters');
-    print('   • Description: lowercase, no period at end');
-    print('   • Body lines: max $maxBodyLineLength characters');
-    print('   • Use ! for breaking changes');
+    Console.error('❌ Invalid conventional commit format');
+    Console.error('');
+    Console.error('✅ Correct format:');
+    Console.error('   type(scope): description');
+    Console.error('   ');
+    Console.error('   [optional body]');
+    Console.error('   ');
+    Console.error('   [optional footer(s)]');
+    Console.error('');
+    Console.error('📝 Examples:');
+    Console.error('   feat(auth): add user registration');
+    Console.error('   fix(ui): resolve button alignment issue');
+    Console.error('   docs: update installation guide');
+    Console.error('   chore(deps): upgrade flutter to 3.24');
+    Console.error('   feat(api)!: remove deprecated endpoints');
+    Console.error('');
+    Console.error('🔧 Available types:');
+    Console.error('   ${allowedTypes.join(', ')}');
+    Console.error('');
+    Console.error('📏 Rules:');
+    Console.error('   • Subject line: max $maxSubjectLength characters');
+    Console.error('   • Description: lowercase, no period at end');
+    Console.error('   • Body lines: max $maxBodyLineLength characters');
+    Console.error('   • Use ! for breaking changes');
   }
 }
 
 void main(List<String> args) {
   if (args.isEmpty) {
-    print('❌ Missing commit message file path');
-    print('💡 Usage: dart run tools/validate_commit.dart <commit-msg-file>');
+    Console.error('❌ Missing commit message file path');
+    Console.error('💡 Usage: dart run tools/validate_commit.dart <commit-msg-file>');
     exit(1);
   }
 
   final commitMsgFile = File(args[0]);
   if (!commitMsgFile.existsSync()) {
-    print('❌ Commit message file not found: ${args[0]}');
+    Console.error('❌ Commit message file not found: ${args[0]}');
     exit(1);
   }
 
   final commitMessage = commitMsgFile.readAsStringSync().trim();
 
   if (commitMessage.isEmpty) {
-    print('❌ Empty commit message');
+    Console.error('❌ Empty commit message');
     exit(1);
   }
 
