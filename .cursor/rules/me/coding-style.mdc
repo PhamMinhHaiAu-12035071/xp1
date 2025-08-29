@@ -160,7 +160,7 @@ Ensure your [.vscode/settings.json](mdc:.vscode/settings.json) includes:
 // ignore_for_file: avoid_print
 
 // ❌ BAD: Lazy fix
-// ignore: avoid_print  
+// ignore: avoid_print
 print('Some message');
 ```
 
@@ -217,6 +217,7 @@ Console.error('❌ Error occurred');
 ### When Print() Is Acceptable
 
 Only in these specific cases:
+
 - Debug-only code that will be removed
 - Temporary development logging
 - Example/demo code not intended for production
@@ -228,6 +229,7 @@ Even then, prefer proper logging frameworks or debug utilities.
 > "Bad programmers worry about the code. Good programmers worry about data structures and their relationships."
 
 Don't paper over problems with ignore directives. Fix the root cause:
+
 1. **Identify**: Why is the linter complaining?
 2. **Design**: What's the proper abstraction?
 3. **Implement**: Clean solution that eliminates the issue

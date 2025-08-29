@@ -1,0 +1,40 @@
+# rps.yaml - Configuration file cho RPS scripts
+scripts:
+  # Formatting commands
+  format: "dart format lib/ test/ --set-exit-if-changed"
+  format-check: "dart format lib/ test/ --set-exit-if-changed --output=none"
+
+  # Analysis commands
+  analyze: "dart analyze --fatal-infos"
+  analyze-strict: "dart analyze --fatal-infos --fatal-warnings"
+
+  # Combined commands
+  check: "dart format lib/ test/ --set-exit-if-changed && dart analyze --fatal-infos"
+  check-strict: "dart format lib/ test/ --set-exit-if-changed && dart analyze --fatal-infos --fatal-warnings"
+
+  # Testing commands
+  test: "flutter test"
+  test-coverage: "flutter test --coverage && genhtml coverage/lcov.info -o coverage/html"
+
+  # Build commands
+  build-android: "flutter build apk --release"
+  build-ios: "flutter build ios --release"
+  build-web: "flutter build web --release"
+
+  # Custom development commands
+  clean: "flutter clean && flutter pub get"
+  reset: "flutter clean && flutter pub get && flutter pub run build_runner build --delete-conflicting-outputs"
+
+  # Git hooks simulation
+  pre-commit: "dart format lib/ test/ --set-exit-if-changed && dart analyze --fatal-infos && flutter test"
+
+  # Team setup commands
+  setup: "flutter pub get && lefthook install"
+  setup-full: "flutter clean && flutter pub get && lefthook install && dart run tools/validate_commit.dart --help || echo 'Commit validator ready'"
+
+  # Git hooks management
+  hooks-install: "lefthook install"
+  hooks-uninstall: "lefthook uninstall"
+
+  # Test commit validation
+  test-commit-validation: "echo 'feat(test): add validation example' > /tmp/test_commit && dart run tools/validate_commit.dart /tmp/test_commit && rm /tmp/test_commit"

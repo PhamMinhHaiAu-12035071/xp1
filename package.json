@@ -1,0 +1,25 @@
+{
+  "name": "xp1",
+  "version": "1.0.0",
+  "description": "![coverage][coverage_badge] [![style: very good analysis][very_good_analysis_badge]][very_good_analysis_link] [![License: MIT][license_badge]][license_link]",
+  "main": "index.js",
+  "directories": {
+    "doc": "docs",
+    "lib": "lib",
+    "test": "test"
+  },
+  "scripts": {
+    "prepare": "lefthook install",
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git@github.com-phamau1994x:PhamMinhHaiAu-12035071/xp1.git"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "lefthook": "^1.8.0"
+  }
+}

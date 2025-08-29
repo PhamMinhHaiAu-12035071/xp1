@@ -1,0 +1,21 @@
+# lefthook.yml
+pre-commit:
+  parallel: false
+  commands:
+    rps-pre-commit:
+      glob: "*.dart"
+      run: fvm flutter pub run rps pre-commit
+      stage_fixed: true
+
+pre-push:
+  parallel: false
+  commands:
+    rps-check-strict:
+      run: fvm flutter pub run rps check-strict
+    rps-test-coverage:
+      run: fvm flutter pub run rps test-coverage
+
+commit-msg:
+  commands:
+    conventional-commit:
+      run: fvm dart run tools/validate_commit.dart {1}

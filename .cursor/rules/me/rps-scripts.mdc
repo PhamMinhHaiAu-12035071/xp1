@@ -1,0 +1,191 @@
+---
+description: Guide for using RPS (Run Pubspec Script) to run format, lint, testing and development scripts
+---
+
+# RPS Scripts Guide
+
+## Introduction to RPS
+
+RPS (Run Pubspec Script) allows you to define and run scripts from [rps.yaml](mdc:rps.yaml) file to simplify development tasks.
+
+## Usage with FVM
+
+**Important**: Always use FVM when running RPS commands:
+
+```bash
+# Basic template
+fvm flutter pub run rps <script-name>
+```
+
+## Scripts Formatting & Analysis
+
+### 1. Format Code
+
+```bash
+# Format and check for changes
+fvm flutter pub run rps format
+
+# Only check format without modifying files
+fvm flutter pub run rps format-check
+```
+
+### 2. Code Analysis
+
+```bash
+# Basic analyze with fatal-infos
+fvm flutter pub run rps analyze
+
+# Strict analyze with warnings
+fvm flutter pub run rps analyze-strict
+```
+
+### 3. Combined Check
+
+```bash
+# Run format + analyze (recommended for development)
+fvm flutter pub run rps check
+
+# Run format + analyze strict (recommended for CI/CD)
+fvm flutter pub run rps check-strict
+```
+
+## Testing Scripts
+
+```bash
+# Run all tests
+fvm flutter pub run rps test
+
+# Run tests with coverage report
+fvm flutter pub run rps test-coverage
+```
+
+## Development Scripts
+
+### 1. Clean & Reset
+
+```bash
+# Clean build and re-fetch dependencies
+fvm flutter pub run rps clean
+
+# Full reset with build_runner
+fvm flutter pub run rps reset
+```
+
+### 2. Pre-commit Check
+
+```bash
+# Run full check like git hooks (format + analyze + test)
+fvm flutter pub run rps pre-commit
+```
+
+## Build Scripts
+
+```bash
+# Build for Android
+fvm flutter pub run rps build-android
+
+# Build for iOS
+fvm flutter pub run rps build-ios
+
+# Build for Web
+fvm flutter pub run rps build-web
+```
+
+## Team Setup & Git Hooks
+
+```bash
+# Basic setup (get dependencies + install hooks)
+fvm flutter pub run rps setup
+
+# Full setup (clean + dependencies + hooks + validation test)
+fvm flutter pub run rps setup-full
+
+# Git hooks management
+fvm flutter pub run rps hooks-install
+fvm flutter pub run rps hooks-uninstall
+
+# Test commit validation
+fvm flutter pub run rps test-commit-validation
+```
+
+## Development Workflow
+
+### When starting to code:
+
+```bash
+fvm flutter pub run rps clean
+```
+
+### Before committing:
+
+```bash
+fvm flutter pub run rps pre-commit
+```
+
+### Check code quality:
+
+```bash
+fvm flutter pub run rps check
+```
+
+### In CI/CD pipeline:
+
+```bash
+fvm flutter pub run rps check-strict
+fvm flutter pub run rps test-coverage
+```
+
+## Script Definitions
+
+All scripts are defined in [rps.yaml](mdc:rps.yaml):
+
+- **format**: Format code with `dart format`
+- **analyze**: Analyze code with `dart analyze`
+- **check**: Combined format + analyze
+- **test**: Run Flutter tests
+- **clean**: Clean project and reinstall dependencies
+- **reset**: Full reset with build_runner
+- **pre-commit**: Full validation pipeline
+- **setup**: Basic project setup (dependencies + git hooks)
+- **setup-full**: Complete project setup with validation test
+- **hooks-install**: Install git hooks via lefthook
+- **hooks-uninstall**: Remove git hooks
+- **test-commit-validation**: Test conventional commit validation
+
+## Best Practices
+
+1. **Always use FVM**: `fvm flutter pub run rps <script>`
+2. **Run check before commit**: `fvm flutter pub run rps pre-commit`
+3. **Use analyze-strict for production**: Catch all warnings
+4. **Test coverage for CI**: `fvm flutter pub run rps test-coverage`
+5. **Clean when having dependency issues**: `fvm flutter pub run rps clean`
+6. **New team member setup**: `fvm flutter pub run rps setup-full`
+7. **Use conventional commits**: Follow format `type(scope): description`
+
+## Troubleshooting
+
+- If format errors occur: Run `fvm flutter pub run rps format` first
+- If analysis errors occur: Check [analysis_options.yaml](mdc:analysis_options.yaml)
+- If tests fail: Run `fvm flutter pub run rps clean` then test again
+- If build_runner issues: Run `fvm flutter pub run rps reset`
+- If commit validation fails: Check commit message format (use `type(scope): description`)
+- If git hooks not working: Run `fvm flutter pub run rps hooks-install`
+- If lefthook not found: Run `npm install` first
+
+## Conventional Commit Types
+
+Valid commit types for validation:
+
+- **feat**: New feature
+- **fix**: Bug fix
+- **docs**: Documentation changes
+- **style**: Code style (formatting, etc)
+- **refactor**: Code refactoring
+- **perf**: Performance improvement
+- **test**: Tests
+- **chore**: Maintenance
+- **ci**: CI/CD
+- **build**: Build system
+- **revert**: Revert previous commit
+
+Example: `feat(auth): add user login functionality`

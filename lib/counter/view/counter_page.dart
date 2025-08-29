@@ -3,7 +3,9 @@ import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:xp1/counter/counter.dart';
 import 'package:xp1/l10n/l10n.dart';
 
+/// Counter page with BlocProvider setup and UI components.
 class CounterPage extends StatelessWidget {
+  /// Creates counter page.
   const CounterPage({super.key});
 
   @override
@@ -15,7 +17,9 @@ class CounterPage extends StatelessWidget {
   }
 }
 
+/// Main counter view with app bar, counter display, and action buttons.
 class CounterView extends StatelessWidget {
+  /// Creates counter view.
   const CounterView({super.key});
 
   @override
@@ -43,7 +47,9 @@ class CounterView extends StatelessWidget {
   }
 }
 
+/// Displays the current counter value with large text styling.
 class CounterText extends StatelessWidget {
+  /// Creates counter text widget.
   const CounterText({super.key});
 
   @override
