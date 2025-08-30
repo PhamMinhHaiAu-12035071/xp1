@@ -128,8 +128,6 @@ class PrTitleValidator {
       ..e('🔧 Available types: ${allowedTypes.join(', ')}')
       ..e('📏 Rules: 3-72 characters, lowercase description');
   }
-
-
 }
 
 void main(List<String> args) {
@@ -156,17 +154,19 @@ void main(List<String> args) {
             final type = parts[0];
             // Clean up description: replace dashes with spaces,
             // remove special chars
-            var description = parts.sublist(1).join(' ')
+            var description = parts
+                .sublist(1)
+                .join(' ')
                 .replaceAll('-', ' ')
-                .replaceAll('#', '')  // Remove # characters
+                .replaceAll('#', '') // Remove # characters
                 .replaceAll('_', ' ') // Replace underscores with spaces
                 .replaceAll(RegExp(r'^\d+\s*'), '') // Remove leading numbers
                 .trim();
             // Ensure description starts with lowercase letter
             if (description.isNotEmpty &&
                 RegExp('^[A-Z]').hasMatch(description[0])) {
-              description = description[0].toLowerCase() +
-                  description.substring(1);
+              description =
+                  description[0].toLowerCase() + description.substring(1);
             }
             // Check if type is valid semantic type
             if (PrTitleValidator.allowedTypes.contains(type)) {
@@ -181,9 +181,9 @@ void main(List<String> args) {
           prTitle = _cleanBranchName(branchName);
         }
         Logger(
-          printer: _SimplePrinter(),
-          output: _CliLogOutput(),
-        )
+            printer: _SimplePrinter(),
+            output: _CliLogOutput(),
+          )
           ..i('📝 Branch name: $branchName')
           ..i('📝 Using branch name as PR title: $prTitle');
       } else {
