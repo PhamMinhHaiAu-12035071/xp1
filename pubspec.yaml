@@ -19,6 +19,7 @@ dependencies:
 dev_dependencies:
   bloc_test: ^10.0.0
   conventional_commit: ^0.6.1+1
+  dependency_validator: ^5.0.2
   flutter_test:
     sdk: flutter
   mocktail: ^1.0.4

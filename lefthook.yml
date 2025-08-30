@@ -32,6 +32,16 @@ pre-commit:
         else
           echo "📦 No pubspec.yaml changes, skipping license check"
         fi
+    # Dependency validation when pubspec.yaml changes
+    deps-check-on-pubspec-change:
+      glob: "pubspec.yaml"
+      run: |
+        if git diff --cached --name-only | grep -q "pubspec.yaml"; then
+          echo "📦 pubspec.yaml changed, validating dependencies..."
+          fvm flutter pub run rps validate-deps
+        else
+          echo "📦 No pubspec.yaml changes, skipping dependency validation"
+        fi
 
 pre-push:
   parallel: false
@@ -45,6 +55,9 @@ pre-push:
     # Run complete CI pipeline via Makefile
     full-ci-pipeline:
       run: make local-ci
+    # Full dependency validation before push
+    validate-dependencies:
+      run: fvm flutter pub run rps validate-deps
 
 commit-msg:
   commands:

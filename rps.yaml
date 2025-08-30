@@ -7,6 +7,7 @@ scripts:
   # Analysis commands
   analyze: "dart analyze --fatal-infos"
   analyze-strict: "dart analyze --fatal-infos --fatal-warnings"
+  validate-deps: "dart run dependency_validator"
 
   # Combined commands
   check: "dart format lib/ test/ --set-exit-if-changed && dart analyze --fatal-infos"
