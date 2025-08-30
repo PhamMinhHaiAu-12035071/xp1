@@ -152,22 +152,8 @@ void main(List<String> args) {
           final parts = branchName.split('/');
           if (parts.length >= 2) {
             final type = parts[0];
-            // Clean up description: replace dashes with spaces,
-            // remove special chars
-            var description = parts
-                .sublist(1)
-                .join(' ')
-                .replaceAll('-', ' ')
-                .replaceAll('#', '') // Remove # characters
-                .replaceAll('_', ' ') // Replace underscores with spaces
-                .replaceAll(RegExp(r'^\d+\s*'), '') // Remove leading numbers
-                .trim();
-            // Ensure description starts with lowercase letter
-            if (description.isNotEmpty &&
-                RegExp('^[A-Z]').hasMatch(description[0])) {
-              description =
-                  description[0].toLowerCase() + description.substring(1);
-            }
+            // Clean up description using the existing helper function
+            final description = _cleanBranchName(parts.sublist(1).join(' '));
             // Check if type is valid semantic type
             if (PrTitleValidator.allowedTypes.contains(type)) {
               prTitle = '$type: $description';

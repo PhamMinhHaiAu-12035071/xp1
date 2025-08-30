@@ -44,16 +44,10 @@ pre-commit:
     pubspec-analyze:
       glob: ["*.dart", "pubspec.yaml"]
       run: |
-        # Check for staged Dart files
-        if git diff --cached --name-only | grep -q "\.dart$"; then
-          echo "📝 Analyzing staged Dart files for linting issues..."
-          STAGED_DART_FILES=$(git diff --cached --name-only | grep "\.dart$")
-          dart analyze $STAGED_DART_FILES
-        fi
-        # Check for pubspec.yaml change
-        if git diff --cached --name-only | grep -q "^pubspec\.yaml$"; then
-          echo "📝 Analyzing pubspec.yaml for linting issues..."
-          dart analyze pubspec.yaml
+        FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(\.dart$|^pubspec\.yaml$)')
+        if [ -n "$FILES_TO_ANALYZE" ]; then
+          echo "📝 Analyzing staged files for linting issues..."
+          dart analyze $FILES_TO_ANALYZE
         fi
 
 pre-push:

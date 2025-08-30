@@ -187,14 +187,14 @@ class CounterView extends StatelessWidget {
 }
 ```
 
-### Cascade Operators (`..`) - **MANDATORY USAGE**
+### Cascade Operators (`..`) - **RECOMMENDED USAGE**
 
-**STOP creating unnecessary variables when you're going to call multiple methods on the same object.** Use cascade operators. This is not a suggestion - it's a requirement to avoid `cascade_invocations` linter errors.
+**Prefer using cascade operators when calling multiple methods on the same object.** This helps avoid creating unnecessary variables and follows Dart best practices to prevent `cascade_invocations` linter errors.
 
 #### **🔥 THE GOLDEN RULE: Multiple Method Calls = Cascade Operators**
 
 ```dart
-// ❌ GARBAGE: Creating variables for multiple calls
+// ❌ Avoid: Creating variables for multiple calls
 final logger = Logger(
   printer: SimplePrinter(),
   output: CliLogOutput(),
@@ -203,7 +203,7 @@ logger.e('Error message 1');
 logger.e('Error message 2');
 logger.e('Error message 3');
 
-// ✅ CORRECT: Use cascade operators for multiple calls
+// ✅ Preferred: Use cascade operators for multiple calls
 Logger(
   printer: SimplePrinter(),
   output: CliLogOutput(),
@@ -212,19 +212,19 @@ Logger(
   ..e('Error message 2')
   ..e('Error message 3');
 
-// ❌ GARBAGE: Multiple method calls on same reference
+// ❌ Avoid: Multiple method calls on same reference
 SomeClass someReference = SomeClass();
 someReference.firstMethod();
 someReference.secondMethod();
 someReference.thirdMethod();
 
-// ✅ CORRECT: Cascade consecutive method calls
+// ✅ Preferred: Cascade consecutive method calls
 SomeClass someReference = SomeClass()
   ..firstMethod()
   ..secondMethod()
   ..thirdMethod();
 
-// ✅ ALSO CORRECT: Separate declaration with cascades
+// ✅ Also good: Separate declaration with cascades
 SomeClass someReference = SomeClass();
 // ... other code in between ...
 someReference
@@ -236,13 +236,13 @@ someReference
 #### **⚡ Single Method Call Rules**
 
 ```dart
-// ✅ CORRECT: Single call, use dot notation
+// ✅ Preferred: Single call, use dot notation
 Logger(
   printer: SimplePrinter(),
   output: CliLogOutput(),
 ).e('Single error message');
 
-// ❌ WRONG: Don't use cascade for single calls (avoid_single_cascade_in_expression_statements)
+// ❌ Avoid: Don't use cascade for single calls (avoid_single_cascade_in_expression_statements)
 Logger(
   printer: SimplePrinter(),
   output: CliLogOutput(),
@@ -254,7 +254,7 @@ Logger(
 Based on our actual codebase fixes:
 
 ```dart
-// ❌ BAD: What we had before (creates variables for no reason)
+// ❌ Before: Creates variables unnecessarily
 if (args.isEmpty) {
   final logger = Logger(
     printer: _SimplePrinter(),
@@ -265,7 +265,7 @@ if (args.isEmpty) {
   exit(1);
 }
 
-// ✅ GOOD: What we fixed it to (proper cascade usage)
+// ✅ Improved: Using cascade operators
 if (args.isEmpty) {
   Logger(
     printer: _SimplePrinter(),
@@ -276,7 +276,7 @@ if (args.isEmpty) {
   exit(1);
 }
 
-// ✅ ALSO GOOD: Single call without cascade
+// ✅ Also good: Single call without cascade
 if (commitMessage.isEmpty) {
   Logger(
     printer: _SimplePrinter(),
@@ -317,35 +317,35 @@ static void _printExamples() {
 }
 ```
 
-#### **🎖️ WHY This Matters (Technical Debt Prevention)**
+#### **🎖️ Why This Matters (Benefits)**
 
-1. **Eliminates pointless variables** - No more `final logger = ...` when you'll only use it for method calls
+1. **Eliminates unnecessary variables** - No need for `final logger = ...` when you'll only use it for method calls
 2. **Reduces code noise** - Fewer lines, cleaner intent
 3. **Prevents linter errors** - `cascade_invocations` rule compliance
 4. **Better readability** - Clear chains of operations on the same object
 5. **Follows Dart idioms** - This is how Dart code should be written
 
-#### **🚨 Common Mistakes to Avoid**
+#### **🚨 Common Patterns to Avoid**
 
 ```dart
-// ❌ WRONG: Single cascade (triggers avoid_single_cascade_in_expression_statements)
+// ❌ Avoid: Single cascade (triggers avoid_single_cascade_in_expression_statements)
 object..method();
 
-// ✅ RIGHT: Single call uses dot notation
+// ✅ Preferred: Single call uses dot notation
 object.method();
 
-// ❌ WRONG: Mixed patterns in same codebase
+// ❌ Avoid: Mixed patterns in same codebase
 final obj = Object();
 obj.method1();  // Sometimes this...
 obj..method2(); // Sometimes this... BE CONSISTENT!
 
-// ✅ RIGHT: Consistent cascade usage
+// ✅ Preferred: Consistent cascade usage
 final obj = Object()
   ..method1()
   ..method2();
 ```
 
-**BOTTOM LINE:** If you're calling 2+ methods on the same object reference, use cascades. If you're calling 1 method, use dot notation. **No exceptions. No excuses. No linter errors.**
+**Summary:** For 2+ methods on the same object reference, use cascades. For single method calls, use dot notation. This approach ensures clean, consistent code that follows Dart best practices.
 
 ## 🧪 Testing Guidelines
 
