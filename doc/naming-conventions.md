@@ -20,8 +20,8 @@ void calculateTotal() {}
 Future<User> fetchUserData() async {}
 
 // ❌ INCORRECT
-String user_name = 'john';     // snake_case
-String UserName = 'john';      // PascalCase
+String user_name = 'john';
+String UserName = 'john';
 ```
 
 ### Classes & Widgets (PascalCase)
@@ -33,23 +33,19 @@ class LoginScreen extends StatelessWidget {}
 enum UserRole { admin, user, guest }
 
 // ❌ INCORRECT
-class userRepository {}        // camelCase
-class login_screen {}          // snake_case
+class userRepository {}
+class login_screen {}
 ```
 
 ### Constants (lowerCamelCase - Very Good Analysis Standard)
 
 ```dart
 // ✅ CORRECT
-class AppConstants {
-  static const String appName = 'MyApp';
-  static const int maxRetries = 3;
-  static const Duration timeout = Duration(seconds: 30);
-}
+static const String appName = 'MyApp';
+static const int maxRetries = 3;
 
-// ❌ INCORRECT - Not recommended by Very Good Analysis
+// ❌ INCORRECT
 const String API_BASE_URL = 'https://api.example.com';
-const int MAX_RETRIES = 3;
 ```
 
 ### Files & Directories (snake_case)
@@ -61,21 +57,16 @@ login_screen.dart
 api_service.dart
 
 // Directory structure
-lib/
-├── features/
-│   ├── user_profile/
-│   └── authentication/
-└── shared/
-    └── widgets/
+lib/features/user_profile/
+lib/features/authentication/
+lib/shared/widgets/
 
 // ❌ INCORRECT
-UserRepository.dart           // PascalCase
-loginScreen.dart             // camelCase
+UserRepository.dart
+loginScreen.dart
 ```
 
 ## Enforcement
-
-### Automatic Validation
 
 ```bash
 # Check naming conventions
@@ -85,20 +76,16 @@ make naming-check
 make naming-fix
 ```
 
-### Linter Configuration
+### Linter Rules
 
-The project uses `analysis_options.yaml` with strict naming rules:
+The project enforces naming through `analysis_options.yaml`:
 
 - `camel_case_types`: Classes, enums → PascalCase
 - `non_constant_identifier_names`: Variables, functions → camelCase
 - `constant_identifier_names`: Constants → lowerCamelCase
 - `file_names`: Files → snake_case
 
-All naming violations are treated as **errors**, not warnings.
-
-### Git Hooks
-
-Pre-commit hooks automatically run `dart analyze` to catch naming violations before they're committed.
+All violations are **errors**. Pre-commit hooks run `dart analyze` automatically.
 
 ## Summary
 
@@ -107,4 +94,4 @@ Pre-commit hooks automatically run `dart analyze` to catch naming violations bef
 3. **Constants**: lowerCamelCase (`appName`, `maxRetries`)
 4. **Files/Directories**: snake_case (`user_model.dart`, `auth/`)
 
-These conventions ensure consistent, readable code that follows Dart/Flutter best practices and Very Good Analysis standards.
+These conventions follow Dart/Flutter best practices and Very Good Analysis standards.
