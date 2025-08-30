@@ -182,6 +182,3 @@ ehthumbs.db
 
 # Development tools
 *.code-workspace
-
-# Development planning documents
-plan.md
