@@ -17,8 +17,8 @@ dependencies:
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1 # Flutter integration for BLoC
-  flutter_localizations: # Flutter localization support
-    sdk: flutter
+  flutter_localizations:
+    sdk: flutter # Flutter localization support
 
   # === UTILITIES ===
   intl: ^0.20.2 # Internationalization utilities
@@ -30,8 +30,10 @@ dev_dependencies:
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
   flutter_test: # Flutter testing framework
     sdk: flutter
+  logger: ^2.6.1 # Beautiful and extensible logging
   mocktail: ^1.0.4 # Modern mocking framework
   rps: ^0.9.1 # Run Pubspec Script tool
+  test: ^1.26.2
   very_good_analysis: ^9.0.0 # Very Good Ventures linting rules
 
 flutter:

@@ -1,27 +1,28 @@
 import 'dart:io';
 
 import 'package:conventional_commit/conventional_commit.dart';
+import 'package:logger/logger.dart';
 
-/// A utility class for handling console output with proper stream separation.
-/// This ensures that success/info messages go to stdout and errors/warnings go to stderr.
-/// This is important for CLI tools to maintain proper output redirection
-/// capabilities.
-class Console {
-  /// Writes a success message to stdout.
-  /// Use this for positive feedback and successful operations.
-  static void success(String message) => stdout.writeln(message);
+/// Custom log output that maintains proper stream separation for CLI tools.
+/// Info/debug messages go to stdout, errors/warnings go to stderr.
+class _CliLogOutput extends LogOutput {
+  @override
+  void output(OutputEvent event) {
+    final isErrorLevel = event.level.index >= Level.warning.index;
+    final target = isErrorLevel ? stderr : stdout;
 
-  /// Writes an informational message to stdout.
-  /// Use this for displaying details about the current operation.
-  static void info(String message) => stdout.writeln(message);
+    for (final line in event.lines) {
+      target.writeln(line);
+    }
+  }
+}
 
-  /// Writes an error message to stderr.
-  /// Use this for critical errors that should prevent further execution.
-  static void error(String message) => stderr.writeln(message);
-
-  /// Writes a warning message to stderr.
-  /// Use this for non-critical issues that don't prevent execution.
-  static void warning(String message) => stderr.writeln(message);
+/// Simple printer for clean CLI output without timestamps or method traces.
+class _SimplePrinter extends LogPrinter {
+  @override
+  List<String> log(LogEvent event) {
+    return [event.message.toString()];
+  }
 }
 
 /// A comprehensive validator for conventional commit messages.
@@ -31,6 +32,12 @@ class Console {
 /// It provides detailed feedback and error messages to guide users toward
 /// proper commit message formatting.
 class CommitValidator {
+  /// Logger instance configured for CLI tools with proper stream separation.
+  static final _logger = Logger(
+    printer: _SimplePrinter(),
+    output: _CliLogOutput(),
+  );
+
   /// List of allowed conventional commit types as defined in the specification.
   /// These represent the standard types that can be used in commit messages.
   static const allowedTypes = [
@@ -60,9 +67,7 @@ class CommitValidator {
   static bool validate(String commitMessage) {
     // Skip validation for merge commits as they follow a different format
     if (commitMessage.startsWith('Merge ')) {
-      Console.success(
-        '✅ Merge commit detected, skipping validation',
-      );
+      _logger.i('✅ Merge commit detected, skipping validation');
       return true;
     }
 
@@ -99,7 +104,7 @@ class CommitValidator {
     }
 
     // Validation passed - provide success feedback
-    Console.success('✅ Commit message validation passed');
+    _logger.i('✅ Commit message validation passed');
     _printCommitInfo(parsedCommit);
     return true;
   }
@@ -111,37 +116,35 @@ class CommitValidator {
   static void _printCommitInfo(ConventionalCommit commit) {
     // Display the commit type if available
     if (commit.type != null) {
-      Console.info('   Type: ${commit.type}');
+      _logger.i('   Type: ${commit.type}');
     }
 
     // Display scopes if any are specified
     if (commit.scopes.isNotEmpty) {
-      Console.info('   Scope: ${commit.scopes.join(', ')}');
+      _logger.i('   Scope: ${commit.scopes.join(', ')}');
     }
 
     // Display the description if available
     if (commit.description != null) {
-      Console.info('   Description: ${commit.description}');
+      _logger.i('   Description: ${commit.description}');
     }
 
     // Highlight breaking changes with a warning
     if (commit.isBreakingChange) {
-      Console.warning('⚠️  BREAKING CHANGE detected!');
+      _logger.w('⚠️  BREAKING CHANGE detected!');
       if (commit.breakingChangeDescription != null) {
-        Console.warning(
-          '   Breaking change: ${commit.breakingChangeDescription}',
-        );
+        _logger.w('   Breaking change: ${commit.breakingChangeDescription}');
       }
     }
 
     // Indicate if the commit has a body section
     if (commit.body != null && commit.body!.isNotEmpty) {
-      Console.info('   Has body: Yes');
+      _logger.i('   Has body: Yes');
     }
 
     // Display footer count if any footers are present
     if (commit.footers.isNotEmpty) {
-      Console.info('   Footers: ${commit.footers.length}');
+      _logger.i('   Footers: ${commit.footers.length}');
     }
   }
 
@@ -149,9 +152,10 @@ class CommitValidator {
   /// This helps users understand what types are valid and guides them to use
   /// correct types.
   static void _printTypeError(String type) {
-    Console.error('❌ Invalid commit type: "$type"');
-    Console.error('');
-    Console.error('🔧 Available types: ${allowedTypes.join(', ')}');
+    _logger
+      ..e('❌ Invalid commit type: "$type"')
+      ..e('')
+      ..e('🔧 Available types: ${allowedTypes.join(', ')}');
     _printExamples();
   }
 
@@ -160,8 +164,9 @@ class CommitValidator {
   /// Conventional Commits specification recommends 3-72 characters for
   /// descriptions.
   static void _printLengthError(int length) {
-    Console.error('❌ Invalid description length: $length characters');
-    Console.error('📏 Description must be 3-72 characters long');
+    _logger
+      ..e('❌ Invalid description length: $length characters')
+      ..e('📏 Description must be 3-72 characters long');
     _printExamples();
   }
 
@@ -170,8 +175,9 @@ class CommitValidator {
   /// Conventional Commits specification requires descriptions to start with
   /// lowercase letters.
   static void _printCapitalizationError() {
-    Console.error('❌ Description should not start with uppercase');
-    Console.error('📝 Use lowercase for description');
+    _logger
+      ..e('❌ Description should not start with uppercase')
+      ..e('📝 Use lowercase for description');
     _printExamples();
   }
 
@@ -179,9 +185,10 @@ class CommitValidator {
   /// conventional commit.
   /// This typically occurs when the message doesn't follow the required format.
   static void _printParsingError(String error) {
-    Console.error('❌ Invalid conventional commit format');
-    Console.error('Parse error: $error');
-    Console.error('');
+    _logger
+      ..e('❌ Invalid conventional commit format')
+      ..e('Parse error: $error')
+      ..e('');
     _printExamples();
   }
 
@@ -189,19 +196,20 @@ class CommitValidator {
   /// proper commit messages.
   /// This includes the correct format, examples, and key rules to remember.
   static void _printExamples() {
-    Console.error('✅ Correct format: type(scope): description');
-    Console.error('');
-    Console.error('📝 Examples:');
-    Console.error('   feat(auth): add user registration');
-    Console.error('   fix(ui): resolve button alignment issue');
-    Console.error('   docs: update installation guide');
-    Console.error('   feat!: add breaking change');
-    Console.error('');
-    Console.error('📏 Rules:');
-    Console.error('   • 3-72 characters for description');
-    Console.error('   • Lowercase description');
-    Console.error('   • Optional scope in parentheses');
-    Console.error('   • Use ! for breaking changes');
+    _logger
+      ..e('✅ Correct format: type(scope): description')
+      ..e('')
+      ..e('📝 Examples:')
+      ..e('   feat(auth): add user registration')
+      ..e('   fix(ui): resolve button alignment issue')
+      ..e('   docs: update installation guide')
+      ..e('   feat!: add breaking change')
+      ..e('')
+      ..e('📏 Rules:')
+      ..e('   • 3-72 characters for description')
+      ..e('   • Lowercase description')
+      ..e('   • Optional scope in parentheses')
+      ..e('   • Use ! for breaking changes');
   }
 }
 
@@ -221,10 +229,12 @@ class CommitValidator {
 void main(List<String> args) {
   // Ensure at least one argument is provided
   if (args.isEmpty) {
-    Console.error('❌ Missing commit message or file path');
-    Console.error(
-      '💡 Usage: dart run tool/validate_commit.dart <message_or_file>',
-    );
+    Logger(
+        printer: _SimplePrinter(),
+        output: _CliLogOutput(),
+      )
+      ..e('❌ Missing commit message or file path')
+      ..e('💡 Usage: dart run tool/validate_commit.dart <message_or_file>');
     exit(1);
   }
 
@@ -244,7 +254,10 @@ void main(List<String> args) {
 
   // Ensure the commit message is not empty
   if (commitMessage.isEmpty) {
-    Console.error('❌ Empty commit message');
+    Logger(
+      printer: _SimplePrinter(),
+      output: _CliLogOutput(),
+    ).e('❌ Empty commit message');
     exit(1);
   }
 

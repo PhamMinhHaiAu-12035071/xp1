@@ -187,6 +187,166 @@ class CounterView extends StatelessWidget {
 }
 ```
 
+### Cascade Operators (`..`) - **MANDATORY USAGE**
+
+**STOP creating unnecessary variables when you're going to call multiple methods on the same object.** Use cascade operators. This is not a suggestion - it's a requirement to avoid `cascade_invocations` linter errors.
+
+#### **🔥 THE GOLDEN RULE: Multiple Method Calls = Cascade Operators**
+
+```dart
+// ❌ GARBAGE: Creating variables for multiple calls
+final logger = Logger(
+  printer: SimplePrinter(),
+  output: CliLogOutput(),
+);
+logger.e('Error message 1');
+logger.e('Error message 2');
+logger.e('Error message 3');
+
+// ✅ CORRECT: Use cascade operators for multiple calls
+Logger(
+  printer: SimplePrinter(),
+  output: CliLogOutput(),
+)
+  ..e('Error message 1')
+  ..e('Error message 2')
+  ..e('Error message 3');
+
+// ❌ GARBAGE: Multiple method calls on same reference
+SomeClass someReference = SomeClass();
+someReference.firstMethod();
+someReference.secondMethod();
+someReference.thirdMethod();
+
+// ✅ CORRECT: Cascade consecutive method calls
+SomeClass someReference = SomeClass()
+  ..firstMethod()
+  ..secondMethod()
+  ..thirdMethod();
+
+// ✅ ALSO CORRECT: Separate declaration with cascades
+SomeClass someReference = SomeClass();
+// ... other code in between ...
+someReference
+  ..firstMethod()
+  ..secondMethod()
+  ..thirdMethod();
+```
+
+#### **⚡ Single Method Call Rules**
+
+```dart
+// ✅ CORRECT: Single call, use dot notation
+Logger(
+  printer: SimplePrinter(),
+  output: CliLogOutput(),
+).e('Single error message');
+
+// ❌ WRONG: Don't use cascade for single calls (avoid_single_cascade_in_expression_statements)
+Logger(
+  printer: SimplePrinter(),
+  output: CliLogOutput(),
+)..e('Single error message');
+```
+
+#### **🎯 Real-World CLI Tool Examples**
+
+Based on our actual codebase fixes:
+
+```dart
+// ❌ BAD: What we had before (creates variables for no reason)
+if (args.isEmpty) {
+  final logger = Logger(
+    printer: _SimplePrinter(),
+    output: _CliLogOutput(),
+  );
+  logger.e('❌ Missing commit message');
+  logger.e('💡 Usage: dart run tool/validate_commit.dart <message>');
+  exit(1);
+}
+
+// ✅ GOOD: What we fixed it to (proper cascade usage)
+if (args.isEmpty) {
+  Logger(
+    printer: _SimplePrinter(),
+    output: _CliLogOutput(),
+  )
+    ..e('❌ Missing commit message')
+    ..e('💡 Usage: dart run tool/validate_commit.dart <message>');
+  exit(1);
+}
+
+// ✅ ALSO GOOD: Single call without cascade
+if (commitMessage.isEmpty) {
+  Logger(
+    printer: _SimplePrinter(),
+    output: _CliLogOutput(),
+  ).e('❌ Empty commit message');
+  exit(1);
+}
+```
+
+#### **🛠️ Error Handling Patterns with Cascades**
+
+```dart
+// ✅ CORRECT: Error messages with context
+static void _printTypeError(String type) {
+  _logger
+    ..e('❌ Invalid commit type: "$type"')
+    ..e('')
+    ..e('🔧 Available types: ${allowedTypes.join(', ')}');
+  _printExamples();
+}
+
+// ✅ CORRECT: Complex error output
+static void _printExamples() {
+  _logger
+    ..e('✅ Correct format: type(scope): description')
+    ..e('')
+    ..e('📝 Examples:')
+    ..e('   feat(auth): add user registration')
+    ..e('   fix(ui): resolve button alignment issue')
+    ..e('   docs: update installation guide')
+    ..e('   feat!: add breaking change')
+    ..e('')
+    ..e('📏 Rules:')
+    ..e('   • 3-72 characters for description')
+    ..e('   • Lowercase description')
+    ..e('   • Optional scope in parentheses')
+    ..e('   • Use ! for breaking changes');
+}
+```
+
+#### **🎖️ WHY This Matters (Technical Debt Prevention)**
+
+1. **Eliminates pointless variables** - No more `final logger = ...` when you'll only use it for method calls
+2. **Reduces code noise** - Fewer lines, cleaner intent
+3. **Prevents linter errors** - `cascade_invocations` rule compliance
+4. **Better readability** - Clear chains of operations on the same object
+5. **Follows Dart idioms** - This is how Dart code should be written
+
+#### **🚨 Common Mistakes to Avoid**
+
+```dart
+// ❌ WRONG: Single cascade (triggers avoid_single_cascade_in_expression_statements)
+object..method();
+
+// ✅ RIGHT: Single call uses dot notation
+object.method();
+
+// ❌ WRONG: Mixed patterns in same codebase
+final obj = Object();
+obj.method1();  // Sometimes this...
+obj..method2(); // Sometimes this... BE CONSISTENT!
+
+// ✅ RIGHT: Consistent cascade usage
+final obj = Object()
+  ..method1()
+  ..method2();
+```
+
+**BOTTOM LINE:** If you're calling 2+ methods on the same object reference, use cascades. If you're calling 1 method, use dot notation. **No exceptions. No excuses. No linter errors.**
+
 ## 🧪 Testing Guidelines
 
 ### Unit Testing (Very Good Analysis Standards)

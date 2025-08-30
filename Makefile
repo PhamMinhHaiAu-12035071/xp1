@@ -1,7 +1,7 @@
 # Makefile for xp1 Flutter project
 # Provides easy commands for local CI equivalent to GitHub Actions
 
-.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check format analyze test help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli
+.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check format analyze test test-coverage coverage-html coverage-open coverage-clean coverage-report help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli
 
 # GitHub Actions equivalent commands
 semantic-check:
@@ -41,6 +41,53 @@ analyze:
 test:
 	@echo "🧪 Running tests..."
 	@fvm flutter test
+
+# Test coverage commands using very_good CLI
+test-coverage:
+	@echo "🧪📊 Running tests with coverage..."
+	@very_good test --coverage
+
+coverage-html:
+	@echo "📊🔧 Generating HTML coverage report..."
+	@if command -v genhtml >/dev/null 2>&1; then \
+		genhtml coverage/lcov.info -o coverage/html --title "xp1 Test Coverage"; \
+		echo "✅ HTML coverage report generated at: coverage/html/index.html"; \
+	else \
+		echo "❌ genhtml not found. Install lcov package:"; \
+		echo "  macOS: brew install lcov"; \
+		echo "  Ubuntu/Debian: sudo apt-get install lcov"; \
+		echo "  CentOS/RHEL: sudo yum install lcov"; \
+		echo "  Or download from: https://github.com/linux-test-project/lcov"; \
+		exit 1; \
+	fi
+
+coverage-open:
+	@echo "🌐📊 Opening HTML coverage report in browser..."
+	@if [ -f coverage/html/index.html ]; then \
+		if command -v open >/dev/null 2>&1; then \
+			open coverage/html/index.html; \
+		elif command -v xdg-open >/dev/null 2>&1; then \
+			xdg-open coverage/html/index.html; \
+		elif command -v start >/dev/null 2>&1; then \
+			start coverage/html/index.html; \
+		else \
+			echo "❌ No browser launcher found. Open manually:"; \
+			echo "   file://$(pwd)/coverage/html/index.html"; \
+		fi \
+	else \
+		echo "❌ HTML coverage report not found. Run 'make coverage-html' first."; \
+		exit 1; \
+	fi
+
+coverage-clean:
+	@echo "🧹 Cleaning coverage files..."
+	@rm -rf coverage/
+
+coverage-report: test-coverage coverage-html
+	@echo "📊📈 Complete coverage workflow finished!"
+	@echo "✅ Coverage data: coverage/lcov.info"
+	@echo "✅ HTML report: coverage/html/index.html"
+	@echo "💡 Run 'make coverage-open' to view in browser"
 
 deps:
 	@echo "📦 Installing dependencies..."
@@ -184,6 +231,24 @@ help:
 	@echo "  make analyze       - Analyze code"
 	@echo "  make test          - Run tests"
 	@echo "  make deps          - Install dependencies"
+	@echo ""
+	@echo "📊 Test Coverage (using very_good CLI + lcov):"
+	@echo "  make test-coverage    - Run tests with coverage (very_good CLI)"
+	@echo "  make coverage-html    - Generate HTML report from lcov.info (genhtml)"
+	@echo "  make coverage-open    - Open HTML coverage report in browser"
+	@echo "  make coverage-clean   - Clean all coverage files"
+	@echo "  make coverage-report  - Complete workflow: test + HTML report"
+	@echo ""
+	@echo "🔧 LCOV & genhtml Usage Examples:"
+	@echo "  # Install lcov (includes genhtml):"
+	@echo "  brew install lcov                    # macOS"
+	@echo "  sudo apt-get install lcov           # Ubuntu/Debian"
+	@echo "  # Manual HTML generation:"
+	@echo "  genhtml coverage/lcov.info -o coverage/html"
+	@echo "  # View coverage summary:"
+	@echo "  lcov --summary coverage/lcov.info"
+	@echo "  # List uncovered lines:"
+	@echo "  lcov --list coverage/lcov.info"
 	@echo ""
 	@echo "⚙️ Setup:"
 	@echo "  make setup         - Initial project setup"
