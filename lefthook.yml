@@ -13,7 +13,9 @@ pre-commit:
     # Quick spell check on staged files
     spell-check-quick:
       glob: "*.md"
-      run: npx cspell --config cspell.json {staged_files} --no-progress || echo "⚠️ Fix spelling issues"
+      run: |
+        npx cspell --config cspell.json {staged_files} --no-progress || \
+        echo "⚠️ Fix spelling issues"
     # Quick format check (fast)
     format-check:
       glob: "*.dart"
@@ -28,9 +30,24 @@ pre-commit:
       run: |
         if git diff --cached --name-only | grep -q "pubspec.yaml"; then
           echo "📦 pubspec.yaml changed, checking licenses..."
-          make license-validate-main
-        else
-          echo "📦 No pubspec.yaml changes, skipping license check"
+          fvm flutter pub run rps license-check
+        fi
+    # Dependency validation when pubspec.yaml changes
+    deps-check-on-pubspec-change:
+      glob: "pubspec.yaml"
+      run: |
+        if git diff --cached --name-only | grep -q "pubspec.yaml"; then
+          echo "📦 pubspec.yaml changed, validating dependencies..."
+          fvm flutter pub run rps validate-deps
+        fi
+    # Dart analyze staged Dart files and pubspec.yaml
+    pubspec-analyze:
+      glob: ["*.dart", "pubspec.yaml"]
+      run: |
+        FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(\.dart$|^pubspec\.yaml$)')
+        if [ -n "$FILES_TO_ANALYZE" ]; then
+          echo "📝 Analyzing staged files for linting issues..."
+          dart analyze $FILES_TO_ANALYZE
         fi
 
 pre-push:
@@ -41,10 +58,13 @@ pre-push:
       run: npm test
     # Full license compliance check trước khi push
     license-compliance:
-      run: make license-check
+      run: fvm flutter pub run rps license-check
     # Run complete CI pipeline via Makefile
     full-ci-pipeline:
       run: make local-ci
+    # Full dependency validation before push
+    validate-dependencies:
+      run: fvm flutter pub run rps validate-deps
 
 commit-msg:
   commands:

@@ -3,28 +3,39 @@ description: A Very Good Project created by Very Good CLI.
 version: 1.0.0+1
 homepage: https://github.com/PhamMinhHaiAu-12035071/xp1
 repository: https://github.com/PhamMinhHaiAu-12035071/xp1.git
+publish_to: "none"
 
 environment:
-  sdk: ^3.8.0
+  sdk: ">=3.8.0 <4.0.0" # Dart SDK range
+  flutter: ">=3.24.0" # Minimum Flutter version
 
 dependencies:
-  bloc: ^9.0.0
+  # === STATE MANAGEMENT ===
+  bloc: ^9.0.0 # Business Logic Component pattern
+
+  # === CORE FRAMEWORK ===
   flutter:
     sdk: flutter
-  flutter_bloc: ^9.1.1
+  flutter_bloc: ^9.1.1 # Flutter integration for BLoC
   flutter_localizations:
-    sdk: flutter
-  intl: ^0.20.2
+    sdk: flutter # Flutter localization support
+
+  # === UTILITIES ===
+  intl: ^0.20.2 # Internationalization utilities
 
 dev_dependencies:
-  bloc_test: ^10.0.0
-  conventional_commit: ^0.6.1+1
-  flutter_test:
+  # === TESTING & DEVELOPMENT TOOLS (Alphabetical Order) ===
+  bloc_test: ^10.0.0 # Testing utilities for BLoC
+  conventional_commit: ^0.6.1+1 # Git commit message linting
+  dependency_validator: ^5.0.2 # Check unused/missing dependencies
+  flutter_test: # Flutter testing framework
     sdk: flutter
-  mocktail: ^1.0.4
-  rps: ^0.9.1
-  very_good_analysis: ^9.0.0
+  logger: ^2.6.1 # Beautiful and extensible logging
+  mocktail: ^1.0.4 # Modern mocking framework
+  rps: ^0.9.1 # Run Pubspec Script tool
+  test: ^1.26.2
+  very_good_analysis: ^9.0.0 # Very Good Ventures linting rules
 
 flutter:
-  generate: true
-  uses-material-design: true
+  generate: true # Enable code generation
+  uses-material-design: true # Use Material Design icons

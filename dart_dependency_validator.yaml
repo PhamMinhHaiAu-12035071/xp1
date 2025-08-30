@@ -1,0 +1,13 @@
+# dart_dependency_validator.yaml
+# Allow pinned packages
+allow_pins: true
+
+# Exclude paths (supports glob)
+exclude:
+  - "app/**"
+  - "build/**"
+
+# Ignore specific packages
+ignore:
+  - analyzer
+  - build_runner

@@ -1,22 +1,54 @@
 import 'dart:io';
 
-/// Console output helper for CLI tools
-class Console {
-  /// Write success message to stdout
-  static void success(String message) => stdout.writeln(message);
+import 'package:logger/logger.dart';
 
-  /// Write info message to stdout
-  static void info(String message) => stdout.writeln(message);
+/// Custom log output that maintains proper stream separation for CLI tools.
+/// Info/debug messages go to stdout, errors/warnings go to stderr.
+class _CliLogOutput extends LogOutput {
+  @override
+  void output(OutputEvent event) {
+    final isErrorLevel = event.level.index >= Level.warning.index;
+    final target = isErrorLevel ? stderr : stdout;
 
-  /// Write error message to stderr
-  static void error(String message) => stderr.writeln(message);
+    for (final line in event.lines) {
+      target.writeln(line);
+    }
+  }
+}
 
-  /// Write warning message to stderr
-  static void warning(String message) => stderr.writeln(message);
+/// Simple printer for clean CLI output without timestamps or method traces.
+class _SimplePrinter extends LogPrinter {
+  @override
+  List<String> log(LogEvent event) {
+    return [event.message.toString()];
+  }
+}
+
+/// Helper function to clean branch names into valid PR titles
+String _cleanBranchName(String branchName) {
+  var cleaned = branchName
+      .replaceAll('-', ' ')
+      .replaceAll('#', '')
+      .replaceAll('_', ' ')
+      .replaceAll(RegExp(r'^\d+\s*'), '') // Remove leading numbers
+      .trim();
+
+  // Ensure description starts with lowercase letter
+  if (cleaned.isNotEmpty && RegExp('^[A-Z]').hasMatch(cleaned[0])) {
+    cleaned = cleaned[0].toLowerCase() + cleaned.substring(1);
+  }
+
+  return cleaned;
 }
 
 /// PR title validator following semantic conventions
 class PrTitleValidator {
+  /// Logger instance configured for CLI tools with proper stream separation.
+  static final _logger = Logger(
+    printer: _SimplePrinter(),
+    output: _CliLogOutput(),
+  );
+
   static const allowedTypes = [
     'feat',
     'fix',
@@ -44,7 +76,18 @@ class PrTitleValidator {
       return false;
     }
 
-    Console.success('✅ PR title validation passed');
+    // Validate description starts with lowercase letter
+    final parts = prTitle.split(': ');
+    if (parts.length >= 2) {
+      final description = parts.sublist(1).join(': ');
+      if (description.isNotEmpty &&
+          description[0] == description[0].toUpperCase()) {
+        _printError();
+        return false;
+      }
+    }
+
+    _logger.i('✅ PR title validation passed');
     _printPrInfo(prTitle);
     return true;
   }
@@ -57,32 +100,33 @@ class PrTitleValidator {
 
       final scopeMatch = RegExp(r'(\w+)(\((.+)\))?(!)?').firstMatch(typeScope);
       if (scopeMatch != null) {
-        Console.info('   Type: ${scopeMatch.group(1)}');
+        _logger.i('   Type: ${scopeMatch.group(1)}');
         if (scopeMatch.group(3) != null) {
-          Console.info('   Scope: ${scopeMatch.group(3)}');
+          _logger.i('   Scope: ${scopeMatch.group(3)}');
         }
         if (scopeMatch.group(4) != null) {
-          Console.info('   Breaking Change: Yes');
+          _logger.i('   Breaking Change: Yes');
         }
-        Console.info('   Description: $description');
+        _logger.i('   Description: $description');
       }
     }
   }
 
   static void _printError() {
-    Console.error('❌ Invalid semantic PR title format');
-    Console.error('');
-    Console.error('✅ Correct format: type(scope): description');
-    Console.error('✅ Breaking change: type(scope)!: description');
-    Console.error('');
-    Console.error('📝 Examples:');
-    Console.error('   feat(auth): add user registration');
-    Console.error('   fix(ui): resolve button alignment issue');
-    Console.error('   feat(api)!: change authentication system');
-    Console.error('   docs: update installation guide');
-    Console.error('');
-    Console.error('🔧 Available types: ${allowedTypes.join(', ')}');
-    Console.error('📏 Rules: 3-72 characters, lowercase description');
+    _logger
+      ..e('❌ Invalid semantic PR title format')
+      ..e('')
+      ..e('✅ Correct format: type(scope): description')
+      ..e('✅ Breaking change: type(scope)!: description')
+      ..e('')
+      ..e('📝 Examples:')
+      ..e('   feat(auth): add user registration')
+      ..e('   fix(ui): resolve button alignment issue')
+      ..e('   feat(api)!: change authentication system')
+      ..e('   docs: update installation guide')
+      ..e('')
+      ..e('🔧 Available types: ${allowedTypes.join(', ')}')
+      ..e('📏 Rules: 3-72 characters, lowercase description');
   }
 }
 
@@ -108,40 +152,51 @@ void main(List<String> args) {
           final parts = branchName.split('/');
           if (parts.length >= 2) {
             final type = parts[0];
-            final description = parts.sublist(1).join(' ').replaceAll('-', ' ');
+            // Clean up description using the existing helper function
+            final description = _cleanBranchName(parts.sublist(1).join(' '));
             // Check if type is valid semantic type
             if (PrTitleValidator.allowedTypes.contains(type)) {
               prTitle = '$type: $description';
             } else {
-              prTitle = parts.sublist(1).join(' ').replaceAll('-', ' ');
+              prTitle = description;
             }
           } else {
-            prTitle = branchName.replaceAll('-', ' ');
+            prTitle = _cleanBranchName(branchName);
           }
         } else {
-          prTitle = branchName.replaceAll('-', ' ');
+          prTitle = _cleanBranchName(branchName);
         }
-        Console.info('📝 Using branch name as PR title: $prTitle');
+        Logger(
+            printer: _SimplePrinter(),
+            output: _CliLogOutput(),
+          )
+          ..i('📝 Branch name: $branchName')
+          ..i('📝 Using branch name as PR title: $prTitle');
       } else {
-        Console.error('❌ Cannot determine PR title');
-        Console.error(
-          '💡 Usage: dart run tool/validate_pr_title.dart '
-          '<pr_title>',
-        );
+        Logger(
+            printer: _SimplePrinter(),
+            output: _CliLogOutput(),
+          )
+          ..e('❌ Cannot determine PR title')
+          ..e('💡 Usage: dart run tool/validate_pr_title.dart <pr_title>');
         exit(1);
       }
     } on Exception catch (e) {
-      Console.error('❌ Cannot determine PR title: $e');
-      Console.error(
-        '💡 Usage: dart run tool/validate_pr_title.dart '
-        '<pr_title>',
-      );
+      Logger(
+          printer: _SimplePrinter(),
+          output: _CliLogOutput(),
+        )
+        ..e('❌ Cannot determine PR title: $e')
+        ..e('💡 Usage: dart run tool/validate_pr_title.dart <pr_title>');
       exit(1);
     }
   }
 
   if (prTitle.isEmpty) {
-    Console.error('❌ Empty PR title');
+    Logger(
+      printer: _SimplePrinter(),
+      output: _CliLogOutput(),
+    ).e('❌ Empty PR title');
     exit(1);
   }
 
