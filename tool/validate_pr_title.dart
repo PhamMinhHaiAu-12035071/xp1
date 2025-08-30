@@ -24,6 +24,23 @@ class _SimplePrinter extends LogPrinter {
   }
 }
 
+/// Helper function to clean branch names into valid PR titles
+String _cleanBranchName(String branchName) {
+  var cleaned = branchName
+      .replaceAll('-', ' ')
+      .replaceAll('#', '')
+      .replaceAll('_', ' ')
+      .replaceAll(RegExp(r'^\d+\s*'), '') // Remove leading numbers
+      .trim();
+
+  // Ensure description starts with lowercase letter
+  if (cleaned.isNotEmpty && RegExp('^[A-Z]').hasMatch(cleaned[0])) {
+    cleaned = cleaned[0].toLowerCase() + cleaned.substring(1);
+  }
+
+  return cleaned;
+}
+
 /// PR title validator following semantic conventions
 class PrTitleValidator {
   /// Logger instance configured for CLI tools with proper stream separation.
@@ -111,6 +128,8 @@ class PrTitleValidator {
       ..e('🔧 Available types: ${allowedTypes.join(', ')}')
       ..e('📏 Rules: 3-72 characters, lowercase description');
   }
+
+
 }
 
 void main(List<String> args) {
@@ -135,23 +154,38 @@ void main(List<String> args) {
           final parts = branchName.split('/');
           if (parts.length >= 2) {
             final type = parts[0];
-            final description = parts.sublist(1).join(' ').replaceAll('-', ' ');
+            // Clean up description: replace dashes with spaces,
+            // remove special chars
+            var description = parts.sublist(1).join(' ')
+                .replaceAll('-', ' ')
+                .replaceAll('#', '')  // Remove # characters
+                .replaceAll('_', ' ') // Replace underscores with spaces
+                .replaceAll(RegExp(r'^\d+\s*'), '') // Remove leading numbers
+                .trim();
+            // Ensure description starts with lowercase letter
+            if (description.isNotEmpty &&
+                RegExp('^[A-Z]').hasMatch(description[0])) {
+              description = description[0].toLowerCase() +
+                  description.substring(1);
+            }
             // Check if type is valid semantic type
             if (PrTitleValidator.allowedTypes.contains(type)) {
               prTitle = '$type: $description';
             } else {
-              prTitle = parts.sublist(1).join(' ').replaceAll('-', ' ');
+              prTitle = description;
             }
           } else {
-            prTitle = branchName.replaceAll('-', ' ');
+            prTitle = _cleanBranchName(branchName);
           }
         } else {
-          prTitle = branchName.replaceAll('-', ' ');
+          prTitle = _cleanBranchName(branchName);
         }
         Logger(
           printer: _SimplePrinter(),
           output: _CliLogOutput(),
-        ).i('📝 Using branch name as PR title: $prTitle');
+        )
+          ..i('📝 Branch name: $branchName')
+          ..i('📝 Using branch name as PR title: $prTitle');
       } else {
         Logger(
             printer: _SimplePrinter(),
