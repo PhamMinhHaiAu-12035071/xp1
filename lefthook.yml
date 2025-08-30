@@ -49,6 +49,15 @@ pre-commit:
           echo "📝 Analyzing staged files for linting issues..."
           dart analyze $FILES_TO_ANALYZE
         fi
+    # Simplified naming check for staged Dart files
+    naming-check:
+      glob: "*.dart"
+      run: |
+        DART_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.dart$')
+        if [ -n "$DART_FILES" ]; then
+          echo "🏷️ Checking naming conventions..."
+          fvm dart analyze --fatal-infos
+        fi
 
 pre-push:
   parallel: false
@@ -65,6 +74,9 @@ pre-push:
     # Full dependency validation before push
     validate-dependencies:
       run: fvm flutter pub run rps validate-deps
+    # Complete naming conventions validation
+    naming-validation:
+      run: make naming-check
 
 commit-msg:
   commands:

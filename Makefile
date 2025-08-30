@@ -1,7 +1,7 @@
 # Makefile for xp1 Flutter project
 # Provides easy commands for local CI equivalent to GitHub Actions
 
-.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check format analyze test test-coverage coverage-html coverage-open coverage-clean coverage-report help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli
+.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check format analyze test test-coverage coverage-html coverage-open coverage-clean coverage-report help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
 
 # GitHub Actions equivalent commands
 semantic-check:
@@ -104,6 +104,28 @@ setup:
 	@fvm flutter pub get
 	@chmod +x scripts/*.sh
 	@echo "✅ Project setup completed"
+
+# Naming conventions enforcement - Simplified per Linus review
+naming-check:
+	@echo "🔍 Checking naming conventions..."
+	@fvm dart analyze --fatal-infos
+	@echo "✅ Naming check completed"
+
+naming-fix:
+	@echo "🔧 Applying naming fixes..."
+	@fvm dart fix --apply
+	@fvm dart format lib/ test/ --set-exit-if-changed
+	@echo "✅ Naming fixes applied"
+
+naming-docs:
+	@echo "📚 Opening naming conventions documentation..."
+	@if command -v open >/dev/null 2>&1; then \
+		open doc/naming-conventions.md; \
+	elif command -v xdg-open >/dev/null 2>&1; then \
+		xdg-open doc/naming-conventions.md; \
+	else \
+		echo "📖 View naming conventions: doc/naming-conventions.md"; \
+	fi
 
 # License compliance checking
 # Business-safe licenses only (avoid GPL, AGPL, unknown)
@@ -253,6 +275,11 @@ help:
 	@echo "🔐 License Compliance:"
 	@echo "  make license-check - Check business-safe licenses only"
 	@echo "  make license-help  - Show all license commands"
+	@echo ""
+	@echo "🏷️ Naming Conventions (Simplified):"
+	@echo "  make naming-check  - Validate naming conventions (dart analyze only)"
+	@echo "  make naming-fix    - Apply naming fixes (dart fix + format)"
+	@echo "  make naming-docs   - Open naming conventions guide"
 	@echo ""
 	@echo "❓ Help:"
 	@echo "  make help          - Show this help"
