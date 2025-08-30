@@ -8,10 +8,12 @@ scripts:
   analyze: "dart analyze --fatal-infos"
   analyze-strict: "dart analyze --fatal-infos --fatal-warnings"
   validate-deps: "dart run dependency_validator"
+  license-check: 'very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"'
 
   # Combined commands
   check: "dart format lib/ test/ --set-exit-if-changed && dart analyze --fatal-infos"
   check-strict: "dart format lib/ test/ --set-exit-if-changed && dart analyze --fatal-infos --fatal-warnings"
+  check-all: 'dart format lib/ test/ --set-exit-if-changed && dart analyze --fatal-infos && dart run dependency_validator && very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"'
 
   # Testing commands
   test: "flutter test"

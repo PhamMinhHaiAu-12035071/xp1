@@ -121,6 +121,8 @@ license-validate-dev: check-very-good-cli
 		--allowed="$(PERMISSIVE_LICENSES)"
 
 # CI/CD friendly check with clean output and performance optimization
+# Note: --jobs=4 enables parallel processing for faster execution
+# Note: --cache-dir improves performance on repeated runs (useful for local development)
 license-ci: check-very-good-cli
 	@very_good packages check licenses \
 		--forbidden="$(COPYLEFT_LICENSES),$(PROBLEMATIC_LICENSES)" \

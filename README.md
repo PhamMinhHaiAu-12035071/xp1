@@ -40,6 +40,18 @@ _\*Xp1 works on iOS, Android, Web, and Windows._
 
 ---
 
+## Quality Assurance 🛡️
+
+This project enforces strict quality standards to prevent production failures:
+
+- **License Compliance**: Blocks GPL/copyleft dependencies that could create legal issues
+- **Dependency Validation**: Catches unused/missing dependencies before they break builds
+- **Semantic Commits**: Ensures clean changelog generation and proper versioning
+
+See `.github/workflows/main.yaml` for implementation details.
+
+---
+
 ## Running Tests 🧪
 
 To run all unit and widget tests use the following command:

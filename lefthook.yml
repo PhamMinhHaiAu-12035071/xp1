@@ -28,7 +28,7 @@ pre-commit:
       run: |
         if git diff --cached --name-only | grep -q "pubspec.yaml"; then
           echo "📦 pubspec.yaml changed, checking licenses..."
-          make license-validate-main
+          fvm flutter pub run rps license-check
         else
           echo "📦 No pubspec.yaml changes, skipping license check"
         fi
@@ -51,7 +51,7 @@ pre-push:
       run: npm test
     # Full license compliance check trước khi push
     license-compliance:
-      run: make license-check
+      run: fvm flutter pub run rps license-check
     # Run complete CI pipeline via Makefile
     full-ci-pipeline:
       run: make local-ci

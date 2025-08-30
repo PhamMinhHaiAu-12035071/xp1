@@ -19,8 +19,63 @@ permissions:
   statuses: write
 
 jobs:
+  # Check for file changes first
+  paths-filter:
+    runs-on: ubuntu-latest
+    outputs:
+      pubspec-changed: ${{ steps.filter.outputs.pubspec }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            pubspec:
+              - 'pubspec.yaml'
+
   semantic-pull-request:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
+
+  dependency-validation:
+    needs: paths-filter
+    if: needs.paths-filter.outputs.pubspec-changed == 'true' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.1"
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔍 Validate dependencies
+        run: flutter pub run rps validate-deps
+
+  license-compliance:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: "3.35.1"
+          cache: true
+
+      - name: 🔧 Setup Very Good CLI
+        run: dart pub global activate very_good_cli
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🔐 Check license compliance
+        run: make license-ci
 
   build:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
