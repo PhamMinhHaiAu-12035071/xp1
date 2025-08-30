@@ -40,14 +40,14 @@ pre-commit:
           echo "📦 pubspec.yaml changed, validating dependencies..."
           fvm flutter pub run rps validate-deps
         fi
-    # Dart analyze staged Dart files and pubspec.yaml
-    pubspec-analyze:
+    # Analyze staged files for linting and naming convention issues
+    staged-analysis:
       glob: ["*.dart", "pubspec.yaml"]
       run: |
         FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(\.dart$|^pubspec\.yaml$)')
         if [ -n "$FILES_TO_ANALYZE" ]; then
-          echo "📝 Analyzing staged files for linting issues..."
-          dart analyze $FILES_TO_ANALYZE
+          echo "📝 Analyzing staged files for linting and naming issues..."
+          fvm dart analyze --fatal-infos $FILES_TO_ANALYZE
         fi
 
 pre-push:
@@ -65,6 +65,9 @@ pre-push:
     # Full dependency validation before push
     validate-dependencies:
       run: fvm flutter pub run rps validate-deps
+    # Complete naming conventions validation
+    naming-validation:
+      run: make naming-check
 
 commit-msg:
   commands:

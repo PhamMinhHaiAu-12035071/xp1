@@ -15,8 +15,34 @@ analyzer:
     strict-inference: true
     strict-raw-types: true
 
-# Very Good Analysis đã include hầu hết rules tốt nhất
-# Chỉ override khi thực sự cần thiết
+  # Custom severity overrides for naming violations
+  errors:
+    # Make naming violations errors (not warnings)
+    non_constant_identifier_names: error
+    camel_case_types: error
+    constant_identifier_names: error
+    file_names: error
+    library_names: error
+    package_names: error
+
+    # Critical code quality issues
+    missing_required_param: error
+    missing_return: error
+    avoid_dynamic_calls: error
+
+    # Documentation requirement
+    public_member_api_docs: error
+
+    # Line length enforcement
+    lines_longer_than_80_chars: error
+
+    # Cascade operator consistency
+    cascade_invocations: error
+    avoid_single_cascade_in_expression_statements: error
+
+# Custom linter rule overrides (only non-default settings)
 linter:
   rules:
-    # lines_longer_than_80_chars: false  # Nếu cần dòng dài hơn
+    # Use relative imports for files within the same package (project style guide)
+    # This overrides the very_good_analysis default of true
+    always_use_package_imports: false
