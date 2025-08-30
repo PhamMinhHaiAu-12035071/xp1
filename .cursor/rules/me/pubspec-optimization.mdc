@@ -1,0 +1,374 @@
+---
+globs: pubspec.yaml
+description: Pubspec.yaml optimization and professional organization guidelines
+---
+
+# Pubspec.yaml Optimization Rules
+
+When working with [pubspec.yaml](mdc:pubspec.yaml), always follow these organization and optimization principles to ensure professionalism and maintainability.
+
+## 1. Structure and Organization
+
+### Group Dependencies by Category
+
+**MANDATORY**: Always organize dependencies into clear groups with categorizing comments:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+
+  # === CORE UI FRAMEWORK ===
+  cupertino_icons: ^1.0.6 # iOS-style icons for Cupertino widgets
+  material_color_utilities: ^0.5.0 # Material Design color system
+
+  # === STATE MANAGEMENT ===
+  bloc: ^8.1.2 # Business Logic Component pattern
+  flutter_bloc: ^8.1.3 # Flutter integration for BLoC
+  equatable: ^2.0.5 # Value equality for immutable objects
+
+  # === NETWORKING ===
+  dio: ^5.3.0 # Powerful HTTP client with interceptors
+  retrofit: ^4.0.3 # Type-safe HTTP client generator
+  json_annotation: ^4.8.1 # Annotations for JSON serialization
+
+  # === LOCAL STORAGE ===
+  shared_preferences: ^2.2.0 # Simple persistent key-value storage
+  sqflite: ^2.3.0 # SQLite database for complex data
+  hive: ^2.2.3 # Fast NoSQL database for offline storage
+
+  # === NAVIGATION ===
+  go_router: ^12.1.1 # Declarative routing solution
+
+  # === UTILITIES ===
+  intl: ^0.18.1 # Internationalization utilities
+  logger: ^2.0.2+1 # Lightweight logging utility
+  path_provider: ^2.1.1 # Platform paths (documents, temp, etc)
+```
+
+### Group Priority Order:
+
+1. CORE UI FRAMEWORK
+2. STATE MANAGEMENT
+3. NETWORKING
+4. LOCAL STORAGE
+5. NAVIGATION
+6. UTILITIES
+7. PLATFORM-SPECIFIC
+
+### Alphabetical Sorting Within Categories
+
+**CRITICAL**: Always maintain alphabetical sorting (A→Z) within each category to satisfy Dart linter `sort_pub_dependencies` rule:
+
+```yaml
+dependencies:
+  # === STATE MANAGEMENT ===
+  bloc: ^9.0.0 # Business Logic Component pattern
+
+  # === CORE FRAMEWORK ===
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1 # Flutter integration for BLoC
+  flutter_localizations: # Flutter localization support
+    sdk: flutter
+
+  # === UTILITIES ===
+  intl: ^0.20.2 # Internationalization utilities
+
+dev_dependencies:
+  # === TESTING & DEVELOPMENT TOOLS (Alphabetical Order) ===
+  bloc_test: ^10.0.0 # Testing utilities for BLoC
+  conventional_commit: ^0.6.1+1 # Git commit message linting
+  dependency_validator: ^5.0.2 # Check unused/missing dependencies
+  flutter_test: # Flutter testing framework
+    sdk: flutter
+  mocktail: ^1.0.4 # Modern mocking framework
+```
+
+**Key Rules**:
+
+- Sort alphabetically ACROSS the entire dependencies section
+- Use strategic category placement to maintain logical grouping
+- Dependencies starting with same letter should be sub-sorted alphabetically
+- SDK dependencies (flutter, flutter_test) follow standard alphabetical rules
+
+## 2. Version Constraints Strategy
+
+### Flexible vs Pinned Versions
+
+**Principles**:
+
+- **Caret (^)**: For stable packages, core libraries
+- **Range (>=x.y.z <w.v.u)**: For packages with frequent breaking changes
+- **Exact (x.y.z)**: Only when absolute stability is required
+
+```yaml
+dependencies:
+  # === STABLE CORE (Flexible) ===
+  dio: ^5.3.0 # Caret: allows 5.3.0 to <6.0.0
+  bloc: ^8.1.2 # Safe for minor/patch updates
+
+  # === BREAKING-PRONE (More Restrictive) ===
+  auto_route: ">=7.8.0 <7.9.0" # Tighter control for complex packages
+  retrofit: "7.0.8" # Pin exact version if stability critical
+
+dev_dependencies:
+  # === TOOLS (Can be more flexible) ===
+  build_runner: ^2.4.0 # Development tools can be more flexible
+
+  # === TESTING (Stable) ===
+  mocktail: ^1.0.0 # Testing libraries should be stable
+```
+
+## 3. Dependency Overrides Management
+
+**Use only when necessary** and always document the reason:
+
+```yaml
+dependency_overrides:
+  # === CONFLICT RESOLUTION ===
+  # Force specific versions to resolve dependency conflicts
+  meta: 1.9.1 # Common conflict resolver
+  analyzer: 6.2.0 # Development tool compatibility
+
+  # === SECURITY PATCHES ===
+  # Override vulnerable versions even if dependencies use older ones
+  http: 1.1.0 # Force latest secure version
+
+
+  # === DEVELOPMENT OVERRIDES ===
+  # Temporary overrides for development (document why)
+  # some_package:
+  #   path: ../local_packages/some_package  # Local development
+```
+
+## 4. Flutter Configuration
+
+### Assets Organization
+
+```yaml
+flutter:
+  uses-material-design: true
+
+  # === ASSETS ORGANIZATION ===
+  assets:
+    # Images by category
+    - assets/images/icons/
+    - assets/images/logos/
+    - assets/images/backgrounds/
+    - assets/images/illustrations/
+
+    # Data files
+    - assets/data/
+    - assets/config/
+
+    # Fonts
+    - assets/fonts/
+
+  # === FONTS MANAGEMENT ===
+  fonts:
+    - family: Primary
+      fonts:
+        - asset: assets/fonts/Primary-Regular.ttf
+          weight: 400
+        - asset: assets/fonts/Primary-Bold.ttf
+          weight: 700
+```
+
+## 5. Environment and SDK Constraints
+
+```yaml
+environment:
+  sdk: ">=3.0.0 <4.0.0" # Dart SDK range
+  flutter: ">=3.10.0" # Minimum Flutter version
+
+# === PLATFORM SUPPORT DOCUMENTATION ===
+# Supported: iOS 12+, Android API 21+, Web (Chrome, Safari, Firefox)
+# Tested on: iOS 15+, Android API 28+
+```
+
+## 6. Documentation Requirements
+
+### Inline Comments Strategy
+
+**MANDATORY**: Each dependency must have a comment briefly describing its purpose:
+
+```yaml
+dependencies:
+  # === STATE MANAGEMENT ===
+  # BLoC pattern implementation
+  # - bloc: Core BLoC library for business logic
+  # - flutter_bloc: Flutter-specific BLoC widgets
+  # - equatable: Simplifies value equality for BLoC states/events
+  bloc: ^8.1.2
+  flutter_bloc: ^8.1.3
+  equatable: ^2.0.5
+```
+
+## 7. Best Practices Checklist
+
+When editing [pubspec.yaml](mdc:pubspec.yaml), ensure:
+
+- [ ] Dependencies are grouped by category with clear categorizing comments
+- [ ] **CRITICAL**: Dependencies are sorted alphabetically (A→Z) across entire section
+- [ ] Each dependency has inline comment describing its purpose
+- [ ] Version constraints match the package's stability
+- [ ] Assets are organized into logical directories
+- [ ] Environment constraints are precisely defined
+- [ ] No unused dependencies (use `dependency_validator`)
+- [ ] Dependency overrides have clear documentation
+- [ ] Complies with 80-character line limit
+- [ ] Fonts are configured with specific weights
+- [ ] Passes `dart analyze` without `sort_pub_dependencies` warnings
+- [ ] Strategic category placement maintains both logic and alphabetical order
+
+## 8. Tools Integration
+
+### Validation Commands
+
+Always run the following commands before commit:
+
+```bash
+# Check linter compliance (including alphabetical sorting)
+dart analyze
+
+# Check for unused dependencies
+dart run dependency_validator
+
+# Update pubspec.lock
+flutter pub get
+
+# Verify no conflicts
+flutter pub deps
+
+# Auto-fix formatting issues
+dart format .
+```
+
+### Development Dependencies Organization
+
+```yaml
+dev_dependencies:
+  # === TESTING & DEV TOOLS (Alphabetical Order) ===
+  bloc_test: ^9.1.4 # Testing utilities for BLoC
+  build_runner: ^2.4.7 # Build system for Dart code generation
+  dependency_validator: ^5.0.2 # Check unused/missing dependencies
+  flutter_lints: ^2.0.3 # Flutter linting rules
+  flutter_test: # Flutter testing framework
+    sdk: flutter
+  json_serializable: ^6.7.1 # JSON serialization code generator
+  mocktail: ^1.0.1 # Modern mocking framework
+  patrol: ^3.5.0 # Integration testing framework
+  retrofit_generator: ^7.0.8 # Generator for Retrofit HTTP client
+  very_good_cli: ^0.26.0 # Project templates and utilities
+```
+
+**Note**: This example shows proper alphabetical sorting (A→Z) while maintaining logical grouping through strategic category naming and placement.
+
+## 9. Version Strategy Documentation
+
+```yaml
+# === VERSION STRATEGY NOTES ===
+# ^x.y.z  - Caret: allows compatible within major version
+# >=x.y.z <w.v.u - Range: explicit min/max versions
+# x.y.z   - Exact: pin to specific version (use sparingly)
+# any     - Any version (avoid in production)
+```
+
+## 10. Linter Compliance Strategy
+
+### Avoiding `sort_pub_dependencies` Warnings
+
+**MANDATORY**: The Dart linter enforces strict alphabetical sorting. Balance this with professional categorization:
+
+#### ✅ **Correct Approach**:
+
+```yaml
+dependencies:
+  # Start with packages beginning with 'a', 'b', etc.
+  # === STATE MANAGEMENT ===
+  bloc: ^9.0.0
+
+  # Continue alphabetically while maintaining logical groups
+  # === CORE FRAMEWORK ===
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  flutter_localizations:
+    sdk: flutter
+
+  # === UTILITIES ===
+  intl: ^0.20.2
+```
+
+#### ❌ **Incorrect Approach**:
+
+```yaml
+dependencies:
+  flutter:
+    sdk: flutter
+  # This breaks alphabetical order - bloc should come before flutter
+  bloc: ^9.0.0 # ← Linter error here
+```
+
+### Linter Validation Commands
+
+Add these to your development workflow:
+
+```bash
+# Check linter compliance
+dart analyze
+
+# Auto-fix formatting issues
+dart format .
+
+# Validate dependencies
+dart run dependency_validator
+```
+
+## 11. Quick Reference Guide
+
+### Before Adding Any Dependency
+
+1. **Identify alphabetical position** - Where does it fit A→Z?
+2. **Choose appropriate category** - Which logical group?
+3. **Add inline comment** - What is its purpose?
+4. **Use correct version constraint** - Caret, range, or exact?
+5. **Run validation** - `dart analyze` and `dependency_validator`
+
+### Common Linter Error Solutions
+
+**Error**: "Dependencies not sorted alphabetically"
+
+```bash
+# Quick fix
+dart analyze --fix --apply-fixes
+```
+
+**Manual fix**: Ensure your dependencies follow this pattern:
+
+```yaml
+dependencies:
+  a_package: ^1.0.0
+  bloc: ^9.0.0
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1
+  z_package: ^1.0.0
+```
+
+### Emergency Alphabetical Sort
+
+If categories become too complex, use this simplified approach:
+
+```yaml
+dependencies:
+  # All dependencies in pure alphabetical order with minimal categorization
+  bloc: ^9.0.0 # State management
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1 # State management
+  intl: ^0.20.2 # Internationalization
+```
+
+Following these rules ensures that [pubspec.yaml](mdc:pubspec.yaml) remains professional, maintainable, linter-compliant, and optimized for team development.
