@@ -63,9 +63,18 @@ class PrTitleValidator {
     'revert',
   ];
 
+  // Capitalized versions for Feat/, Fix/, etc. format
+  static final List<String> capitalizedTypes = allowedTypes
+      .map((type) => type[0].toUpperCase() + type.substring(1))
+      .toList();
+
   static final _prTitlePattern = RegExp(
-    '^(${allowedTypes.join('|')})'
-    r'(\([^)]+\))?!?: .{3,72}$',
+    '^('
+    '(?:${allowedTypes.join('|')})'
+    r'(\([^)]+\))?!?:|'
+    '(?:${capitalizedTypes.join('|')})'
+    r'(?:\([^)]+\))?/)'
+    r'.{3,72}$',
   );
 
   /// Validates PR title according to Conventional Commits spec
@@ -93,22 +102,42 @@ class PrTitleValidator {
   }
 
   static void _printPrInfo(String title) {
-    final parts = title.split(': ');
-    if (parts.length >= 2) {
-      final typeScope = parts[0];
-      final description = parts.sublist(1).join(': ');
+    String typeScope;
+    String description;
+    var isCapitalizedFormat = false;
 
-      final scopeMatch = RegExp(r'(\w+)(\((.+)\))?(!)?').firstMatch(typeScope);
-      if (scopeMatch != null) {
-        _logger.i('   Type: ${scopeMatch.group(1)}');
-        if (scopeMatch.group(3) != null) {
-          _logger.i('   Scope: ${scopeMatch.group(3)}');
-        }
-        if (scopeMatch.group(4) != null) {
-          _logger.i('   Breaking Change: Yes');
-        }
-        _logger.i('   Description: $description');
+    // Check if it's capitalized slash format (Feat/, Fix/, etc.)
+    if (title.contains('/')) {
+      final parts = title.split('/ ');
+      if (parts.length >= 2) {
+        typeScope = parts[0];
+        description = parts.sublist(1).join('/ ');
+        isCapitalizedFormat = true;
+      } else {
+        return; // Invalid format
       }
+    } else {
+      // Conventional format with colon
+      final parts = title.split(': ');
+      if (parts.length >= 2) {
+        typeScope = parts[0];
+        description = parts.sublist(1).join(': ');
+      } else {
+        return; // Invalid format
+      }
+    }
+
+    final scopeMatch = RegExp(r'(\w+)(\((.+)\))?(!)?').firstMatch(typeScope);
+    if (scopeMatch != null) {
+      final separator = isCapitalizedFormat ? '/' : ':';
+      _logger.i('   Type: ${scopeMatch.group(1)}$separator');
+      if (scopeMatch.group(3) != null) {
+        _logger.i('   Scope: ${scopeMatch.group(3)}');
+      }
+      if (scopeMatch.group(4) != null) {
+        _logger.i('   Breaking Change: Yes');
+      }
+      _logger.i('   Description: $description');
     }
   }
 
@@ -116,12 +145,16 @@ class PrTitleValidator {
     _logger
       ..e('❌ Invalid semantic PR title format')
       ..e('')
-      ..e('✅ Correct format: type(scope): description')
-      ..e('✅ Breaking change: type(scope)!: description')
+      ..e('✅ Correct formats:')
+      ..e('   Conventional: type(scope): description')
+      ..e('   Capitalized: Type(scope)/ description')
+      ..e('   Breaking change: type(scope)!: description')
       ..e('')
       ..e('📝 Examples:')
       ..e('   feat(auth): add user registration')
       ..e('   fix(ui): resolve button alignment issue')
+      ..e('   Feat(auth)/ add user registration')
+      ..e('   Fix(ui)/ resolve button alignment issue')
       ..e('   feat(api)!: change authentication system')
       ..e('   docs: update installation guide')
       ..e('')
@@ -155,8 +188,9 @@ void main(List<String> args) {
             // Clean up description using the existing helper function
             final description = _cleanBranchName(parts.sublist(1).join(' '));
             // Check if type is valid semantic type
-            if (PrTitleValidator.allowedTypes.contains(type)) {
-              prTitle = '$type: $description';
+            if (PrTitleValidator.allowedTypes.contains(type.toLowerCase())) {
+              // Convert to conventional format for validation
+              prTitle = '${type.toLowerCase()}: $description';
             } else {
               prTitle = description;
             }

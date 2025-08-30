@@ -40,65 +40,9 @@ analyzer:
     cascade_invocations: error
     avoid_single_cascade_in_expression_statements: error
 
-# Enhanced naming conventions and coding standards
+# Custom linter rule overrides (only non-default settings)
 linter:
   rules:
-    # === NAMING CONVENTIONS ===
-    # Classes, enums, typedefs: PascalCase
-    camel_case_types: true
-
-    # Variables, functions, parameters: camelCase
-    non_constant_identifier_names: true
-
-    # Constants: lowerCamelCase (Very Good Analysis standard)
-    constant_identifier_names: true
-
-    # Files: snake_case
-    file_names: true
-
-    # Libraries: snake_case with underscores
-    library_names: true
-
-    # Packages: lowercase_with_underscores
-    package_names: true
-
-    # === CODE QUALITY & STANDARDS ===
-    # Enforce 80-character line limit for readability
-    lines_longer_than_80_chars: true
-
-    # Prefer single quotes for strings
-    prefer_single_quotes: true
-
-    # Use trailing commas for better diffs
-    require_trailing_commas: true
-
-    # Proper documentation for public APIs
-    public_member_api_docs: true
-
-    # Consistent constructor usage
-    prefer_const_constructors: true
-    prefer_const_constructors_in_immutables: true
-
-    # === CASCADE OPERATORS ===
-    # Avoid single cascade (use dot notation for single calls)
-    avoid_single_cascade_in_expression_statements: true
-
-    # Prefer cascade for multiple method calls
-    cascade_invocations: true
-
-    # === ADDITIONAL QUALITY RULES ===
-    # Avoid dynamic types
-    avoid_dynamic_calls: true
-
-    # Prefer final for local variables
-    prefer_final_locals: true
-
-    # Avoid redundant argument values
-    avoid_redundant_argument_values: true
-
-    # === WIDGET SPECIFIC ===
-    # Use package imports (Very Good Analysis standard)
-    always_use_package_imports: true
-
-    # Sort dependencies alphabetically
-    sort_pub_dependencies: true
+    # Use relative imports for files within the same package (project style guide)
+    # This overrides the very_good_analysis default of true
+    always_use_package_imports: false
