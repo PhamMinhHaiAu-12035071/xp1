@@ -8,13 +8,13 @@ scripts:
   analyze: "fvm dart analyze --fatal-infos"
   analyze-quick: "fvm dart analyze --fatal-infos"
   analyze-strict: "fvm dart analyze --fatal-infos --fatal-warnings"
-  validate-deps: "fvm dart run dependency_validator"
+  validate-deps: "fvm flutter pub run dependency_validator"
   license-check: 'very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"'
 
   # Combined commands
   check: "fvm dart format lib/ test/ --set-exit-if-changed && fvm dart analyze --fatal-infos"
   check-strict: "fvm dart format lib/ test/ --set-exit-if-changed && fvm dart analyze --fatal-infos --fatal-warnings"
-  check-all: 'fvm dart format lib/ test/ --set-exit-if-changed && fvm dart analyze --fatal-infos && fvm dart run dependency_validator && very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"'
+  check-all: 'fvm dart format lib/ test/ --set-exit-if-changed && fvm dart analyze --fatal-infos && fvm flutter pub run dependency_validator && very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"'
 
   # Testing commands
   test: "fvm flutter test"

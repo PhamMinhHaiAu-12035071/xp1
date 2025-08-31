@@ -6,6 +6,8 @@ concurrency:
 
 env:
   FLUTTER_VERSION: "3.35.1" # Should match .fvmrc flutter version
+  FVM_CACHE_PATH: ~/.fvm
+  PUB_CACHE: ~/.pub-cache
 
 on:
   push:
@@ -75,17 +77,33 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
-      - name: 🗂️ Cache FVM
+      - name: 🗂️ Cache FVM and Flutter SDK
         uses: actions/cache@v4
         with:
-          path: ~/.pub-cache/bin
-          key: ${{ runner.os }}-fvm-${{ env.FLUTTER_VERSION }}
+          path: |
+            ~/.pub-cache/bin
+            ~/.fvm/flutter_sdk
+            ~/.fvm/releases.json
+          key: ${{ runner.os }}-fvm-flutter-${{ env.FLUTTER_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-fvm-flutter-
 
       - name: 🔧 Install FVM
         run: dart pub global activate fvm
 
       - name: 🔧 Add Dart Pub Bin to PATH
         run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
+      - name: 🔧 Setup FVM Flutter (use cache if available)
+        run: |
+          if [ -d "$HOME/.fvm/flutter_sdk" ]; then
+            echo "✅ Flutter SDK found in cache"
+            fvm use ${{ env.FLUTTER_VERSION }} --force
+          else
+            echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
+            fvm install ${{ env.FLUTTER_VERSION }}
+            fvm use ${{ env.FLUTTER_VERSION }} --force
+          fi
 
       - name: 📦 Install dependencies
         run: flutter pub get
@@ -148,17 +166,33 @@ jobs:
           key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
           restore-keys: ${{ runner.os }}-pub-
 
-      - name: 🗂️ Cache FVM
+      - name: 🗂️ Cache FVM and Flutter SDK
         uses: actions/cache@v4
         with:
-          path: ~/.pub-cache/bin
-          key: ${{ runner.os }}-fvm-${{ env.FLUTTER_VERSION }}
+          path: |
+            ~/.pub-cache/bin
+            ~/.fvm/flutter_sdk
+            ~/.fvm/releases.json
+          key: ${{ runner.os }}-fvm-flutter-${{ env.FLUTTER_VERSION }}
+          restore-keys: |
+            ${{ runner.os }}-fvm-flutter-
 
       - name: 🔧 Install FVM
         run: dart pub global activate fvm
 
       - name: 🔧 Add Dart Pub Bin to PATH
         run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
+      - name: 🔧 Setup FVM Flutter (use cache if available)
+        run: |
+          if [ -d "$HOME/.fvm/flutter_sdk" ]; then
+            echo "✅ Flutter SDK found in cache"
+            fvm use ${{ env.FLUTTER_VERSION }} --force
+          else
+            echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
+            fvm install ${{ env.FLUTTER_VERSION }}
+            fvm use ${{ env.FLUTTER_VERSION }} --force
+          fi
 
       - name: 📦 Install dependencies
         run: flutter pub get
