@@ -81,33 +81,34 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.pub-cache/bin
-            ~/.fvm/flutter_sdk
-            ~/.fvm/releases.json
-          key: ${{ runner.os }}-fvm-flutter-${{ env.FLUTTER_VERSION }}
+            ~/.fvm
+          key: ${{ runner.os }}-fvm-complete-${{ env.FLUTTER_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-fvm-flutter-
+            ${{ runner.os }}-fvm-complete-
 
-      - name: 🔧 Install and Setup FVM
+                        - name: 🔧 Install FVM using official installer
         run: |
-          # Install FVM
-          dart pub global activate fvm
+          # Use official FVM installer for reliability
+          curl -fsSL https://fvm.app/install.sh | bash
 
-          # Add to PATH
-          export PATH="$HOME/.pub-cache/bin:$PATH"
-          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+          # Add FVM to PATH
+          export PATH="$HOME/.fvm/bin:$PATH"
+          echo "$HOME/.fvm/bin" >> $GITHUB_PATH
 
           # Verify FVM installation
-          $HOME/.pub-cache/bin/fvm --version
+          echo "📋 Verifying FVM installation..."
+          fvm --version
 
-          # Setup Flutter with FVM
-          if [ -d "$HOME/.fvm/flutter_sdk" ]; then
+      - name: 🔧 Setup Flutter with FVM
+        run: |
+          # Setup Flutter with smart caching
+          if [ -d "$HOME/.fvm/flutter_sdk" ] && [ -f "$HOME/.fvm/flutter_sdk/bin/flutter" ]; then
             echo "✅ Flutter SDK found in cache"
-            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
+            fvm use ${{ env.FLUTTER_VERSION }} --force
           else
             echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
-            $HOME/.pub-cache/bin/fvm install ${{ env.FLUTTER_VERSION }}
-            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
+            fvm install ${{ env.FLUTTER_VERSION }}
+            fvm use ${{ env.FLUTTER_VERSION }} --force
           fi
 
       - name: 📦 Install dependencies
@@ -175,33 +176,34 @@ jobs:
         uses: actions/cache@v4
         with:
           path: |
-            ~/.pub-cache/bin
-            ~/.fvm/flutter_sdk
-            ~/.fvm/releases.json
-          key: ${{ runner.os }}-fvm-flutter-${{ env.FLUTTER_VERSION }}
+            ~/.fvm
+          key: ${{ runner.os }}-fvm-complete-${{ env.FLUTTER_VERSION }}
           restore-keys: |
-            ${{ runner.os }}-fvm-flutter-
+            ${{ runner.os }}-fvm-complete-
 
-      - name: 🔧 Install and Setup FVM
+                        - name: 🔧 Install FVM using official installer
         run: |
-          # Install FVM
-          dart pub global activate fvm
+          # Use official FVM installer for reliability
+          curl -fsSL https://fvm.app/install.sh | bash
 
-          # Add to PATH
-          export PATH="$HOME/.pub-cache/bin:$PATH"
-          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+          # Add FVM to PATH
+          export PATH="$HOME/.fvm/bin:$PATH"
+          echo "$HOME/.fvm/bin" >> $GITHUB_PATH
 
           # Verify FVM installation
-          $HOME/.pub-cache/bin/fvm --version
+          echo "📋 Verifying FVM installation..."
+          fvm --version
 
-          # Setup Flutter with FVM
-          if [ -d "$HOME/.fvm/flutter_sdk" ]; then
+      - name: 🔧 Setup Flutter with FVM
+        run: |
+          # Setup Flutter with smart caching
+          if [ -d "$HOME/.fvm/flutter_sdk" ] && [ -f "$HOME/.fvm/flutter_sdk/bin/flutter" ]; then
             echo "✅ Flutter SDK found in cache"
-            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
+            fvm use ${{ env.FLUTTER_VERSION }} --force
           else
             echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
-            $HOME/.pub-cache/bin/fvm install ${{ env.FLUTTER_VERSION }}
-            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
+            fvm install ${{ env.FLUTTER_VERSION }}
+            fvm use ${{ env.FLUTTER_VERSION }} --force
           fi
 
       - name: 📦 Install dependencies
