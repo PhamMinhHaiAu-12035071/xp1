@@ -169,8 +169,8 @@ Each feature is organized in its own directory with:
 ### Code Quality
 - **Static Analysis**: Very Good Ventures analysis rules (130+ strict rules)
 - **Code Formatting**: Automatic formatting with `dart format` (80 character limit)
-- **Linting**: Comprehensive linting rules với very_good_analysis
-- **Documentation**: Mandatory documentation cho tất cả public APIs
+- **Linting**: Comprehensive linting rules with very_good_analysis
+- **Documentation**: Mandatory documentation for all public APIs
 - **Error Handling**: Specific exception handling patterns
 
 ### Git Workflow
@@ -237,8 +237,8 @@ flutter build macos --flavor production
 ## 📚 Documentation
 
 ### Available Documentation
-- **[Tech Stack](tech-stack.md)**: Detailed technology stack information
-- **[Architecture](architecture.md)**: Comprehensive architecture documentation
+- **[Tech Stack](../core/tech-stack.md)**: Detailed technology stack information
+- **[Architecture](../core/architecture.md)**: Comprehensive architecture documentation
 - **[API Documentation]**: Generated API documentation (if applicable)
 
 ### Contributing to Documentation
@@ -259,10 +259,10 @@ flutter build macos --flavor production
 
 ### Code Standards
 - Follow Very Good Ventures coding standards (130+ strict rules)
-- Write comprehensive tests với proper mocking
+- Write comprehensive tests with proper mocking
 - Use meaningful commit messages (conventional commits)
 - Keep commits atomic and focused
-- Mandatory documentation cho public APIs
+- Mandatory documentation for all public APIs
 - Specific exception handling patterns
 
 ## 📄 License

@@ -1,0 +1,22 @@
+// GENERATED CODE - DO NOT MODIFY BY HAND
+
+part of 'env_development.dart';
+
+// **************************************************************************
+// EnviedGenerator
+// **************************************************************************
+
+// coverage:ignore-file
+// ignore_for_file: type=lint
+// generated_from: lib/features/env/development.env
+final class _EnvDev {
+  static const String apiUrl = 'https://dev-api.xp1.com/api/v1';
+
+  static const String appName = 'XP1 Development';
+
+  static const String environmentName = 'development';
+
+  static const bool isDebugMode = true;
+
+  static const int apiTimeoutMs = 30000;
+}

@@ -8,9 +8,9 @@ Welcome to the Xp1 Flutter project documentation. This index provides quick acce
 
 ### Core Documentation
 - **[README](README.md)** - Project overview, setup, and quick start guide
-- **[Tech Stack](tech-stack.md)** - Comprehensive technology stack information
-- **[Architecture](architecture.md)** - System architecture and design patterns
-- **[Development Guidelines](development-guidelines.md)** - Coding standards and best practices
+- **[Tech Stack](../core/tech-stack.md)** - Comprehensive technology stack information
+- **[Architecture](../core/architecture.md)** - System architecture and design patterns
+- **[Development Guidelines](../core/development-guidelines.md)** - Coding standards and best practices
 
 ### Quick Reference
 - **[Project Structure](#project-structure)** - File and folder organization
@@ -79,8 +79,8 @@ flutter run --flavor development --target lib/main_development.dart
 ### Code Quality
 - **Static Analysis**: Very Good Ventures analysis rules (130+ strict rules)
 - **Code Formatting**: Automatic formatting with `dart format` (80 character limit)
-- **Linting**: Comprehensive linting rules với very_good_analysis
-- **Documentation**: Mandatory documentation cho tất cả public APIs
+- **Linting**: Comprehensive linting rules with very_good_analysis
+- **Documentation**: Mandatory documentation for all public APIs
 - **Error Handling**: Specific exception handling patterns
 
 ### Git Workflow
@@ -235,10 +235,10 @@ testWidgets('counter increments when + button is pressed', (tester) async {
 
 ### Code Standards
 - Follow Very Good Ventures coding standards (130+ strict rules)
-- Write comprehensive tests với proper mocking
+- Write comprehensive tests with proper mocking
 - Use meaningful commit messages (conventional commits)
 - Keep commits atomic and focused
-- Mandatory documentation cho public APIs
+- Mandatory documentation for all public APIs
 - Specific exception handling patterns
 
 ## 📄 License
@@ -273,9 +273,9 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE) f
 | Document | Purpose | Audience |
 |----------|---------|----------|
 | [README](README.md) | Project overview and quick start | All users |
-| [Tech Stack](tech-stack.md) | Technology details | Developers |
-| [Architecture](architecture.md) | System design | Architects, Developers |
-| [Development Guidelines](development-guidelines.md) | Coding standards | Developers |
+| [Tech Stack](../core/tech-stack.md) | Technology details | Developers |
+| [Architecture](../core/architecture.md) | System design | Architects, Developers |
+| [Development Guidelines](../core/development-guidelines.md) | Coding standards | Developers |
 
 ---
 

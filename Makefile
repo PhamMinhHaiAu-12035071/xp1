@@ -40,7 +40,7 @@ analyze:
 
 test:
 	@echo "🧪 Running tests..."
-	@fvm flutter test
+	@very_good test
 
 # Test coverage commands using very_good CLI
 test-coverage:

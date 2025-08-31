@@ -19,11 +19,11 @@ pre-commit:
     # Quick format check (fast)
     format-check:
       glob: "*.dart"
-      run: fvm dart format lib/ test/ --set-exit-if-changed --output=none
+      run: fvm flutter pub run rps format-check
     # Quick analysis (staged files only)
     analyze-quick:
       glob: "*.dart"
-      run: fvm flutter analyze --fatal-infos
+      run: fvm flutter pub run rps analyze-quick
     # Quick license check cho staged changes
     license-quick:
       glob: "pubspec.yaml"
@@ -47,7 +47,7 @@ pre-commit:
         FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(\.dart$|^pubspec\.yaml$)')
         if [ -n "$FILES_TO_ANALYZE" ]; then
           echo "📝 Analyzing staged files for linting and naming issues..."
-          fvm dart analyze --fatal-infos $FILES_TO_ANALYZE
+          fvm flutter pub run rps analyze-quick $FILES_TO_ANALYZE
         fi
 
 pre-push:
