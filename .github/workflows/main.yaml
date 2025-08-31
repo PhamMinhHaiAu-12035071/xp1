@@ -86,7 +86,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-fvm-complete-
 
-                        - name: 🔧 Install FVM using official installer
+      - name: 🔧 Install FVM using official installer
         run: |
           # Use official FVM installer for reliability
           curl -fsSL https://fvm.app/install.sh | bash
@@ -181,7 +181,7 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-fvm-complete-
 
-                        - name: 🔧 Install FVM using official installer
+      - name: 🔧 Install FVM using official installer
         run: |
           # Use official FVM installer for reliability
           curl -fsSL https://fvm.app/install.sh | bash
