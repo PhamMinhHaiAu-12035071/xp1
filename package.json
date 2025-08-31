@@ -28,12 +28,24 @@
   "keywords": [],
   "author": "",
   "license": "ISC",
+  "engines": {
+    "node": ">=18.0.0 <24.0.0",
+    "npm": ">=9.0.0 <11.0.0"
+  },
   "devDependencies": {
     "bats": "1.12.0",
-    "bats-assert": "github:ztombol/bats-assert#9f88b42",
-    "bats-file": "github:bats-core/bats-file#c0bb8ef",
-    "bats-support": "github:ztombol/bats-support#004e707",
+    "bats-assert": "github:bats-core/bats-assert",
+    "bats-file": "github:bats-core/bats-file",
+    "bats-support": "github:bats-core/bats-support",
     "cspell": "8.0.0",
     "lefthook": "1.8.0"
+  },
+  "overrides": {
+    "bats-assert": {
+      "bats-support": "github:bats-core/bats-support"
+    },
+    "bats-file": {
+      "bats-support": "github:bats-core/bats-support"
+    }
   }
 }
