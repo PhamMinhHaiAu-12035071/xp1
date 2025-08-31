@@ -1,43 +1,43 @@
-name: 'Flutter Setup with FVM'
-description: 'Optimized Flutter setup with FVM, caching, and dependencies'
+name: "Flutter Setup with FVM"
+description: "Optimized Flutter setup with FVM, caching, and dependencies"
 inputs:
   flutter-version:
-    description: 'Flutter version to use'
+    description: "Flutter version to use"
     required: true
-    default: '3.35.1'
+    default: "3.35.1"
   cache-key-suffix:
-    description: 'Additional cache key suffix'
+    description: "Additional cache key suffix"
     required: false
-    default: ''
+    default: ""
   install-deps:
-    description: 'Install pub dependencies'
+    description: "Install pub dependencies"
     required: false
-    default: 'true'
+    default: "true"
   setup-build-runner:
-    description: 'Setup build_runner caching'
+    description: "Setup build_runner caching"
     required: false
-    default: 'false'
+    default: "false"
   enable-performance-monitor:
-    description: 'Enable performance monitoring'
+    description: "Enable performance monitoring"
     required: false
-    default: 'false'
+    default: "false"
   job-name:
-    description: 'Name of the job for monitoring'
+    description: "Name of the job for monitoring"
     required: false
-    default: 'flutter-setup'
+    default: "flutter-setup"
 
 outputs:
   cache-hit:
-    description: 'Whether cache was hit'
+    description: "Whether cache was hit"
     value: ${{ steps.cache-check.outputs.cache-hit }}
   flutter-path:
-    description: 'Flutter installation path'
+    description: "Flutter installation path"
     value: ${{ steps.setup.outputs.flutter-path }}
   duration:
-    description: 'Job duration in seconds (if monitoring enabled)'
+    description: "Job duration in seconds (if monitoring enabled)"
     value: ${{ steps.monitor.outputs.duration }}
   recommendations:
-    description: 'Performance recommendations (if monitoring enabled)'
+    description: "Performance recommendations (if monitoring enabled)"
     value: ${{ steps.monitor.outputs.recommendations }}
 
 runs:
@@ -71,7 +71,7 @@ runs:
       run: |
         # Ensure FVM in PATH
         export PATH="$HOME/.fvm/bin:$PATH"
-        
+
         # Fast Flutter setup with smart caching
         if [ -d "$HOME/.fvm/versions/${{ inputs.flutter-version }}" ]; then
           echo "✅ Flutter ${{ inputs.flutter-version }} found in cache"
@@ -81,7 +81,32 @@ runs:
           fvm install ${{ inputs.flutter-version }} --setup
           fvm use ${{ inputs.flutter-version }} --force
         fi
-        
+
+        # Add Flutter and Dart binaries to PATH (critical fix)
+        FLUTTER_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin"
+        DART_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin/cache/dart-sdk/bin"
+
+        echo "$FLUTTER_BIN_PATH" >> $GITHUB_PATH
+        echo "$DART_BIN_PATH" >> $GITHUB_PATH
+        export PATH="$FLUTTER_BIN_PATH:$DART_BIN_PATH:$PATH"
+
+        # Verify both Flutter and Dart are accessible
+        if command -v flutter &> /dev/null; then
+          echo "✅ Flutter is accessible at: $(which flutter)"
+          flutter --version
+        else
+          echo "❌ Flutter not found in PATH after setup"
+          exit 1
+        fi
+
+        if command -v dart &> /dev/null; then
+          echo "✅ Dart is accessible at: $(which dart)"
+          dart --version
+        else
+          echo "❌ Dart not found in PATH after setup"
+          exit 1
+        fi
+
         # Set output
         echo "flutter-path=$HOME/.fvm/versions/${{ inputs.flutter-version }}" >> $GITHUB_OUTPUT
 
@@ -114,8 +139,20 @@ runs:
       if: inputs.install-deps == 'true'
       shell: bash
       run: |
-        export PATH="$HOME/.fvm/bin:$PATH"
-        fvm flutter pub get --suppress-analytics
+        # Ensure FVM, Flutter, and Dart are in PATH
+        FLUTTER_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin"
+        DART_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin/cache/dart-sdk/bin"
+        export PATH="$HOME/.fvm/bin:$FLUTTER_BIN_PATH:$DART_BIN_PATH:$PATH"
+
+        # Verify both Flutter and Dart are accessible before running pub get
+        if command -v flutter &> /dev/null && command -v dart &> /dev/null; then
+          echo "✅ Flutter ready for pub get: $(which flutter)"
+          echo "✅ Dart ready for pub get: $(which dart)"
+          fvm flutter pub get --suppress-analytics
+        else
+          echo "❌ Flutter or Dart not accessible for pub get"
+          exit 1
+        fi
 
     - name: 📊 Monitor Performance
       id: monitor
