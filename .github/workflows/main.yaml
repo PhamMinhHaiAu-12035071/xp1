@@ -88,21 +88,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-fvm-flutter-
 
-      - name: 🔧 Install FVM
-        run: dart pub global activate fvm
-
-      - name: 🔧 Add Dart Pub Bin to PATH
-        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
-
-      - name: 🔧 Setup FVM Flutter (use cache if available)
+      - name: 🔧 Install and Setup FVM
         run: |
+          # Install FVM
+          dart pub global activate fvm
+
+          # Add to PATH
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
+          # Verify FVM installation
+          $HOME/.pub-cache/bin/fvm --version
+
+          # Setup Flutter with FVM
           if [ -d "$HOME/.fvm/flutter_sdk" ]; then
             echo "✅ Flutter SDK found in cache"
-            fvm use ${{ env.FLUTTER_VERSION }} --force
+            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
           else
             echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
-            fvm install ${{ env.FLUTTER_VERSION }}
-            fvm use ${{ env.FLUTTER_VERSION }} --force
+            $HOME/.pub-cache/bin/fvm install ${{ env.FLUTTER_VERSION }}
+            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
           fi
 
       - name: 📦 Install dependencies
@@ -177,21 +182,26 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-fvm-flutter-
 
-      - name: 🔧 Install FVM
-        run: dart pub global activate fvm
-
-      - name: 🔧 Add Dart Pub Bin to PATH
-        run: echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
-
-      - name: 🔧 Setup FVM Flutter (use cache if available)
+      - name: 🔧 Install and Setup FVM
         run: |
+          # Install FVM
+          dart pub global activate fvm
+
+          # Add to PATH
+          export PATH="$HOME/.pub-cache/bin:$PATH"
+          echo "$HOME/.pub-cache/bin" >> $GITHUB_PATH
+
+          # Verify FVM installation
+          $HOME/.pub-cache/bin/fvm --version
+
+          # Setup Flutter with FVM
           if [ -d "$HOME/.fvm/flutter_sdk" ]; then
             echo "✅ Flutter SDK found in cache"
-            fvm use ${{ env.FLUTTER_VERSION }} --force
+            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
           else
             echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
-            fvm install ${{ env.FLUTTER_VERSION }}
-            fvm use ${{ env.FLUTTER_VERSION }} --force
+            $HOME/.pub-cache/bin/fvm install ${{ env.FLUTTER_VERSION }}
+            $HOME/.pub-cache/bin/fvm use ${{ env.FLUTTER_VERSION }} --force
           fi
 
       - name: 📦 Install dependencies
