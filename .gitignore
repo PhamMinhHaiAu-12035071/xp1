@@ -153,6 +153,8 @@ yarn-error.log*
 .env.production
 
 # Environment configuration files (CRITICAL: Keep these secret!)
+# Allow sample/example files to be committed
+!lib/features/env/*.env.example
 lib/features/env/*.env
 lib/features/env/*.g.dart
 

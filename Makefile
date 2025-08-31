@@ -1,7 +1,7 @@
 # Makefile for xp1 Flutter project
 # Provides easy commands for local CI equivalent to GitHub Actions
 
-.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check format analyze test test-coverage coverage-html coverage-open coverage-clean coverage-report help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
+.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check format analyze test test-coverage coverage-html coverage-open coverage-clean coverage-report help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs install-dev install-staging install-prod install-all run-dev run-staging run-prod
 
 # GitHub Actions equivalent commands
 semantic-check:
@@ -27,25 +27,26 @@ local-ci: test-scripts semantic-check flutter-ci
 	@echo "✅ All checks equivalent to GitHub Actions passed!"
 
 # Quick development commands
-check: flutter-ci
-	@echo "✅ Quick development check completed"
+check:
+	@echo "✅ Quick development check via RPS..."
+	@fvm flutter pub run rps check
 
 format:
-	@echo "🎨 Formatting code..."
-	@fvm dart format lib/ test/ --set-exit-if-changed
+	@echo "🎨 Formatting code via RPS..."
+	@fvm flutter pub run rps format
 
 analyze:
-	@echo "🔍 Analyzing code..."
-	@fvm flutter analyze --fatal-infos
+	@echo "🔍 Analyzing code via RPS..."
+	@fvm flutter pub run rps analyze
 
 test:
-	@echo "🧪 Running tests..."
-	@very_good test
+	@echo "🧪 Running tests via RPS..."
+	@fvm flutter pub run rps test
 
 # Test coverage commands using very_good CLI
 test-coverage:
-	@echo "🧪📊 Running tests with coverage..."
-	@very_good test --coverage
+	@echo "🧪📊 Running tests with coverage via RPS..."
+	@fvm flutter pub run rps test-coverage
 
 coverage-html:
 	@echo "📊🔧 Generating HTML coverage report..."
@@ -90,12 +91,12 @@ coverage-report: test-coverage coverage-html
 	@echo "💡 Run 'make coverage-open' to view in browser"
 
 deps:
-	@echo "📦 Installing dependencies..."
-	@fvm flutter pub get
+	@echo "📦 Installing dependencies via RPS..."
+	@fvm flutter pub run rps setup
 
 clean:
-	@echo "🧹 Cleaning build files..."
-	@fvm flutter clean
+	@echo "🧹 Cleaning build files via RPS..."
+	@fvm flutter pub run rps clean
 
 # Setup commands
 setup:
@@ -232,6 +233,38 @@ license-help:
 	@echo "📋 Business-safe licenses: $(PERMISSIVE_LICENSES)"
 	@echo "⚠️  Avoided licenses: $(COPYLEFT_LICENSES),$(PROBLEMATIC_LICENSES)"
 
+# Complete environment setup commands for new team members
+# These commands call RPS scripts to avoid code duplication
+install-dev:
+	@echo "🚀 Setting up complete development environment via RPS..."
+	@fvm dart run rps install-dev
+
+install-staging:
+	@echo "🚀 Setting up complete staging environment via RPS..."
+	@fvm dart run rps install-staging
+
+install-prod:
+	@echo "🚀 Setting up complete production environment via RPS..."
+	@fvm dart run rps install-prod
+
+install-all:
+	@echo "🚀 Setting up ALL environments via RPS..."
+	@fvm dart run rps install-all
+
+# Environment-specific run commands (convenience aliases)
+# These commands call RPS scripts to maintain consistency
+run-dev:
+	@echo "🏃 Running development environment via RPS..."
+	@fvm dart run rps run-dev
+
+run-staging:
+	@echo "🏃 Running staging environment via RPS..."
+	@fvm dart run rps run-staging
+
+run-prod:
+	@echo "🏃 Running production environment via RPS..."
+	@fvm dart run rps run-prod
+
 # Help command
 help:
 	@echo "Available commands:"
@@ -244,14 +277,14 @@ help:
 	@echo "  make spell-check    - Job 3: Spell checking"
 	@echo ""
 	@echo "⚡ Quick Development:"
-	@echo "  make check         - Quick Flutter checks only"
-	@echo "  make format        - Format code"
-	@echo "  make analyze       - Analyze code"
-	@echo "  make test          - Run tests"
-	@echo "  make deps          - Install dependencies"
+	@echo "  make check         - Quick Flutter checks via RPS"
+	@echo "  make format        - Format code via RPS"
+	@echo "  make analyze       - Analyze code via RPS"
+	@echo "  make test          - Run tests via RPS"
+	@echo "  make deps          - Install dependencies via RPS"
 	@echo ""
 	@echo "📊 Test Coverage (using very_good CLI + lcov):"
-	@echo "  make test-coverage    - Run tests with coverage (very_good CLI)"
+	@echo "  make test-coverage    - Run tests with coverage via RPS"
 	@echo "  make coverage-html    - Generate HTML report from lcov.info (genhtml)"
 	@echo "  make coverage-open    - Open HTML coverage report in browser"
 	@echo "  make coverage-clean   - Clean all coverage files"
@@ -268,9 +301,18 @@ help:
 	@echo "  # List uncovered lines:"
 	@echo "  lcov --list coverage/lcov.info"
 	@echo ""
-	@echo "⚙️ Setup:"
-	@echo "  make setup         - Initial project setup"
+	@echo "⚙️ Setup & Installation:"
+	@echo "  make install-dev   - Complete development environment setup (RECOMMENDED for new devs)"
+	@echo "  make install-staging - Complete staging environment setup"
+	@echo "  make install-prod  - Complete production environment setup"
+	@echo "  make install-all   - Setup all environments at once"
+	@echo "  make setup         - Basic project setup (legacy)"
 	@echo "  make clean         - Clean build files"
+	@echo ""
+	@echo "🏃 Quick Run Commands:"
+	@echo "  make run-dev       - Run development environment"
+	@echo "  make run-staging   - Run staging environment"
+	@echo "  make run-prod      - Run production environment"
 	@echo ""
 	@echo "🔐 License Compliance:"
 	@echo "  make license-check - Check business-safe licenses only"
