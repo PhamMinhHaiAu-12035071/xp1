@@ -468,3 +468,184 @@ make test-coverage
 - All environments must be considered for environment-related changes
 
 **Remember**: These commands are your quality assurance system. They prevent 95% of common issues and ensure professional-grade code delivery. Make them automatic and non-negotiable!
+
+## 🌐 Language Requirements - English Only Policy
+
+### 📝 **MANDATORY: English Language for All Content**
+
+**CRITICAL RULE**: All code, documentation, comments, and markdown files MUST be written in English only. This is non-negotiable for:
+
+1. **Spell Check Compliance**: Prevents cspell errors in CI/CD
+2. **International Collaboration**: Ensures global accessibility
+3. **Professional Standards**: Maintains consistent codebase language
+4. **Tool Compatibility**: Works with all development tools and IDEs
+
+### 🚫 **What Must Be English**
+
+#### **Code Content**
+```dart
+// ❌ WRONG: Vietnamese comments
+/// Quản lý trạng thái counter với increment và decrement
+class CounterCubit extends Cubit<int> {
+  /// Tạo một CounterCubit với giá trị ban đầu là 0
+  CounterCubit() : super(0);
+  
+  /// Tăng giá trị counter lên 1
+  void increment() => emit(state + 1); // Tăng số lên
+}
+
+// ✅ CORRECT: English comments and documentation
+/// Manages counter state with increment and decrement operations.
+class CounterCubit extends Cubit<int> {
+  /// Creates a CounterCubit with initial state of 0.
+  CounterCubit() : super(0);
+  
+  /// Increments the counter value by 1.
+  void increment() => emit(state + 1); // Increment the value
+}
+```
+
+#### **Documentation Files**
+```markdown
+❌ WRONG: Vietnamese markdown content
+# Cấu Hình Environment với Envied
+## Tổng Quan
+Hệ thống quản lý multiple environments...
+
+✅ CORRECT: English markdown content
+# Environment Configuration with Envied
+## Overview
+Multiple environment management system...
+```
+
+#### **Comments and Strings**
+```dart
+// ❌ WRONG: Vietnamese strings and comments
+const appTitle = 'Ứng Dụng Đếm Số'; // Tiêu đề ứng dụng
+// TODO: Thêm tính năng reset counter
+
+// ✅ CORRECT: English strings and comments
+const appTitle = 'Counter Application'; // Application title
+// TODO: Add counter reset feature
+```
+
+### ✅ **English Language Checklist**
+
+Before any commit, verify:
+
+- [ ] **All documentation** (README, guides, etc.) is in English
+- [ ] **All code comments** are in English
+- [ ] **All string literals** for UI are either in English or use i18n keys
+- [ ] **All commit messages** follow conventional commits in English
+- [ ] **All variable/method names** use English terminology
+- [ ] **All test descriptions** are in English
+
+### 🛠️ **Spell Check Integration**
+
+Our cspell configuration enforces English-only content:
+
+```json
+{
+  "language": "en",
+  "dictionaries": ["vgv_allowed", "vgv_forbidden"]
+}
+```
+
+**When spell check fails:**
+1. Convert non-English content to English
+2. Add technical terms to `cspell.json` words array if needed
+3. Never suppress spell check with ignore comments
+
+### 🎯 **Vibe Coding English Protocol**
+
+#### **During Active Coding:**
+
+```bash
+# After creating any markdown or documentation
+npx cspell doc/**/*.md --no-progress    # Verify English content
+
+# After adding comments or strings
+dart run rps analyze                    # Check for linting issues
+```
+
+#### **Content Creation Guidelines:**
+
+1. **Documentation Files**: Always write in clear, professional English
+2. **Code Comments**: Use concise English explanations
+3. **Variable Names**: Follow English naming conventions
+4. **Error Messages**: Use English for user-facing messages
+5. **Test Descriptions**: Write test cases in English
+
+#### **Common Translation Patterns:**
+
+| Vietnamese | English | Usage |
+|------------|---------|--------|
+| `Tổng quan` | `Overview` | Documentation sections |
+| `Cấu hình` | `Configuration` | Settings and setup |
+| `Kiến trúc` | `Architecture` | System design |
+| `Sử dụng` | `Usage` | How-to guides |
+| `Khắc phục sự cố` | `Troubleshooting` | Error resolution |
+
+### 🚨 **Pre-Commit English Validation**
+
+Add to your workflow:
+
+```bash
+# Validate English content before commit
+npx cspell doc/**/*.md README.md --no-progress
+dart run rps analyze  # Includes comment validation
+dart run rps format   # Ensures consistent formatting
+
+# Full validation
+dart run rps pre-commit  # Must pass for English compliance
+```
+
+### 📚 **English Documentation Standards**
+
+#### **Markdown Files:**
+- Use clear, professional English
+- Follow standard technical writing conventions
+- Prefer active voice over passive voice
+- Use consistent terminology throughout
+
+#### **Code Documentation:**
+- Use complete sentences for class/method documentation
+- Follow Dart documentation standards with `///`
+- Include parameter descriptions with `[paramName]` syntax
+- Provide usage examples in English
+
+#### **Error Messages:**
+```dart
+// ❌ WRONG: Mixed languages
+throw Exception('Lỗi khi load config');
+
+// ✅ CORRECT: English error messages
+throw ConfigurationException('Failed to load configuration');
+```
+
+### 🔧 **Tools for English Compliance**
+
+#### **Editor Integration:**
+- VS Code: Install "Code Spell Checker" extension
+- Set language to English in editor settings
+- Enable real-time spell checking
+
+#### **Git Hooks:**
+- Pre-commit hooks run spell check automatically
+- Blocks commits with non-English content
+- Provides immediate feedback on language issues
+
+#### **CI/CD Integration:**
+- GitHub Actions runs spell check on all markdown files
+- Fails build if non-English content is detected
+- Generates reports of language compliance issues
+
+### 💡 **Best Practices Summary**
+
+1. **Always Default to English**: When in doubt, use English
+2. **Consistent Terminology**: Use the same English terms throughout the project
+3. **Professional Tone**: Write documentation as if for international users
+4. **Tool Integration**: Leverage spell check and linting tools
+5. **Review Process**: Check English compliance during code reviews
+
+This English-only policy ensures our codebase remains accessible, professional, and compatible with all development tools and international collaboration standards.

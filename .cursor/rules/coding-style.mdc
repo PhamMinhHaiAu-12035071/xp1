@@ -883,6 +883,256 @@ dart fix --apply                              # Auto-fix some issues
 
 Following these guidelines ensures clean, maintainable code that passes all linter checks with zero warnings or errors.
 
+## 🌐 English Language Requirements - MANDATORY
+
+### 📝 **ZERO TOLERANCE: English Only for All Content**
+
+**CRITICAL RULE**: All code, documentation, comments, markdown files, and any written content MUST be in English only. This is mandatory for spell check compliance and professional standards.
+
+#### **🚫 What Must Be English**
+
+**1. Code Documentation & Comments:**
+```dart
+// ❌ WRONG: Vietnamese documentation
+/// Quản lý trạng thái đếm số với các phương thức tăng giảm
+class CounterCubit extends Cubit<int> {
+  /// Tạo instance với giá trị ban đầu là 0
+  CounterCubit() : super(0);
+  
+  /// Tăng giá trị lên 1 đơn vị
+  void increment() => emit(state + 1); // Tăng số lên
+}
+
+// ✅ CORRECT: English documentation
+/// Manages counter state with increment and decrement operations.
+class CounterCubit extends Cubit<int> {
+  /// Creates a CounterCubit with initial state of 0.
+  CounterCubit() : super(0);
+  
+  /// Increments the counter value by 1.
+  void increment() => emit(state + 1); // Increment the value
+}
+```
+
+**2. Error Messages & Exceptions:**
+```dart
+// ❌ WRONG: Vietnamese error messages
+throw Exception('Lỗi khi tải cấu hình môi trường');
+throw ConfigException('Không tìm thấy file .env');
+
+// ✅ CORRECT: English error messages
+throw Exception('Failed to load environment configuration');
+throw ConfigException('Environment file .env not found');
+```
+
+**3. Test Descriptions:**
+```dart
+// ❌ WRONG: Vietnamese test descriptions
+test('nên trả về giá trị đúng khi gọi apiUrl', () {
+  // test implementation
+});
+
+group('Kiểm tra repository implementation', () {
+  // tests
+});
+
+// ✅ CORRECT: English test descriptions
+test('should return correct value when calling apiUrl', () {
+  // test implementation
+});
+
+group('Repository implementation tests', () {
+  // tests
+});
+```
+
+**4. Variable & Method Names:**
+```dart
+// ❌ WRONG: Vietnamese naming
+final tenUngDung = 'My App';
+void capNhatNguoiDung() {}
+class QuanLyNguoiDung {}
+
+// ✅ CORRECT: English naming
+final appName = 'My App';
+void updateUser() {}
+class UserManager {}
+```
+
+**5. Markdown Documentation:**
+```markdown
+❌ WRONG: Vietnamese markdown
+# Hướng Dẫn Cài Đặt
+## Tổng Quan Dự Án
+Dự án này sử dụng Flutter để phát triển...
+
+✅ CORRECT: English markdown
+# Installation Guide
+## Project Overview
+This project uses Flutter to develop...
+```
+
+#### **✅ English Compliance Checklist**
+
+Before any commit, verify:
+
+- [ ] **All class/method documentation** uses English `/// comments`
+- [ ] **All inline comments** are in English
+- [ ] **All variable names** use English terminology
+- [ ] **All method names** use English terminology  
+- [ ] **All error messages** are in English
+- [ ] **All test descriptions** are in English
+- [ ] **All markdown files** are in English
+- [ ] **All README content** is in English
+- [ ] **All commit messages** are in English (conventional commits)
+
+#### **🛠️ Spell Check Integration**
+
+Our cspell configuration (`cspell.json`) enforces English-only:
+
+```json
+{
+  "language": "en",
+  "dictionaries": ["vgv_allowed", "vgv_forbidden"]
+}
+```
+
+**When spell check fails:**
+1. ✅ Convert non-English content to proper English
+2. ✅ Add technical terms to `cspell.json` words array if needed
+3. ❌ NEVER suppress spell check with ignore directives
+
+#### **🎯 Common Vietnamese → English Translations**
+
+| Vietnamese Term | English Term | Usage Context |
+|-----------------|--------------|---------------|
+| `tạo` | `create` | Method names |
+| `cập nhật` | `update` | Method names |
+| `xóa` | `delete` | Method names |
+| `tìm kiếm` | `search` | Method names |
+| `lấy` | `get` | Method names |
+| `cấu hình` | `configuration` | Class/variable names |
+| `quản lý` | `manager` | Class names |
+| `dịch vụ` | `service` | Class names |
+| `kho lưu trữ` | `repository` | Class names |
+| `môi trường` | `environment` | General usage |
+| `ứng dụng` | `application` | General usage |
+| `người dùng` | `user` | General usage |
+
+#### **🚨 Pre-Commit English Validation**
+
+During vibe coding, run these commands to ensure English compliance:
+
+```bash
+# 1. Spell check all markdown files
+npx cspell doc/**/*.md README.md --no-progress
+
+# 2. Analyze code for linting (includes comment validation)
+dart run rps analyze
+
+# 3. Format code consistently
+dart run rps format
+
+# 4. Complete validation pipeline
+dart run rps pre-commit  # Must pass for English compliance
+```
+
+#### **📚 English Documentation Standards**
+
+**Class Documentation Template:**
+```dart
+/// Brief description of what the class does.
+///
+/// Longer description with more details about the class purpose,
+/// usage patterns, and any important considerations.
+///
+/// Example:
+/// ```dart
+/// final manager = UserManager();
+/// final user = await manager.getUser('123');
+/// ```
+class UserManager {
+  /// Brief description of what the method does.
+  ///
+  /// [parameter] Description of the parameter.
+  /// Returns description of what the method returns.
+  Future<User> getUser(String userId) async {
+    // Implementation
+  }
+}
+```
+
+**Test Documentation Template:**
+```dart
+group('UserManager', () {
+  group('getUser', () {
+    test('should return user when valid ID is provided', () {
+      // Test implementation
+    });
+    
+    test('should throw UserNotFoundException when user does not exist', () {
+      // Test implementation
+    });
+    
+    test('should handle network errors gracefully', () {
+      // Test implementation
+    });
+  });
+});
+```
+
+#### **💡 Best Practices for English Content**
+
+1. **Use Active Voice**: "The method returns a value" vs "A value is returned"
+2. **Be Concise**: Clear and direct explanations
+3. **Use Standard Terms**: Follow Flutter/Dart naming conventions
+4. **Consistent Terminology**: Use the same English terms throughout
+5. **Professional Tone**: Write as if for international developers
+
+#### **🔧 Editor Configuration for English**
+
+**VS Code Settings (`.vscode/settings.json`):**
+```json
+{
+  "cSpell.language": "en",
+  "cSpell.enabled": true,
+  "cSpell.diagnosticLevel": "Error",
+  "dart.documentation": "full",
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit"
+  }
+}
+```
+
+### 🚀 Vibe Coding English Protocol
+
+#### **Real-Time Validation During Coding:**
+
+```bash
+# After writing any documentation or comments
+dart run rps analyze              # Check for linting issues
+
+# After creating markdown files
+npx cspell [filename].md --no-progress  # Verify English content
+
+# After adding error messages or strings
+dart run rps format               # Ensure formatting compliance
+```
+
+#### **Emergency English Fixes:**
+
+```bash
+# When spell check fails in CI
+npx cspell doc/**/*.md --list-files  # Find problematic files
+# Convert content to English and re-commit
+
+# When linting fails due to comments
+dart analyze --fatal-infos         # See specific issues
+# Fix non-English comments and re-run
+```
+
+**ZERO TOLERANCE POLICY**: Any non-English content will cause spell check failures in CI/CD. Always write in English from the start to avoid rework and failed builds.
+
 ## 🚀 Vibe Coding Workflow - Mandatory Command Execution
 
 **CRITICAL RULE**: During any coding session, these commands MUST be executed to prevent linting errors, warnings, and test failures. This is non-negotiable for code quality.
