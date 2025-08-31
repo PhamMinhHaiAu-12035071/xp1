@@ -5,3 +5,9 @@ targets:
         options:
           # Override environment file path from CLI using --define
           override: true
+      injectable_generator|injectable_builder:
+        options:
+          auto_register: true
+          # Focus on lib folder only
+          generate_for:
+            - lib/**
