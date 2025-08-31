@@ -4,6 +4,9 @@ concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
 
+env:
+  FLUTTER_VERSION: "3.35.1" # Should match .fvmrc flutter version
+
 on:
   push:
     branches:
@@ -47,7 +50,7 @@ jobs:
       - name: 🔧 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.1"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       - name: 📦 Install dependencies
@@ -65,7 +68,7 @@ jobs:
       - name: 🔧 Setup Flutter
         uses: subosito/flutter-action@v2
         with:
-          flutter-version: "3.35.1"
+          flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
       - name: 🔧 Setup Very Good CLI
@@ -80,7 +83,7 @@ jobs:
   build:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
     with:
-      flutter_channel: stable
+      flutter_version: "3.35.1" # Should match .fvmrc flutter version
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
