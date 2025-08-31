@@ -1,0 +1,59 @@
+name: 'Performance Monitor'
+description: 'Monitor CI performance and provide optimization insights'
+inputs:
+  job-name:
+    description: 'Name of the job being monitored'
+    required: true
+  start-time:
+    description: 'Job start time (optional)'
+    required: false
+
+outputs:
+  duration:
+    description: 'Job duration in seconds'
+    value: ${{ steps.monitor.outputs.duration }}
+  recommendations:
+    description: 'Performance recommendations'
+    value: ${{ steps.monitor.outputs.recommendations }}
+
+runs:
+  using: composite
+  steps:
+    - name: 📊 Monitor Performance
+      id: monitor
+      shell: bash
+      run: |
+        # Record timing
+        end_time=$(date +%s)
+        start_time=${GITHUB_JOB_START_TIME:-$(date +%s)}
+        duration=$((end_time - start_time))
+        
+        echo "duration=$duration" >> $GITHUB_OUTPUT
+        echo "⏱️ Job '${{ inputs.job-name }}' completed in ${duration}s"
+        
+        # Performance analysis
+        recommendations=""
+        if [ $duration -gt 300 ]; then
+          recommendations="Consider using faster runners or better caching"
+        elif [ $duration -gt 180 ]; then
+          recommendations="Good performance, minor optimizations possible"  
+        else
+          recommendations="Excellent performance!"
+        fi
+        
+        echo "recommendations=$recommendations" >> $GITHUB_OUTPUT
+        echo "💡 $recommendations"
+        
+        # Cache hit analysis
+        if [ -f "$RUNNER_TEMP/cache-stats" ]; then
+          echo "📊 Cache Performance:"
+          cat "$RUNNER_TEMP/cache-stats"
+        fi
+
+    - name: 📈 Performance Summary
+      shell: bash
+      run: |
+        echo "## 🚀 Performance Report for ${{ inputs.job-name }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Duration**: ${{ steps.monitor.outputs.duration }}s" >> $GITHUB_STEP_SUMMARY
+        echo "- **Recommendation**: ${{ steps.monitor.outputs.recommendations }}" >> $GITHUB_STEP_SUMMARY
+        echo "- **Runner**: ${{ runner.os }}-${{ runner.arch }}" >> $GITHUB_STEP_SUMMARY

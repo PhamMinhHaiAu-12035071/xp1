@@ -1,0 +1,263 @@
+name: xp1-ultra-fast
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.35.1"
+  # Performance optimizations
+  PUB_CACHE: ${{ github.workspace }}/.pub-cache
+  DART_TOOL_CACHE: ${{ github.workspace }}/.dart_tool_cache
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  statuses: write
+
+jobs:
+  # Ultra-fast change detection with early exit
+  detect-changes:
+    runs-on: ubuntu-latest
+    outputs:
+      has-dart: ${{ steps.changes.outputs.dart }}
+      has-docs: ${{ steps.changes.outputs.docs }}
+      has-deps: ${{ steps.changes.outputs.deps }}
+      skip-ci: ${{ steps.skip-check.outputs.skip }}
+    steps:
+      - name: ⚡ Checkout (depth=1 for speed)
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      - name: 🔍 Smart change detection
+        id: changes
+        uses: dorny/paths-filter@v3
+        with:
+          list-files: none # Faster without file lists
+          filters: |
+            dart:
+              - 'lib/**'
+              - 'test/**'
+              - 'pubspec.yaml'
+              - 'build.yaml'
+            docs:
+              - '**/*.md'
+            deps:
+              - 'pubspec.lock'
+
+      - name: 🚫 Check for CI skip
+        id: skip-check
+        run: |
+          if [[ "${{ github.event.head_commit.message }}" == *"[skip ci]"* ]] || [[ "${{ github.event.head_commit.message }}" == *"[ci skip]"* ]]; then
+            echo "skip=true" >> $GITHUB_OUTPUT
+            echo "⏭️ CI skipped via commit message"
+          else
+            echo "skip=false" >> $GITHUB_OUTPUT
+          fi
+
+  # Lightning-fast setup with maximum parallelization
+  lightning-setup:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.skip-ci != 'true' && needs.detect-changes.outputs.has-dart == 'true'
+    runs-on: ubuntu-latest-4-cores
+    outputs:
+      cache-key: ${{ steps.cache-key.outputs.key }}
+      setup-time: ${{ steps.perf.outputs.duration }}
+    steps:
+      - name: ⚡ Ultra-fast checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # Parallel cache restoration (multiple caches simultaneously)
+      - name: 🔥 Parallel cache restore
+        id: cache-restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.fvm
+            ${{ env.PUB_CACHE }}
+            .dart_tool
+            lib/**/*.g.dart  
+            lib/**/*.config.dart
+          key: ultra-cache-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-${{ hashFiles('**/pubspec.lock', 'build.yaml') }}-${{ hashFiles('lib/**/*.dart', '!lib/**/*.g.dart') }}
+          restore-keys: |
+            ultra-cache-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-${{ hashFiles('**/pubspec.lock', 'build.yaml') }}-
+            ultra-cache-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-
+
+      # Lightning setup (skip if cache hit)
+      - name: ⚡ Lightning Flutter setup
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          install-deps: false
+          enable-performance-monitor: true
+          job-name: lightning-setup
+
+      # Ultra-fast dependency installation
+      - name: ⚡ Lightning pub get
+        run: |
+          export PATH="$HOME/.fvm/bin:$PATH"
+          fvm flutter pub get --suppress-analytics --offline || fvm flutter pub get --suppress-analytics
+
+      # Smart code generation (only if needed)
+      - name: ⚡ Smart code generation
+        run: |
+          export PATH="$HOME/.fvm/bin:$PATH"
+
+          # Check if generation needed
+          if [ ! -f "lib/core/di/injection_container.config.dart" ] || \
+             [ "lib/features/env/env_development.dart" -nt "lib/core/di/injection_container.config.dart" ]; then
+            echo "🔥 Fast code generation..."
+            # Use all available cores
+            fvm flutter pub run build_runner build --release --delete-conflicting-outputs
+          else
+            echo "✅ Generated files are current"
+          fi
+
+      # Save everything to cache
+      - name: 💾 Save ultra cache
+        if: steps.cache-restore.outputs.cache-hit != 'true'
+        uses: actions/cache/save@v4
+        with:
+          path: |
+            ~/.fvm
+            ${{ env.PUB_CACHE }}
+            .dart_tool
+            lib/**/*.g.dart
+            lib/**/*.config.dart
+          key: ultra-cache-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-${{ hashFiles('**/pubspec.lock', 'build.yaml') }}-${{ hashFiles('lib/**/*.dart', '!lib/**/*.g.dart') }}
+
+      - name: 🔑 Set cache key
+        id: cache-key
+        run: |
+          echo "key=ultra-cache-${{ runner.os }}-${{ env.FLUTTER_VERSION }}-${{ hashFiles('**/pubspec.lock', 'build.yaml') }}-${{ hashFiles('lib/**/*.dart', '!lib/**/*.g.dart') }}" >> $GITHUB_OUTPUT
+
+  # Maximum parallelization - all validations run simultaneously
+  ultra-validation:
+    needs: [detect-changes, lightning-setup]
+    if: needs.detect-changes.outputs.skip-ci != 'true'
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          # Combined lint job
+          - name: lint
+            runner: ubuntu-latest
+            script: dart format --set-exit-if-changed . && flutter analyze --fatal-infos && flutter pub deps-check
+            condition: ${{ needs.detect-changes.outputs.has-dart == 'true' }}
+
+          # CPU-intensive jobs on faster runners
+          - name: test
+            runner: ubuntu-latest-4-cores
+            script: flutter test --no-pub --coverage --concurrency=6 --test-randomize-ordering-seed=random
+            condition: ${{ needs.detect-changes.outputs.has-dart == 'true' }}
+
+          - name: license-check
+            runner: ubuntu-latest
+            script: dart pub global activate very_good_cli && make license-ci
+            condition: ${{ needs.detect-changes.outputs.has-deps == 'true' }}
+
+    runs-on: ${{ matrix.runner }}
+    steps:
+      - name: ⏭️ Skip if conditions not met
+        if: matrix.condition != 'true'
+        run: echo "⏭️ Skipping ${{ matrix.name }} - condition not met" && exit 0
+
+      - name: ⚡ Ultra-fast checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 1
+
+      # Instant cache restore
+      - name: ⚡ Instant cache restore
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            ~/.fvm
+            ${{ env.PUB_CACHE }}
+            .dart_tool
+            lib/**/*.g.dart
+            lib/**/*.config.dart
+          key: ${{ needs.lightning-setup.outputs.cache-key }}
+          fail-on-cache-miss: true # Fail fast if setup didn't work
+
+      # Lightning-fast environment setup
+      - name: ⚡ Lightning environment
+        run: |
+          export PATH="$HOME/.fvm/bin:$PATH"
+          echo "$HOME/.fvm/bin" >> $GITHUB_PATH
+          # Verify setup
+          fvm flutter --version --suppress-analytics
+
+      # Execute the specific validation
+      - name: ⚡ ${{ matrix.name }}
+        run: |
+          export PATH="$HOME/.fvm/bin:$PATH"
+          echo "🚀 Running ${{ matrix.name }}..."
+          ${{ matrix.script }}
+
+      # Coverage upload for test job only
+      - name: 📊 Coverage check
+        if: matrix.name == 'test'
+        uses: VeryGoodOpenSource/very_good_coverage@v3
+        with:
+          path: coverage/lcov.info
+
+  # Lightning docs validation (parallel)
+  lightning-docs:
+    needs: detect-changes
+    if: needs.detect-changes.outputs.has-docs == 'true'
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: 📝 Ultra-fast spell check
+        uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
+        with:
+          includes: "**/*.md"
+
+  # PR validation (parallel)
+  lightning-pr:
+    if: github.event_name == 'pull_request'
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
+
+  # Final status aggregation
+  ultra-status:
+    if: always() && needs.detect-changes.outputs.skip-ci != 'true'
+    needs:
+      [
+        detect-changes,
+        lightning-setup,
+        ultra-validation,
+        lightning-docs,
+        lightning-pr,
+      ]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📊 Workflow Performance Summary
+        run: |
+          echo "## ⚡ Ultra-Fast CI Performance Report" >> $GITHUB_STEP_SUMMARY
+          echo "- **Setup Time**: ${{ needs.lightning-setup.outputs.duration || 'N/A' }}s" >> $GITHUB_STEP_SUMMARY
+          echo "- **Total Jobs**: ${{ strategy.job-total || 'Multiple' }}" >> $GITHUB_STEP_SUMMARY  
+          echo "- **Parallel Execution**: ✅ Maximum parallelization" >> $GITHUB_STEP_SUMMARY
+          echo "- **Smart Caching**: ✅ Ultra cache enabled" >> $GITHUB_STEP_SUMMARY
+          echo "- **Runner Optimization**: ✅ 4-core for CPU-intensive tasks" >> $GITHUB_STEP_SUMMARY
+
+      - name: ✅ Success
+        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+        run: echo "🎉 All validations passed with ultra-fast performance!"
+
+      - name: ❌ Failure
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "❌ Some validations failed"
+          exit 1

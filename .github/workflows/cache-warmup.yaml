@@ -1,0 +1,47 @@
+# yaml-language-server: $schema=https://json.schemastore.org/github-workflow.json
+name: Cache Warmup
+
+on:
+  schedule:
+    # Run daily at 2 AM UTC to warm caches
+    - cron: "0 2 * * *"
+  workflow_dispatch:
+    inputs:
+      force-refresh:
+        description: "Force refresh all caches"
+        required: false
+        default: false
+        type: boolean
+
+env:
+  FLUTTER_VERSION: "3.35.1"
+
+jobs:
+  warmup-caches:
+    runs-on: ubuntu-latest-4-cores
+    strategy:
+      matrix:
+        cache-type: [flutter-sdk, pub-deps]
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔥 Warm Flutter SDK cache
+        if: matrix.cache-type == 'flutter-sdk'
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache-key-suffix: "-warmup"
+          install-deps: false
+
+      - name: 🔥 Warm pub dependencies cache
+        if: matrix.cache-type == 'pub-deps'
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache-key-suffix: "-deps-warmup"
+
+      - name: 📊 Cache statistics
+        run: |
+          echo "📊 Cache warmup completed for: ${{ matrix.cache-type }}"
+          du -sh ~/.fvm ~/.pub-cache .dart_tool 2>/dev/null || true

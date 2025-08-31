@@ -1,0 +1,257 @@
+name: xp1-optimized
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  FLUTTER_VERSION: "3.35.1"
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+permissions:
+  contents: read
+  pull-requests: write
+  checks: write
+  statuses: write
+
+jobs:
+  # Fast path filtering
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      pubspec: ${{ steps.filter.outputs.pubspec }}
+      dart: ${{ steps.filter.outputs.dart }}
+      docs: ${{ steps.filter.outputs.docs }}
+      licenses: ${{ steps.filter.outputs.licenses }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: dorny/paths-filter@v3
+        id: filter
+        with:
+          filters: |
+            pubspec:
+              - 'pubspec.yaml'
+            dart:
+              - 'lib/**/*.dart'
+              - 'test/**/*.dart'  
+              - 'tool/**/*.dart'
+            docs:
+              - '**/*.md'
+              - 'doc/**/*'
+            licenses:
+              - 'pubspec.yaml'
+              - 'pubspec.lock'
+
+  # Combined setup and code generation (fastest path)
+  setup-and-codegen:
+    needs: changes
+    if: needs.changes.outputs.dart == 'true' || needs.changes.outputs.pubspec == 'true' || github.event_name == 'push'
+    runs-on: ubuntu-latest-4-cores
+    outputs:
+      cache-key: ${{ steps.cache-info.outputs.cache-key }}
+      generation-needed: ${{ steps.check-generation.outputs.needed }}
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter (optimized)
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          setup-build-runner: true
+          cache-key-suffix: "-setup"
+
+      - name: 📋 Check if code generation needed
+        id: check-generation
+        run: |
+          # Smart generation check
+          if [ ! -f "lib/core/di/injection_container.config.dart" ] || [ ! -f ".dart_tool/build/entrypoint/build.dart.snapshot" ]; then
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "🆕 Code generation needed (missing files)"
+          elif find lib -name "*.dart" -not -name "*.g.dart" -not -name "*.config.dart" -newer "lib/core/di/injection_container.config.dart" | grep -q .; then
+            echo "needed=true" >> $GITHUB_OUTPUT
+            echo "🔄 Code generation needed (source newer than generated)"
+          else
+            echo "needed=false" >> $GITHUB_OUTPUT
+            echo "✅ Generated files are up to date"
+          fi
+
+      - name: 🏗️ Generate code (conditional & optimized)
+        if: steps.check-generation.outputs.needed == 'true'
+        run: |
+          echo "⚡ Starting optimized code generation..."
+          start_time=$(date +%s)
+
+          # Use release mode + parallel processing
+          fvm flutter pub run build_runner build \
+            --delete-conflicting-outputs \
+            --release \
+            --verbose \
+            --enable-experiment=enhanced-enums
+            
+          end_time=$(date +%s)
+          duration=$((end_time - start_time))
+          echo "⚡ Code generation completed in ${duration}s"
+
+          # Verify generated files
+          echo "📊 Generated files:"
+          find lib -name "*.g.dart" -o -name "*.config.dart" | wc -l | xargs echo "Count:"
+
+      - name: 📤 Cache generated files globally
+        id: cache-save
+        uses: actions/cache/save@v4
+        if: steps.check-generation.outputs.needed == 'true'
+        with:
+          path: |
+            lib/**/*.g.dart
+            lib/**/*.config.dart
+            .dart_tool/build
+          key: generated-files-${{ runner.os }}-${{ hashFiles('**/pubspec.lock', 'build.yaml') }}-${{ github.sha }}
+
+      - name: 🔍 Set cache key
+        id: cache-info
+        run: |
+          echo "cache-key=generated-files-${{ runner.os }}-${{ hashFiles('**/pubspec.lock', 'build.yaml') }}-${{ github.sha }}" >> $GITHUB_OUTPUT
+
+  # Parallel validation matrix (all run simultaneously)
+  validation:
+    needs: [changes, setup-and-codegen]
+    if: always() && !failure() && (needs.changes.outputs.dart == 'true' || needs.changes.outputs.pubspec == 'true' || needs.changes.outputs.licenses == 'true' || github.event_name == 'push')
+    strategy:
+      fail-fast: false
+      matrix:
+        job:
+          - name: analysis
+            runner: ubuntu-latest
+            condition: ${{ needs.changes.outputs.dart == 'true' || github.event_name == 'push' }}
+          - name: test
+            runner: ubuntu-latest-4-cores
+            condition: ${{ needs.changes.outputs.dart == 'true' || github.event_name == 'push' }}
+          - name: license-compliance
+            runner: ubuntu-latest
+            condition: ${{ needs.changes.outputs.licenses == 'true' || github.event_name == 'push' }}
+    runs-on: ${{ matrix.job.runner }}
+    steps:
+      - name: ⏭️ Skip if not needed
+        if: matrix.job.condition != 'true'
+        run: |
+          echo "Skipping ${{ matrix.job.name }} - conditions not met"
+          exit 0
+
+      - name: 📥 Checkout repository
+        if: matrix.job.condition == 'true'
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter (optimized)
+        if: matrix.job.condition == 'true'
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache-key-suffix: "-${{ matrix.job.name }}"
+
+      - name: 📥 Restore generated files
+        if: matrix.job.condition == 'true' && needs.setup-and-codegen.outputs.generation-needed == 'true'
+        uses: actions/cache/restore@v4
+        with:
+          path: |
+            lib/**/*.g.dart
+            lib/**/*.config.dart
+            .dart_tool/build
+          key: ${{ needs.setup-and-codegen.outputs.cache-key }}
+
+      # Analysis job steps
+      - name: 🔍 Analyze code
+        if: matrix.job.condition == 'true' && matrix.job.name == 'analysis'
+        run: |
+          echo "🔍 Running analysis..."
+          flutter analyze --fatal-infos
+          dart format --set-exit-if-changed .
+          flutter pub deps-check
+
+      # Test job steps
+      - name: 🧪 Run tests with coverage
+        if: matrix.job.condition == 'true' && matrix.job.name == 'test'
+        run: |
+          echo "🧪 Running tests..."
+          flutter test \
+            --no-pub \
+            --coverage \
+            --test-randomize-ordering-seed random \
+            --concurrency=4 \
+            --plain-name="xp1 Tests"
+
+      - name: 📊 Check coverage
+        if: matrix.job.condition == 'true' && matrix.job.name == 'test'
+        uses: VeryGoodOpenSource/very_good_coverage@v3
+        with:
+          path: coverage/lcov.info
+
+      # License compliance steps
+      - name: 🔐 Check license compliance
+        if: matrix.job.condition == 'true' && matrix.job.name == 'license-compliance'
+        run: |
+          echo "🔐 Checking license compliance..."
+          dart pub global activate very_good_cli
+          make license-ci
+
+  # Dependency validation (only when needed)
+  dependency-validation:
+    needs: changes
+    if: needs.changes.outputs.pubspec == 'true' || github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter (lightweight)
+        uses: ./.github/actions/flutter-setup
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache-key-suffix: "-deps"
+
+      - name: 🔍 Validate dependencies
+        run: flutter pub run rps validate-deps
+
+  # Documentation checks (parallel with other jobs)
+  docs-and-pr-checks:
+    needs: changes
+    if: needs.changes.outputs.docs == 'true' || github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        job: [spell-check, semantic-pr]
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 📝 Spell check
+        if: matrix.job == 'spell-check' && needs.changes.outputs.docs == 'true'
+        uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
+        with:
+          includes: "**/*.md"
+          modified_files_only: false
+
+      - name: 📋 Semantic PR check
+        if: matrix.job == 'semantic-pr' && github.event_name == 'pull_request'
+        uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
+
+  # Status check aggregation
+  ci-success:
+    if: always()
+    needs: [validation, dependency-validation, docs-and-pr-checks]
+    runs-on: ubuntu-latest
+    steps:
+      - name: ✅ All checks passed
+        if: ${{ !contains(needs.*.result, 'failure') && !contains(needs.*.result, 'cancelled') }}
+        run: echo "🎉 All CI checks passed!"
+
+      - name: ❌ Some checks failed
+        if: ${{ contains(needs.*.result, 'failure') || contains(needs.*.result, 'cancelled') }}
+        run: |
+          echo "❌ Some CI checks failed or were cancelled"
+          exit 1

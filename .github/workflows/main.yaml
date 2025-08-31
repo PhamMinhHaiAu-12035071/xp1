@@ -63,56 +63,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
-
-      - name: 🗂️ Cache pub dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.PUB_CACHE }}
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-
-      - name: 🗂️ Cache FVM and Flutter SDK
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.fvm
-          key: ${{ runner.os }}-fvm-complete-${{ env.FLUTTER_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-fvm-complete-
-
-      - name: 🔧 Install FVM using official installer
-        run: |
-          # Use official FVM installer for reliability
-          curl -fsSL https://fvm.app/install.sh | bash
-
-          # Add FVM to PATH
-          export PATH="$HOME/.fvm/bin:$PATH"
-          echo "$HOME/.fvm/bin" >> $GITHUB_PATH
-
-          # Verify FVM installation
-          echo "📋 Verifying FVM installation..."
-          fvm --version
-
-      - name: 🔧 Setup Flutter with FVM
-        run: |
-          # Setup Flutter with smart caching
-          if [ -d "$HOME/.fvm/flutter_sdk" ] && [ -f "$HOME/.fvm/flutter_sdk/bin/flutter" ]; then
-            echo "✅ Flutter SDK found in cache"
-            fvm use ${{ env.FLUTTER_VERSION }} --force
-          else
-            echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
-            fvm install ${{ env.FLUTTER_VERSION }}
-            fvm use ${{ env.FLUTTER_VERSION }} --force
-          fi
-
-      - name: 📦 Install dependencies
-        run: flutter pub get
 
       - name: 🔍 Validate dependencies
         run: flutter pub run rps validate-deps
@@ -126,10 +79,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
 
       - name: 🗂️ Cache pub dependencies
         uses: actions/cache@v4
@@ -143,9 +95,6 @@ jobs:
       - name: 🔧 Setup Very Good CLI
         run: dart pub global activate very_good_cli
 
-      - name: 📦 Install dependencies
-        run: flutter pub get
-
       - name: 🔐 Check license compliance
         run: make license-ci
 
@@ -158,68 +107,34 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
+          setup-build-runner: true
+          enable-performance-monitor: true
 
-      - name: 🗂️ Cache pub dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.PUB_CACHE }}
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
-
-      - name: 🗂️ Cache FVM and Flutter SDK
-        uses: actions/cache@v4
-        with:
-          path: |
-            ~/.fvm
-          key: ${{ runner.os }}-fvm-complete-${{ env.FLUTTER_VERSION }}
-          restore-keys: |
-            ${{ runner.os }}-fvm-complete-
-
-      - name: 🔧 Install FVM using official installer
+      - name: 🏗️ Generate code (optimized with timing)
         run: |
-          # Use official FVM installer for reliability
-          curl -fsSL https://fvm.app/install.sh | bash
+          echo "⏰ Starting code generation at $(date)"
+          start_time=$(date +%s)
 
-          # Add FVM to PATH
-          export PATH="$HOME/.fvm/bin:$PATH"
-          echo "$HOME/.fvm/bin" >> $GITHUB_PATH
-
-          # Verify FVM installation
-          echo "📋 Verifying FVM installation..."
-          fvm --version
-
-      - name: 🔧 Setup Flutter with FVM
-        run: |
-          # Setup Flutter with smart caching
-          if [ -d "$HOME/.fvm/flutter_sdk" ] && [ -f "$HOME/.fvm/flutter_sdk/bin/flutter" ]; then
-            echo "✅ Flutter SDK found in cache"
-            fvm use ${{ env.FLUTTER_VERSION }} --force
+          # Check if generated files exist and are up-to-date
+          if [ -f ".dart_tool/build/entrypoint/build.dart.snapshot" ] && [ -f "lib/core/di/injection_container.config.dart" ]; then
+            echo "🔄 Incremental build (cache hit)"
+            fvm flutter pub run build_runner build --release --verbose
           else
-            echo "⏬ Installing Flutter SDK ${{ env.FLUTTER_VERSION }}"
-            fvm install ${{ env.FLUTTER_VERSION }}
-            fvm use ${{ env.FLUTTER_VERSION }} --force
+            echo "🆕 Full build (cache miss or first run)"
+            fvm flutter pub run build_runner build --delete-conflicting-outputs --release --verbose
           fi
 
-      - name: 📦 Install dependencies
-        run: flutter pub get
+          end_time=$(date +%s)
+          duration=$((end_time - start_time))
+          echo "⚡ Code generation completed in ${duration} seconds"
 
-      - name: 🗂️ Cache build_runner outputs
-        uses: actions/cache@v4
-        with:
-          path: |
-            .dart_tool/build
-            lib/**/*.g.dart
-            lib/**/*.config.dart
-          key: ${{ runner.os }}-build-runner-${{ hashFiles('**/pubspec.lock', 'lib/**/*.dart', '!lib/**/*.g.dart', '!lib/**/*.config.dart') }}
-
-      - name: 🏗️ Generate code
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+          # Show generated files stats
+          echo "📊 Generated files:"
+          find lib -name "*.g.dart" -o -name "*.config.dart" | wc -l | xargs echo "Total generated files:"
+          du -sh .dart_tool/build 2>/dev/null | cut -f1 | xargs echo "Build cache size:" || echo "Build cache size: N/A"
 
       - name: 📤 Upload generated files
         uses: actions/upload-artifact@v4
@@ -239,10 +154,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
 
       - name: 🗂️ Cache pub dependencies
         uses: actions/cache@v4
@@ -257,9 +171,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: generated-files
-
-      - name: 📦 Install dependencies
-        run: flutter pub get
 
       - name: ✅ Verify dependencies
         run: flutter pub deps-check
@@ -279,10 +190,9 @@ jobs:
         uses: actions/checkout@v4
 
       - name: 🔧 Setup Flutter
-        uses: subosito/flutter-action@v2
+        uses: ./.github/actions/flutter-setup
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          cache: true
 
       - name: 🗂️ Cache pub dependencies
         uses: actions/cache@v4
@@ -297,9 +207,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: generated-files
-
-      - name: 📦 Install dependencies
-        run: flutter pub get
 
       - name: 🧪 Run tests
         run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
