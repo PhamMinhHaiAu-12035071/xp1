@@ -79,8 +79,8 @@ flutter run --flavor development --target lib/main_development.dart
 ### Code Quality
 - **Static Analysis**: Very Good Ventures analysis rules (130+ strict rules)
 - **Code Formatting**: Automatic formatting with `dart format` (80 character limit)
-- **Linting**: Comprehensive linting rules với very_good_analysis
-- **Documentation**: Mandatory documentation cho tất cả public APIs
+- **Linting**: Comprehensive linting rules with very_good_analysis
+- **Documentation**: Mandatory documentation for all public APIs
 - **Error Handling**: Specific exception handling patterns
 
 ### Git Workflow
@@ -235,10 +235,10 @@ testWidgets('counter increments when + button is pressed', (tester) async {
 
 ### Code Standards
 - Follow Very Good Ventures coding standards (130+ strict rules)
-- Write comprehensive tests với proper mocking
+- Write comprehensive tests with proper mocking
 - Use meaningful commit messages (conventional commits)
 - Keep commits atomic and focused
-- Mandatory documentation cho public APIs
+- Mandatory documentation for all public APIs
 - Specific exception handling patterns
 
 ## 📄 License

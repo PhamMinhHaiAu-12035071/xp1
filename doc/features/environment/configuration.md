@@ -1,10 +1,10 @@
-# Environment Configuration với Envied
+# Environment Configuration with Envied
 
-## 📋 Tổng Quan
+## 📋 Overview
 
-Hệ thống quản lý multiple environments sử dụng [envied package](https://pub.dev/packages/envied) cho việc bảo mật và quản lý environment variables.
+Multiple environments management system using [envied package](https://pub.dev/packages/envied) for secure management of environment variables.
 
-## 🏗️ Kiến Trúc
+## 🏗️ Architecture
 
 ### Clean Architecture Pattern
 
@@ -27,7 +27,7 @@ lib/features/env/
 
 ### 1. Code Generation
 
-Trước khi chạy app, cần generate environment code:
+Before running the app, you need to generate environment code:
 
 ```bash
 # Development environment
@@ -40,7 +40,7 @@ dart run rps generate-env-staging
 dart run rps generate-env-prod
 ```
 
-### 2. Running App với Environment
+### 2. Running App with Environment
 
 ```bash
 # Development
@@ -53,7 +53,7 @@ dart run rps run-staging
 dart run rps run-prod
 ```
 
-### 3. Building với Environment
+### 3. Building with Environment
 
 ```bash
 # Development build
@@ -68,7 +68,7 @@ dart run rps build-prod
 
 ## ⚙️ Environment Variables
 
-Mỗi environment file chứa:
+Each environment file contains:
 
 ```env
 API_URL=https://api-url.com/api/v1
@@ -80,9 +80,9 @@ API_TIMEOUT_MS=30000
 
 ## 🔧 Development Workflow
 
-### 1. Thêm Environment Variable Mới
+### 1. Adding New Environment Variables
 
-1. **Cập nhật Repository Interface:**
+1. **Update Repository Interface:**
 
 ```dart
 // lib/features/env/domain/env_config_repository.dart
@@ -91,14 +91,14 @@ abstract class EnvConfigRepository {
 }
 ```
 
-2. **Cập nhật Environment Files:**
+2. **Update Environment Files:**
 
 ```env
 # development.env, staging.env, production.env
 NEW_VARIABLE=value
 ```
 
-3. **Cập nhật Environment Classes:**
+3. **Update Environment Classes:**
 
 ```dart
 // env_development.dart, env_staging.dart, env_production.dart
@@ -106,7 +106,7 @@ NEW_VARIABLE=value
 static String newVariable = _EnvDev.newVariable;
 ```
 
-4. **Cập nhật Factory:**
+4. **Update Factory:**
 
 ```dart
 // env_config_factory.dart
@@ -124,7 +124,7 @@ static String getNewVariableForEnvironment(EnvironmentType environment) {
 }
 ```
 
-5. **Cập nhật Repository Implementation:**
+5. **Update Repository Implementation:**
 
 ```dart
 // env_config_repository_impl.dart
@@ -132,7 +132,7 @@ static String getNewVariableForEnvironment(EnvironmentType environment) {
 String get newVariable => EnvConfigFactory.newVariable;
 ```
 
-6. **Generate lại code:**
+6. **Regenerate code:**
 
 ```bash
 dart run rps generate-env-dev
@@ -150,20 +150,20 @@ flutter test test/features/env/infrastructure/env_config_factory_test.dart
 
 ## 🔒 Security Best Practices
 
-### ✅ Đã Implement:
+### ✅ Already Implemented:
 
-- **.env files đã được gitignore** để tránh expose secrets
-- **Generated files (.g.dart) đã được gitignore**
-- **Clean Architecture** tách biệt domain logic và infrastructure
-- **Factory pattern** cho runtime environment selection
-- **Type-safe access** thông qua repository interface
+- **.env files are gitignored** to avoid exposing secrets
+- **Generated files (.g.dart) are gitignored**
+- **Clean Architecture** separates domain logic and infrastructure
+- **Factory pattern** for runtime environment selection
+- **Type-safe access** through repository interface
 
-### ⚠️ Lưu Ý Quan Trọng:
+### ⚠️ Important Notes:
 
-1. **KHÔNG BAO GIỜ** commit file `.env` vào Git
-2. **KHÔNG BAO GIỜ** commit file `.g.dart` vào Git
-3. **LUÔN LUÔN** sử dụng repository interface, không truy cập trực tiếp env classes
-4. Trong production, xem xét sử dụng `obfuscate: true` cho sensitive data
+1. **NEVER** commit `.env` files to Git
+2. **NEVER** commit `.g.dart` files to Git
+3. **ALWAYS** use repository interface, do not access env classes directly
+4. In production, consider using `obfuscate: true` for sensitive data
 
 ## 🛠️ CLI Commands Reference
 
@@ -191,26 +191,26 @@ dart run rps build-staging  # Build staging
 dart run rps build-prod     # Build production
 ```
 
-### Manual Commands (nếu cần):
+### Manual Commands (if needed):
 
 ```bash
-# Generate với specific env file
+# Generate with specific env file
 dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
-# Run với environment flag
+# Run with environment flag
 flutter run --dart-define=ENVIRONMENT=development --target=lib/main_development.dart
 ```
 
 ## 🧪 Testing
 
-Environment configuration được test comprehensive:
+Environment configuration is comprehensively tested:
 
-- **Unit tests** cho factory pattern
-- **Integration tests** cho repository implementation
+- **Unit tests** for factory pattern
+- **Integration tests** for repository implementation
 - **Environment-specific** behavior testing
 
 ```bash
-# Run tất cả environment tests
+# Run all environment tests
 flutter test test/features/env/
 
 # Test coverage
@@ -219,7 +219,7 @@ flutter test --coverage test/features/env/
 
 ## 📈 Monitoring & Debugging
 
-Bootstrap code sẽ log environment info khi start:
+Bootstrap code will log environment info at startup:
 
 ```
 🚀 Starting app with environment: development
@@ -229,7 +229,7 @@ Bootstrap code sẽ log environment info khi start:
 
 ## 🔄 CI/CD Integration
 
-Trong CI/CD pipeline, sử dụng:
+In CI/CD pipeline, use:
 
 ```yaml
 # GitHub Actions example
@@ -255,12 +255,12 @@ dart run rps generate-env-dev
 
 ### Issue: Environment Not Switching
 
-1. Kiểm tra `--dart-define=ENVIRONMENT=xxx` flag
+1. Check `--dart-define=ENVIRONMENT=xxx` flag
 2. Verify environment factory logic
-3. Check bootstrap logs cho environment info
+3. Check bootstrap logs for environment info
 
 ### Issue: Missing Environment Variables
 
-1. Verify file `.env` tồn tại
-2. Check file path trong `@Envied(path: '...')` annotation
-3. Run code generation lại
+1. Verify that `.env` file exists
+2. Check file path in `@Envied(path: '...')` annotation
+3. Run code generation again
