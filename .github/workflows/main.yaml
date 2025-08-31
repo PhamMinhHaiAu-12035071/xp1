@@ -83,7 +83,8 @@ jobs:
   build:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
     with:
-      flutter_version: "3.35.1" # Should match .fvmrc flutter version
+      flutter_version: ${{ env.FLUTTER_VERSION }}
+      build_runner: true
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
