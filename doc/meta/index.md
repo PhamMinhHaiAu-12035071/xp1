@@ -8,9 +8,9 @@ Welcome to the Xp1 Flutter project documentation. This index provides quick acce
 
 ### Core Documentation
 - **[README](README.md)** - Project overview, setup, and quick start guide
-- **[Tech Stack](tech-stack.md)** - Comprehensive technology stack information
-- **[Architecture](architecture.md)** - System architecture and design patterns
-- **[Development Guidelines](development-guidelines.md)** - Coding standards and best practices
+- **[Tech Stack](../core/tech-stack.md)** - Comprehensive technology stack information
+- **[Architecture](../core/architecture.md)** - System architecture and design patterns
+- **[Development Guidelines](../core/development-guidelines.md)** - Coding standards and best practices
 
 ### Quick Reference
 - **[Project Structure](#project-structure)** - File and folder organization
@@ -273,9 +273,9 @@ This project is licensed under the MIT License - see the [LICENSE](../LICENSE) f
 | Document | Purpose | Audience |
 |----------|---------|----------|
 | [README](README.md) | Project overview and quick start | All users |
-| [Tech Stack](tech-stack.md) | Technology details | Developers |
-| [Architecture](architecture.md) | System design | Architects, Developers |
-| [Development Guidelines](development-guidelines.md) | Coding standards | Developers |
+| [Tech Stack](../core/tech-stack.md) | Technology details | Developers |
+| [Architecture](../core/architecture.md) | System design | Architects, Developers |
+| [Development Guidelines](../core/development-guidelines.md) | Coding standards | Developers |
 
 ---
 

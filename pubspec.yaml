@@ -13,6 +13,9 @@ dependencies:
   # === STATE MANAGEMENT ===
   bloc: ^9.0.0 # Business Logic Component pattern
 
+  # === ENVIRONMENT MANAGEMENT ===
+  envied: ^1.2.0 # Secure environment variable management
+
   # === CORE FRAMEWORK ===
   flutter:
     sdk: flutter
@@ -26,8 +29,10 @@ dependencies:
 dev_dependencies:
   # === TESTING & DEVELOPMENT TOOLS (Alphabetical Order) ===
   bloc_test: ^10.0.0 # Testing utilities for BLoC
+  build_runner: ^2.4.13 # Build system for code generation
   conventional_commit: ^0.6.1+1 # Git commit message linting
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
+  envied_generator: ^1.2.0 # Code generator for envied package
   flutter_test: # Flutter testing framework
     sdk: flutter
   logger: ^2.6.1 # Beautiful and extensible logging

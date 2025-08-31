@@ -63,6 +63,74 @@ linter:
 * **Include usage examples** in documentation for complex widgets and methods.
 * **Document all public APIs** with detailed parameter descriptions (bắt buộc).
 
+#### Documentation Templates for Common Patterns
+
+**Sealed Class Documentation:**
+```dart
+/// Sealed class representing different application environments.
+/// 
+/// This class provides a factory pattern for environment-specific 
+/// configurations and ensures type safety when switching between 
+/// development, staging, and production.
+sealed class Environment {
+  /// Creates an instance of Environment.
+  const Environment();
+  
+  /// Gets the current environment instance based on compile-time 
+  /// configuration.
+  static Environment get current => _getCurrentEnvironment();
+  
+  /// The API base URL for this environment.
+  String get apiUrl;
+  
+  /// The application name for this environment.
+  String get appName;
+}
+```
+
+**Factory Class Documentation:**
+```dart
+/// Factory class for accessing environment configuration.
+/// 
+/// Provides static methods to access current environment settings
+/// and utilities for environment-specific operations.
+class EnvConfigFactory {
+  /// Gets the current environment instance.
+  static Environment get currentEnvironment => Environment.current;
+  
+  /// Gets the API URL from the current environment.
+  static String get apiUrl => currentEnvironment.apiUrl;
+  
+  /// Gets the API URL for a specific environment.
+  /// 
+  /// [environment] The environment to get the API URL from.
+  static String getApiUrlForEnvironment(Environment environment) =>
+      environment.apiUrl;
+}
+```
+
+**Implementation Class Documentation:**
+```dart
+/// Development environment configuration.
+/// 
+/// Provides configuration values specific to development environment.
+final class Development extends Environment {
+  /// Creates a development environment instance.
+  const Development();
+  
+  @override
+  String get apiUrl => EnvDev.apiUrl;
+}
+```
+
+**Auto-Documentation Rules:**
+- **Classes/Interfaces**: What they represent and their primary purpose
+- **Methods**: What they do and their parameters (use `[paramName]` syntax)
+- **Properties**: What they represent or contain
+- **Constructors**: What they create and initial state
+- **Factory methods**: What they return and when to use them
+- **Static methods**: Their purpose and when to call them
+
 ## Naming Conventions (Very Good Analysis Standards)
 
 ### Classes, Enums, Typedefs, Extensions

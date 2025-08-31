@@ -1,0 +1,1118 @@
+---
+globs: *.dart
+description: Dart coding style guidelines to prevent linter errors and warnings
+---
+
+# Dart Coding Style Guidelines
+
+## 🚨 Critical Rules to Prevent Linter Errors
+
+> **ZERO TOLERANCE POLICY**: No linting errors, no warnings, no exceptions. Every issue must be resolved before commit.
+
+**Priority Order for Quick Fixes:**
+1. 🔥 **cascade_invocations** - Use `..` for instance methods, records `()` for static methods
+2. 🔥 **public_member_api_docs** - Add `/// documentation` to all public APIs  
+3. 🔥 **lines_longer_than_80_chars** - Break long lines immediately
+4. 🔥 **prefer_const_constructors** - Add `const` wherever possible
+5. 🔥 **avoid_print** - Replace with `Console.info()` or proper logging
+
+### 1. Cascade Operators (`..`) - MANDATORY for Multiple Calls
+
+**THE GOLDEN RULE:** Use cascade operators when calling 2+ methods on the same object instance.
+
+```dart
+// ❌ LINT ERROR: cascade_invocations
+final logger = Logger(printer: SimplePrinter());
+logger.e('Error message 1');
+logger.e('Error message 2');
+logger.e('Error message 3');
+
+// ✅ CORRECT: Use cascade operators
+Logger(printer: SimplePrinter())
+  ..e('Error message 1')
+  ..e('Error message 2')
+  ..e('Error message 3');
+
+// ❌ SPECIAL CASE: Static methods (cascade won't work)
+EnvConfigFactory.apiUrl;
+EnvConfigFactory.appName;
+EnvConfigFactory.environmentName;
+
+// ✅ SOLUTION: Use records for grouping static calls
+final _ = (
+  EnvConfigFactory.apiUrl,
+  EnvConfigFactory.appName,
+  EnvConfigFactory.environmentName,
+);
+```
+
+**Rules:**
+
+- **Instance methods (2+ calls)** → Use cascade operators (`..`)
+- **Instance methods (1 call)** → Use dot notation (`.`)
+- **Static methods (multiple calls)** → Use records `()` or meaningful variables
+- **Static methods (single call)** → Direct access
+
+### 2. Documentation - MANDATORY for Public APIs
+
+**ALL public members MUST have documentation** to avoid `public_member_api_docs` errors.
+
+```dart
+// ❌ LINT ERROR: Missing documentation
+class CounterCubit extends Cubit<int> {
+  CounterCubit() : super(0);
+  void increment() => emit(state + 1);
+}
+
+// ✅ CORRECT: Document all public APIs
+/// A cubit that manages a counter state with increment and decrement operations.
+class CounterCubit extends Cubit<int> {
+  /// Creates a CounterCubit with initial state of 0.
+  CounterCubit() : super(0);
+
+  /// Increments the counter value by 1.
+  void increment() => emit(state + 1);
+}
+```
+
+**Documentation Templates for Common Patterns:**
+
+```dart
+// ✅ SEALED CLASS DOCUMENTATION
+/// Sealed class representing different application environments.
+///
+/// This class provides a factory pattern for environment-specific
+/// configurations and ensures type safety when switching between
+/// development, staging, and production.
+sealed class Environment {
+  /// Creates an instance of Environment.
+  const Environment();
+
+  /// Gets the current environment instance based on compile-time
+  /// configuration.
+  static Environment get current => _getCurrentEnvironment();
+
+  /// The API base URL for this environment.
+  String get apiUrl;
+
+  /// The application name for this environment.
+  String get appName;
+}
+
+// ✅ FACTORY CLASS DOCUMENTATION
+/// Factory class for accessing environment configuration.
+///
+/// Provides static methods to access current environment settings
+/// and utilities for environment-specific operations.
+class EnvConfigFactory {
+  /// Gets the current environment instance.
+  static Environment get currentEnvironment => Environment.current;
+
+  /// Gets the API URL from the current environment.
+  static String get apiUrl => currentEnvironment.apiUrl;
+
+  /// Gets the API URL for a specific environment.
+  ///
+  /// [environment] The environment to get the API URL from.
+  static String getApiUrlForEnvironment(Environment environment) =>
+      environment.apiUrl;
+}
+
+// ✅ IMPLEMENTATION CLASS DOCUMENTATION
+/// Development environment configuration.
+///
+/// Provides configuration values specific to development environment.
+final class Development extends Environment {
+  /// Creates a development environment instance.
+  const Development();
+
+  @override
+  String get apiUrl => EnvDev.apiUrl;
+}
+
+// ✅ REPOSITORY IMPLEMENTATION DOCUMENTATION
+/// Implementation of [EnvConfigRepository] that provides environment
+/// configuration through [EnvConfigFactory].
+///
+/// This repository acts as a bridge between the domain layer and the
+/// infrastructure layer, delegating configuration access to the factory.
+class EnvConfigRepositoryImpl implements EnvConfigRepository {
+  @override
+  String get apiUrl => EnvConfigFactory.apiUrl;
+}
+```
+
+**Auto-Documentation Rules:**
+
+- **Classes/Interfaces**: What they represent and their primary purpose
+- **Methods**: What they do and their parameters (use `[paramName]` syntax)
+- **Properties**: What they represent or contain
+- **Constructors**: What they create and initial state
+- **Factory methods**: What they return and when to use them
+- **Static methods**: Their purpose and when to call them
+
+### 3. Naming Conventions - Strict Enforcement
+
+```dart
+// ✅ CORRECT: Naming patterns
+class UserRepository {}        // PascalCase for classes
+final userName = 'John';       // camelCase for variables
+void getUserData() {}          // camelCase for methods
+const maxRetries = 3;          // camelCase for constants (NOT SCREAMING_SNAKE_CASE)
+
+// File names: snake_case
+user_repository.dart
+counter_cubit.dart
+```
+
+### 4. Import Organization - Prevent unused_import Errors
+
+```dart
+// ✅ CORRECT: Organized imports (dart_code_metrics order)
+import 'dart:async';           // Dart core
+import 'dart:developer';
+
+import 'package:bloc/bloc.dart';      // External packages
+import 'package:flutter/material.dart';
+
+import 'package:xp1/counter/counter.dart';  // Internal packages
+import 'package:xp1/l10n/l10n.dart';
+```
+
+### 5. Const Constructors - MANDATORY When Possible
+
+```dart
+// ❌ LINT ERROR: prefer_const_constructors
+class MyWidget extends StatelessWidget {
+  MyWidget({super.key});  // Missing const
+
+  @override
+  Widget build(BuildContext context) {
+    return Text('Hello');  // Missing const
+  }
+}
+
+// ✅ CORRECT: Use const constructors
+class MyWidget extends StatelessWidget {
+  const MyWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return const Text('Hello');
+  }
+}
+```
+
+### 6. Line Length - 80 Characters Maximum
+
+```dart
+// ❌ LINT ERROR: lines_longer_than_80_chars
+expect(EnvConfigFactory.getAppNameForEnvironment(const Development()), equals('XP1 Development'));
+
+// ✅ CORRECT: Break long lines appropriately
+expect(
+  EnvConfigFactory.getAppNameForEnvironment(const Development()),
+  equals('XP1 Development'),
+);
+```
+
+### 7. Error Handling - Specific Exception Classes
+
+```dart
+// ❌ AVOID: Generic exceptions
+throw Exception('User not found');
+
+// ✅ CORRECT: Specific exception classes
+class UserNotFoundException implements Exception {
+  const UserNotFoundException(this.userId);
+  final String userId;
+
+  @override
+  String toString() => 'UserNotFoundException: User with ID $userId not found';
+}
+
+throw UserNotFoundException(userId);
+```
+
+### 8. Widget Structure - Performance Optimized
+
+```dart
+// ❌ PERFORMANCE ISSUE: Unnecessary rebuilds
+class CounterText extends StatelessWidget {
+  const CounterText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final cubit = context.read<CounterCubit>();  // ❌ Will not rebuild
+    return Text('${cubit.state}');
+  }
+}
+
+// ✅ CORRECT: Selective rebuilds
+class CounterText extends StatelessWidget {
+  const CounterText({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final count = context.select((CounterCubit cubit) => cubit.state);
+    return Text('$count');
+  }
+}
+```
+
+### 9. Test Structure - Comprehensive Coverage
+
+```dart
+// ✅ CORRECT: Test structure with proper setup/teardown
+void main() {
+  group('CounterCubit', () {
+    late CounterCubit counterCubit;
+
+    setUp(() {
+      counterCubit = CounterCubit();
+    });
+
+    tearDown(() {
+      counterCubit.close();
+    });
+
+    test('initial state is 0', () {
+      expect(counterCubit.state, equals(0));
+    });
+  });
+}
+```
+
+### 10. Memory Management - Prevent Leaks
+
+```dart
+// ✅ CORRECT: Proper disposal
+class _MyWidgetState extends State<MyWidget> {
+  late Timer _timer;
+
+  @override
+  void initState() {
+    super.initState();
+    _timer = Timer.periodic(const Duration(seconds: 1), (_) {});
+  }
+
+  @override
+  void dispose() {
+    _timer.cancel();  // ❌ CRITICAL: Always dispose resources
+    super.dispose();
+  }
+}
+```
+
+## 🔧 Quick Fixes for Common Linter Errors
+
+### avoid_print → Use proper console output
+
+```dart
+// ❌ avoid_print
+print('Debug message');
+
+// ✅ Use Console class or log
+Console.info('Debug message');
+log('Debug message');
+```
+
+### prefer_final_locals → Use final when possible
+
+```dart
+// ❌ prefer_final_locals
+String message = 'Hello';
+
+// ✅ Use final
+final message = 'Hello';
+```
+
+### unnecessary_lambdas → Use tear-offs
+
+```dart
+// ❌ unnecessary_lambdas
+items.map((e) => e.toString())
+
+// ✅ Use tear-off
+items.map(Object.toString)
+```
+
+### prefer_function_declarations_over_variables
+
+```dart
+// ❌ prefer_function_declarations_over_variables
+final builder = () => const MockApp();
+
+// ✅ Use function declaration
+MockApp builder() => const MockApp();
+```
+
+### omit_local_variable_types → Omit obvious type annotations
+
+```dart
+// ❌ omit_local_variable_types
+for (int i = 0; i < 1000; i++) {
+  // code here
+}
+
+// ✅ Use type inference
+for (var i = 0; i < 1000; i++) {
+  // code here
+}
+```
+
+## 🔥 Real-World Error Patterns & Solutions
+
+### Repository Pattern Implementation Fixes
+
+```dart
+// ❌ LINT ERROR: Missing documentation + cascade_invocations
+class EnvConfigRepositoryImpl implements EnvConfigRepository {
+  @override
+  String get apiUrl => EnvConfigFactory.apiUrl;
+  @override
+  String get appName => EnvConfigFactory.appName;
+  @override
+  String get environmentName => EnvConfigFactory.environmentName;
+}
+
+// ✅ CORRECT: Documented implementation
+/// Implementation of [EnvConfigRepository] that provides environment
+/// configuration through [EnvConfigFactory].
+///
+/// This repository acts as a bridge between the domain layer and the
+/// infrastructure layer, delegating configuration access to the factory.
+class EnvConfigRepositoryImpl implements EnvConfigRepository {
+  @override
+  String get apiUrl => EnvConfigFactory.apiUrl;
+  @override
+  String get appName => EnvConfigFactory.appName;
+  @override
+  String get environmentName => EnvConfigFactory.environmentName;
+}
+```
+
+### Test File Common Issues & Solutions
+
+```dart
+// ❌ MULTIPLE LINT ERRORS: Line length + cascade_invocations + type annotation
+test('should cache environment properties for fast access', () {
+  // This test will FAIL - current implementation calls static getters repeatedly
+  final stopwatch = Stopwatch()..start();
+
+  for (int i = 0; i < 1000; i++) {
+    EnvConfigFactory.apiUrl;
+    EnvConfigFactory.appName;
+    EnvConfigFactory.environmentName;
+  }
+});
+
+// ✅ CORRECT: Fixed all issues
+test('should cache environment properties for fast access', () {
+  // This test will FAIL - current implementation calls static getters
+  // repeatedly
+  final stopwatch = Stopwatch()..start();
+
+  for (var i = 0; i < 1000; i++) {
+    // Use records to group static method calls
+    final _ = (
+      EnvConfigFactory.apiUrl,
+      EnvConfigFactory.appName,
+      EnvConfigFactory.environmentName,
+    );
+  }
+});
+
+// ❌ LINT ERROR: Line length in group descriptions
+group('Repository Pattern Integration (TDD Red Phase - These should FAIL)', () {
+
+// ✅ CORRECT: Break long group descriptions
+group(
+  'Repository Pattern Integration (TDD Red Phase - These should FAIL)',
+  () {
+```
+
+### Performance Testing Patterns
+
+```dart
+// ❌ WRONG: Static calls without grouping (cascade_invocations)
+for (var i = 0; i < 1000; i++) {
+  EnvConfigFactory.apiUrl;
+  EnvConfigFactory.appName;
+  EnvConfigFactory.environmentName;
+}
+
+// ✅ CORRECT: Group static calls with records
+for (var i = 0; i < 1000; i++) {
+  final _ = (
+    EnvConfigFactory.apiUrl,
+    EnvConfigFactory.appName,
+    EnvConfigFactory.environmentName,
+  );
+}
+
+// ✅ ALTERNATIVE: Use meaningful variables when records don't make sense
+for (var i = 0; i < 1000; i++) {
+  final apiUrl = EnvConfigFactory.apiUrl;
+  final appName = EnvConfigFactory.appName;
+  final envName = EnvConfigFactory.environmentName;
+
+  // Use the variables here
+  expect(apiUrl, isNotEmpty);
+  expect(appName, contains('XP1'));
+  expect(envName, isNotEmpty);
+}
+```
+
+## 🎯 VS Code Settings for Auto-Fix
+
+Ensure your `.vscode/settings.json` includes:
+
+```json
+{
+  "dart.lineLength": 80,
+  "editor.formatOnSave": true,
+  "editor.rulers": [80],
+  "editor.codeActionsOnSave": {
+    "source.fixAll": "explicit",
+    "source.organizeImports": "explicit"
+  }
+}
+```
+
+## ⚡ Commands to Keep Code Clean
+
+```bash
+# Format code
+dart format lib/ test/ --set-exit-if-changed
+
+# Analyze for issues
+dart analyze --fatal-infos
+
+# Run tests with coverage
+flutter test --coverage
+
+# Check very_good_analysis compliance
+very_good test --coverage
+```
+
+## 📁 File Organization & Naming
+
+### Directory Structure Standards
+
+```
+feature_name/
+├── cubit/
+│   ├── feature_cubit.dart
+│   └── feature_state.dart
+├── view/
+│   ├── feature_page.dart
+│   └── widgets/
+├── models/
+│   └── feature_model.dart
+└── feature.dart  # Barrel export
+```
+
+### File Naming Rules
+
+```dart
+// ✅ CORRECT: snake_case for files
+user_repository.dart
+counter_cubit.dart
+env_config_factory.dart
+
+// ❌ WRONG: PascalCase or camelCase for files
+UserRepository.dart
+counterCubit.dart
+```
+
+## 🎨 Advanced Formatting Rules
+
+### Complex Widget Breaking
+
+```dart
+// ❌ TOO LONG: Single line widget construction
+return BlocProvider(create: (_) => CounterCubit(), child: CounterView());
+
+// ✅ CORRECT: Proper widget breaking
+return BlocProvider(
+  create: (_) => CounterCubit(),
+  child: const CounterView(),
+);
+
+// ✅ CORRECT: Complex nested widgets
+return Scaffold(
+  appBar: AppBar(
+    title: Text(l10n.counterAppBarTitle),
+    backgroundColor: Theme.of(context).primaryColor,
+  ),
+  body: const Center(
+    child: CounterText(),
+  ),
+);
+```
+
+### Method Chaining & Fluent APIs
+
+```dart
+// ❌ TOO LONG: Single line chaining
+final result = repository.getUser(id).then((user) => user.updateProfile()).catchError((error) => handleError(error));
+
+// ✅ CORRECT: Break fluent chains
+final result = repository
+    .getUser(id)
+    .then((user) => user.updateProfile())
+    .catchError((error) => handleError(error));
+```
+
+## 🧪 Advanced Testing Patterns
+
+### BLoC Testing with States
+
+```dart
+// ✅ CORRECT: Comprehensive BLoC testing
+blocTest<UserCubit, UserState>(
+  'emits [UserLoading, UserSuccess] when user is fetched successfully',
+  build: () => UserCubit(repository: mockRepository),
+  setUp: () {
+    when(() => mockRepository.getUser(any()))
+        .thenAnswer((_) async => mockUser);
+  },
+  act: (cubit) => cubit.fetchUser('123'),
+  expect: () => [
+    const UserLoading(),
+    UserSuccess(mockUser),
+  ],
+  verify: (_) {
+    verify(() => mockRepository.getUser('123')).called(1);
+  },
+);
+```
+
+### Widget Testing with Mocks
+
+```dart
+// ✅ CORRECT: Widget test with proper mocking
+testWidgets('should display user name when loaded', (tester) async {
+  when(() => mockUserCubit.state).thenReturn(UserSuccess(mockUser));
+
+  await tester.pumpWidget(
+    MaterialApp(
+      home: BlocProvider<UserCubit>.value(
+        value: mockUserCubit,
+        child: const UserProfilePage(),
+      ),
+    ),
+  );
+
+  expect(find.text(mockUser.name), findsOneWidget);
+});
+```
+
+## 🔐 Security & Validation Rules
+
+### Input Sanitization
+
+```dart
+// ❌ SECURITY RISK: Direct user input usage
+void updateUser(String email, String name) {
+  // Direct usage without validation
+  user.email = email;
+}
+
+// ✅ SECURE: Proper validation
+void updateUser(String email, String name) {
+  if (!isValidEmail(email)) {
+    throw InvalidEmailException(email);
+  }
+  if (name.trim().isEmpty) {
+    throw EmptyNameException();
+  }
+
+  user.email = email.trim().toLowerCase();
+  user.name = name.trim();
+}
+```
+
+### Environment Variable Usage
+
+```dart
+// ❌ WRONG: Direct environment access
+final apiUrl = Platform.environment['API_URL'] ?? 'fallback';
+
+// ✅ CORRECT: Use environment configuration factory
+final apiUrl = EnvConfigFactory.apiUrl;
+```
+
+## 📱 Flutter-Specific Performance Rules
+
+### Widget Optimization Patterns
+
+```dart
+// ❌ PERFORMANCE ISSUE: Creating widgets in build method
+@override
+Widget build(BuildContext context) {
+  final button = ElevatedButton(
+    onPressed: () => increment(),
+    child: const Text('Increment'),
+  );
+  return button;
+}
+
+// ✅ OPTIMIZED: Static widgets or proper separation
+class IncrementButton extends StatelessWidget {
+  const IncrementButton({super.key, required this.onPressed});
+
+  final VoidCallback onPressed;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      child: const Text('Increment'),
+    );
+  }
+}
+```
+
+### State Management Optimization
+
+```dart
+// ❌ INEFFICIENT: Rebuilding entire widget tree
+class CounterPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CounterCubit, int>(
+      builder: (context, count) {
+        return Scaffold(
+          appBar: AppBar(title: Text('Counter: $count')),
+          body: Column(children: [
+            Text('Current count: $count'),
+            ElevatedButton(
+              onPressed: () => context.read<CounterCubit>().increment(),
+              child: const Text('Increment'),
+            ),
+          ]),
+        );
+      },
+    );
+  }
+}
+
+// ✅ OPTIMIZED: Selective rebuilds
+class CounterPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: BlocBuilder<CounterCubit, int>(
+          builder: (context, count) => Text('Counter: $count'),
+        ),
+      ),
+      body: Column(children: [
+        const CounterText(), // Only rebuilds when count changes
+        const IncrementButton(), // Never rebuilds
+      ]),
+    );
+  }
+}
+```
+
+## 🏗️ Architecture Patterns
+
+### Repository Pattern Implementation
+
+```dart
+// ✅ CORRECT: Repository with proper error handling
+abstract class UserRepository {
+  Future<User> getUser(String id);
+  Future<void> updateUser(User user);
+  Future<void> deleteUser(String id);
+}
+
+class UserRepositoryImpl implements UserRepository {
+  const UserRepositoryImpl({
+    required this.apiClient,
+    required this.localDatabase,
+  });
+
+  final ApiClient apiClient;
+  final LocalDatabase localDatabase;
+
+  @override
+  Future<User> getUser(String id) async {
+    try {
+      // Try local first, then remote
+      final localUser = await localDatabase.getUser(id);
+      if (localUser != null) return localUser;
+
+      final remoteUser = await apiClient.getUser(id);
+      await localDatabase.saveUser(remoteUser);
+      return remoteUser;
+    } on NetworkException {
+      // Return cached version if available
+      final cachedUser = await localDatabase.getUser(id);
+      if (cachedUser != null) return cachedUser;
+      rethrow;
+    }
+  }
+}
+```
+
+### Factory Pattern for Environment Configuration
+
+```dart
+// ✅ CORRECT: Environment factory with sealed classes
+sealed class Environment {
+  const Environment();
+  static Environment get current => _getCurrentEnvironment();
+
+  String get apiUrl;
+  String get appName;
+  bool get isDebugMode;
+}
+
+final class Development extends Environment {
+  const Development();
+  @override String get apiUrl => EnvDev.apiUrl;
+  @override String get appName => EnvDev.appName;
+  @override bool get isDebugMode => EnvDev.isDebugMode;
+}
+```
+
+## 🎯 Linus Philosophy Applied
+
+> "Bad programmers worry about the code. Good programmers worry about data structures and their relationships."
+
+### Never Use Band-Aid Solutions
+
+**NEVER** suppress linter warnings with ignore directives unless absolutely necessary:
+
+```dart
+// ❌ BAD: Band-aid solution
+// ignore_for_file: avoid_print
+// ignore: cascade_invocations
+
+// ✅ GOOD: Fix the root cause
+Logger(printer: SimplePrinter())
+  ..info('Process started')
+  ..info('Configuration loaded');
+```
+
+### Root Cause Analysis Process
+
+1. **Identify**: Why is the linter complaining?
+2. **Design**: What's the proper abstraction?
+3. **Implement**: Clean solution that eliminates the issue
+4. **Verify**: No warnings, better architecture
+
+### Console Output Best Practices
+
+For CLI tools, implement proper console abstraction:
+
+```dart
+/// Console output helper for CLI tools
+class Console {
+  /// Write success message to stdout
+  static void success(String message) => stdout.writeln(message);
+
+  /// Write info message to stdout
+  static void info(String message) => stdout.writeln(message);
+
+  /// Write error message to stderr
+  static void error(String message) => stderr.writeln(message);
+
+  /// Write warning message to stderr
+  static void warning(String message) => stderr.writeln(message);
+}
+
+// ✅ USAGE: Proper stream separation
+Console.success('✅ Validation passed');
+Console.error('❌ Error occurred');
+```
+
+Remember: **Readability and consistency are more important than cramming code into fewer lines.**
+
+## 🚨 Zero Tolerance Issues
+
+These MUST be fixed immediately:
+
+1. **Missing documentation** on public APIs
+2. **cascade_invocations** warnings
+3. **lines_longer_than_80_chars** errors
+4. **avoid_print** in production code
+5. **Missing const** constructors
+6. **Unused imports**
+7. **Memory leaks** (undisposed resources)
+8. **Security vulnerabilities** (unvalidated input)
+9. **Performance anti-patterns** (unnecessary rebuilds)
+10. **Architecture violations** (direct environment access)
+
+## 📋 Quick Reference: Error → Solution (Copy-Paste Ready)
+
+| **Linter Error**                 | **1-Second Fix**            | **Copy-Paste Solution**                                                               |
+| -------------------------------- | --------------------------- | ------------------------------------------------------------------------------------- |
+| `public_member_api_docs`         | Add doc comment             | `/// Implementation of [Repository].`                                                |
+| `cascade_invocations` (static)   | Group with records          | `final _ = (Factory.a, Factory.b, Factory.c);`                                       |
+| `cascade_invocations` (instance) | Use cascade                 | `logger..info('A')..info('B')..info('C');`                                           |
+| `lines_longer_than_80_chars`     | Break at comma/operator     | `group(`<br/>&nbsp;&nbsp;`'Long description',`<br/>&nbsp;&nbsp;`() {`                |
+| `omit_local_variable_types`      | Replace type with `var`     | `for (var i = 0; i < 10; i++)`                                                       |
+| `prefer_const_constructors`      | Add `const` keyword         | `const Text('Hello')`                                                                 |
+| `avoid_print`                    | Use Console abstraction     | `Console.info('message')`                                                             |
+| `unnecessary_lambdas`            | Use tear-off                | `items.map(Object.toString)`                                                          |
+| `prefer_final_locals`            | Change to `final`           | `final message = 'Hello';`                                                           |
+
+**⚡ Speed Commands:**
+```bash
+dart format lib/ test/ --set-exit-if-changed  # Fix formatting
+dart analyze --fatal-infos                    # See all errors  
+dart fix --apply                              # Auto-fix some issues
+```
+
+## 🎯 Error Prevention Checklist
+
+**Before committing, verify:**
+
+- [ ] All public classes/methods have `/// documentation`
+- [ ] Multiple static calls grouped with records `()`
+- [ ] Multiple instance calls use cascade `..`
+- [ ] No lines exceed 80 characters
+- [ ] Use `var` instead of explicit types for obvious cases
+- [ ] All constructors that can be `const` are marked `const`
+- [ ] No `print()` statements in production code
+
+Following these guidelines ensures clean, maintainable code that passes all linter checks with zero warnings or errors.
+
+## 🚀 Vibe Coding Workflow - Mandatory Command Execution
+
+**CRITICAL RULE**: During any coding session, these commands MUST be executed to prevent linting errors, warnings, and test failures. This is non-negotiable for code quality.
+
+### 🎯 Pre-Coding Checklist (ALWAYS RUN)
+
+Before making ANY code changes, execute:
+
+```bash
+# 1. Quick health check
+make check                     # Format + analyze (fast)
+
+# 2. Verify tests are working
+make test                      # Run all tests
+
+# 3. Optional: Check coverage if working on new features
+make test-coverage            # Run tests with coverage
+```
+
+**RPS Alternative Commands:**
+
+```bash
+dart run rps check            # Format + analyze
+dart run rps test             # Run tests
+dart run rps test-coverage    # Tests with coverage
+```
+
+### 🔧 During Coding (After Each Significant Change)
+
+After writing code, immediately run:
+
+```bash
+# Quick validation (run frequently)
+dart run rps format           # Auto-fix formatting
+dart run rps analyze          # Check for issues
+flutter test --dart-define=ENVIRONMENT=development  # Quick test
+```
+
+**Makefile Shortcuts:**
+
+```bash
+make format                   # Format code
+make analyze                  # Analyze code
+make test                     # Run tests
+```
+
+### ✅ Pre-Commit (MANDATORY)
+
+Before committing, ALWAYS run:
+
+```bash
+# Complete validation pipeline
+dart run rps pre-commit       # Format + analyze + test
+
+# OR use make command
+make check                    # Format + analyze only
+make test                     # Verify tests pass
+
+# Full CI equivalent (recommended)
+make local-ci                 # Complete pipeline
+```
+
+### 🛡️ Error Prevention Strategy
+
+#### **Level 1: Automatic Prevention (Lefthook)**
+
+```yaml
+# These run automatically via lefthook.yml
+- pre-commit: Format, analyze, test
+- pre-push: Full CI pipeline
+- commit-msg: Conventional commit validation
+```
+
+#### **Level 2: Manual Validation (Required)**
+
+```bash
+# Before starting work
+make check && make test
+
+# During development (after each change)
+dart run rps format && dart run rps analyze
+
+# Before committing (mandatory)
+dart run rps pre-commit
+
+# Before pushing (ultimate validation)
+make local-ci
+```
+
+#### **Level 3: Environment-Specific Testing**
+
+```bash
+# Test all environments
+dart run rps generate-env-dev && dart run rps test
+dart run rps generate-env-staging && dart run rps test
+dart run rps generate-env-prod && dart run rps test
+```
+
+### 🚨 Critical Command Reference
+
+| **Phase**       | **Required Commands**                          | **Purpose**           |
+| --------------- | ---------------------------------------------- | --------------------- |
+| **Pre-Work**    | `make check` + `make test`                     | Ensure clean baseline |
+| **During Work** | `dart run rps format` + `dart run rps analyze` | Continuous validation |
+| **Pre-Commit**  | `dart run rps pre-commit`                      | Complete validation   |
+| **Pre-Push**    | `make local-ci`                                | Full CI pipeline      |
+
+### 🎨 Tool Integration Hierarchy
+
+#### **1. RPS Scripts (Primary)**
+
+```bash
+# Most commonly used commands
+dart run rps format           # Format code
+dart run rps analyze          # Analyze code
+dart run rps test             # Run tests
+dart run rps test-coverage    # Coverage testing
+dart run rps check            # Format + analyze
+dart run rps pre-commit       # Full pre-commit validation
+```
+
+#### **2. Makefile (CI Equivalent)**
+
+```bash
+# GitHub Actions equivalent
+make local-ci                 # Complete CI pipeline
+make check                    # Quick development check
+make test-coverage           # Coverage with HTML report
+make format                  # Format only
+make analyze                 # Analyze only
+make test                    # Test only
+```
+
+#### **3. Lefthook (Automatic)**
+
+```bash
+# Automatic execution
+git commit                   # Triggers pre-commit hooks
+git push                     # Triggers pre-push hooks
+```
+
+### ⚡ Emergency Commands (When Things Break)
+
+#### **When Linting Fails:**
+
+```bash
+dart run rps format          # Fix formatting issues
+dart analyze --fatal-infos   # See specific errors
+dart fix --apply             # Auto-fix some issues
+```
+
+#### **When Tests Fail:**
+
+```bash
+flutter clean && flutter pub get    # Reset environment
+dart run rps generate-env-dev       # Regenerate environment
+flutter test --dart-define=ENVIRONMENT=development
+```
+
+#### **When Coverage Drops:**
+
+```bash
+make test-coverage          # Generate coverage report
+make coverage-open          # View HTML report
+# Add tests for uncovered code
+```
+
+### 🎯 Vibe Coding Success Metrics
+
+**Zero Tolerance Indicators:**
+
+- ❌ No linting errors or warnings
+- ❌ No test failures
+- ❌ No formatting inconsistencies
+- ❌ No missing documentation
+- ❌ No license compliance issues
+
+**Success Indicators:**
+
+- ✅ All commands execute without errors
+- ✅ Coverage maintains or improves
+- ✅ Git hooks pass automatically
+- ✅ CI pipeline ready (make local-ci passes)
+
+### 📋 Daily Workflow Template
+
+```bash
+# 1. Start of day
+git pull
+make check && make test
+
+# 2. During development (after each feature/fix)
+dart run rps format
+dart run rps analyze
+flutter test
+
+# 3. Before committing
+dart run rps pre-commit
+
+# 4. Before pushing
+make local-ci
+
+# 5. End of day verification
+make test-coverage
+make coverage-open  # Verify coverage
+```
+
+### 🔥 Emergency Workflow (When Under Pressure)
+
+```bash
+# Minimum viable commands (never skip these)
+dart run rps format           # 1. Fix formatting
+dart run rps analyze          # 2. Check for errors
+flutter test                  # 3. Verify tests pass
+
+# If time allows
+dart run rps pre-commit       # Complete validation
+```
+
+### 🏆 Advanced Vibe Coding (Performance Mode)
+
+```bash
+# Parallel execution for speed
+dart run rps format & dart run rps analyze & wait
+
+# Environment-specific rapid testing
+flutter test --dart-define=ENVIRONMENT=development --coverage
+
+# Continuous validation during development
+watch -n 30 'dart run rps check'  # Auto-check every 30 seconds
+```
+
+**Remember**: These commands are your safety net. Running them religiously prevents the majority of CI failures and maintains code quality standards. Make them muscle memory!

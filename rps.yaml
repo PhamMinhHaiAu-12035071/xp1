@@ -24,6 +24,29 @@ scripts:
   build-ios: "flutter build ios --release"
   build-web: "flutter build web --release"
 
+  # Environment-specific build commands
+  build-dev: "flutter build apk --debug --dart-define=ENVIRONMENT=development"
+  build-staging: "flutter build apk --release --dart-define=ENVIRONMENT=staging"
+  build-prod: "flutter build apk --release --dart-define=ENVIRONMENT=production"
+
+  # Environment-specific run commands
+  run-dev: "flutter run --dart-define=ENVIRONMENT=development --target=lib/main_development.dart"
+  run-staging: "flutter run --dart-define=ENVIRONMENT=staging --target=lib/main_staging.dart"
+  run-prod: "flutter run --dart-define=ENVIRONMENT=production --target=lib/main_production.dart"
+
+  # Environment configuration commands
+  # Usage: Run specific environment setup before development/testing
+  # Example: dart run rps generate-env-dev && dart run rps run-dev
+
+  # Generate development environment (most common for daily development)
+  generate-env-dev: "dart run build_runner clean && dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs"
+
+  # Generate staging environment (for testing staging configs)
+  generate-env-staging: "dart run build_runner clean && dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs"
+
+  # Generate production environment (for release builds)
+  generate-env-prod: "dart run build_runner clean && dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs"
+
   # Custom development commands
   clean: "flutter clean && flutter pub get"
   reset: "flutter clean && flutter pub get && flutter pub run build_runner build --delete-conflicting-outputs"

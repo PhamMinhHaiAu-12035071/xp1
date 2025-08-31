@@ -1,9 +1,10 @@
-version: 4.40.0
-installed_at: '2025-08-25T02:02:40.541Z'
+version: 4.41.0
+installed_at: '2025-08-31T08:15:44.881Z'
 install_type: full
 agent: null
 ides_setup:
   - cursor
+  - claude-code
 expansion_packs: []
 files:
   - path: .bmad-core/working-in-the-brownfield.md
@@ -12,11 +13,20 @@ files:
   - path: .bmad-core/user-guide.md
     hash: e633affe88d4ff20
     modified: false
+  - path: .bmad-core/install-manifest.yaml
+    hash: e65cb683b734195c
+    modified: false
   - path: .bmad-core/enhanced-ide-development-workflow.md
     hash: 39beb3516c070e2b
     modified: false
   - path: .bmad-core/core-config.yaml
-    hash: 073cf6d2527c545d
+    hash: 94ce5b2faad48235
+    modified: false
+  - path: .bmad-core/utils/workflow-management.md
+    hash: c2196880f2281f84
+    modified: false
+  - path: .bmad-core/utils/bmad-doc-template.md
+    hash: 34df6ead8b91abfc
     modified: false
   - path: .bmad-core/workflows/greenfield-ui.yaml
     hash: defde5d6bdcedd49
@@ -35,12 +45,6 @@ files:
     modified: false
   - path: .bmad-core/workflows/brownfield-fullstack.yaml
     hash: 60a703d65da43d27
-    modified: false
-  - path: .bmad-core/utils/workflow-management.md
-    hash: c2196880f2281f84
-    modified: false
-  - path: .bmad-core/utils/bmad-doc-template.md
-    hash: 34df6ead8b91abfc
     modified: false
   - path: .bmad-core/templates/story-tmpl.yaml
     hash: 11e79b87ff700c8f
@@ -116,6 +120,18 @@ files:
     modified: false
   - path: .bmad-core/checklists/architect-checklist.md
     hash: 15ef7d01b0e31c3f
+    modified: false
+  - path: .bmad-core/agent-teams/team-no-ui.yaml
+    hash: 00cbffc4106cbe1e
+    modified: false
+  - path: .bmad-core/agent-teams/team-ide-minimal.yaml
+    hash: 424972103dfde87d
+    modified: false
+  - path: .bmad-core/agent-teams/team-fullstack.yaml
+    hash: 14c7a2d8bc7ceb6f
+    modified: false
+  - path: .bmad-core/agent-teams/team-all.yaml
+    hash: db5b0ff0a9c9c2e8
     modified: false
   - path: .bmad-core/agents/ux-expert.md
     hash: a99c4d3c839db162
@@ -215,16 +231,4 @@ files:
     modified: false
   - path: .bmad-core/tasks/advanced-elicitation.md
     hash: d39118bf32237a21
-    modified: false
-  - path: .bmad-core/agent-teams/team-no-ui.yaml
-    hash: 00cbffc4106cbe1e
-    modified: false
-  - path: .bmad-core/agent-teams/team-ide-minimal.yaml
-    hash: 424972103dfde87d
-    modified: false
-  - path: .bmad-core/agent-teams/team-fullstack.yaml
-    hash: 14c7a2d8bc7ceb6f
-    modified: false
-  - path: .bmad-core/agent-teams/team-all.yaml
-    hash: db5b0ff0a9c9c2e8
     modified: false

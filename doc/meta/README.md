@@ -237,8 +237,8 @@ flutter build macos --flavor production
 ## 📚 Documentation
 
 ### Available Documentation
-- **[Tech Stack](tech-stack.md)**: Detailed technology stack information
-- **[Architecture](architecture.md)**: Comprehensive architecture documentation
+- **[Tech Stack](../core/tech-stack.md)**: Detailed technology stack information
+- **[Architecture](../core/architecture.md)**: Comprehensive architecture documentation
 - **[API Documentation]**: Generated API documentation (if applicable)
 
 ### Contributing to Documentation

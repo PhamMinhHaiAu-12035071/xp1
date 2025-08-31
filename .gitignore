@@ -152,6 +152,10 @@ yarn-error.log*
 .env.local
 .env.production
 
+# Environment configuration files (CRITICAL: Keep these secret!)
+lib/features/env/*.env
+lib/features/env/*.g.dart
+
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
 

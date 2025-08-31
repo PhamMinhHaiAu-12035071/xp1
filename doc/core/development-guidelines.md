@@ -345,7 +345,44 @@ final obj = Object()
   ..method2();
 ```
 
-**Summary:** For 2+ methods on the same object reference, use cascades. For single method calls, use dot notation. This approach ensures clean, consistent code that follows Dart best practices.
+#### **⚠️ Special Cases: Static Methods & Alternative Approaches**
+
+**Note:** Cascade operators only work with instances, not static methods on classes.
+
+```dart
+// ❌ Doesn't work: Cascade with static methods
+EnvConfigFactory
+  ..apiUrl
+  ..appName;  // Error: Type 'Type' has no getter 'apiUrl'
+
+// ✅ Solution 1: Use records for grouping (Dart 3+)
+final _ = (
+  EnvConfigFactory.apiUrl,
+  EnvConfigFactory.appName,
+  EnvConfigFactory.environmentName,
+  EnvConfigFactory.isDebugMode,
+);
+
+// ✅ Solution 2: Extract to separate statements when meaningful
+final apiUrl = EnvConfigFactory.apiUrl;
+final appName = EnvConfigFactory.appName;
+final envName = EnvConfigFactory.environmentName;
+// Use variables as needed...
+
+// ✅ Solution 3: Create instance if possible
+final config = EnvConfigFactory.currentEnvironment
+  ..validateConfiguration()
+  ..logConfiguration();
+```
+
+#### **🎯 Updated Golden Rule**
+
+1. **Instance methods (2+ calls)** → Use cascade operators (`..`)
+2. **Instance methods (1 call)** → Use dot notation (`.`)
+3. **Static methods (multiple calls)** → Use records `()` or meaningful variables
+4. **Static methods (single call)** → Direct access
+
+**Summary:** For 2+ methods on the same object reference, use cascades. For single method calls, use dot notation. For static methods, use records or meaningful variables. This approach ensures clean, consistent code that follows Dart best practices.
 
 ## 🧪 Testing Guidelines
 

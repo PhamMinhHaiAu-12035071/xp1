@@ -3,6 +3,7 @@ import 'dart:developer';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:xp1/features/env/infrastructure/env_config_factory.dart';
 
 /// BlocObserver for logging state changes and errors during development.
 class AppBlocObserver extends BlocObserver {
@@ -30,7 +31,13 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 
   Bloc.observer = const AppBlocObserver();
 
-  // Add cross-flavor configuration here
+  // Environment configuration initialization
+  log(
+    '🚀 Starting app with environment: '
+    '${EnvConfigFactory.environmentName}',
+  );
+  log('📍 API URL: ${EnvConfigFactory.apiUrl}');
+  log('🔧 Debug mode: ${EnvConfigFactory.isDebugMode}');
 
   runApp(await builder());
 }
