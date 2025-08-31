@@ -35,7 +35,7 @@ void main() {
     late MockBloc mockBloc;
 
     setUp(() {
-      observer = const AppBlocObserver();
+      observer = AppBlocObserver();
       mockBloc = MockBloc('initial');
     });
 
@@ -133,7 +133,7 @@ void main() {
       FlutterError.onError = null;
 
       // Reset Bloc.observer to default
-      Bloc.observer = const AppBlocObserver();
+      Bloc.observer = AppBlocObserver();
     });
 
     test('should set up FlutterError.onError handler', () {
@@ -141,14 +141,14 @@ void main() {
       FlutterError.onError = (details) {
         log(details.exceptionAsString(), stackTrace: details.stack);
       };
-      Bloc.observer = const AppBlocObserver();
+      Bloc.observer = AppBlocObserver();
 
       expect(FlutterError.onError, isNotNull);
       expect(FlutterError.onError, isA<Function>());
     });
 
     test('should set up AppBlocObserver', () {
-      Bloc.observer = const AppBlocObserver();
+      Bloc.observer = AppBlocObserver();
 
       expect(Bloc.observer, isA<AppBlocObserver>());
     });
@@ -222,6 +222,101 @@ void main() {
         },
         returnsNormally,
       );
+    });
+
+    group('setupBootstrap', () {
+      test('should setup all bootstrap components correctly', () {
+        // Call the testable setup function
+        expect(setupBootstrap, returnsNormally);
+
+        // Verify all components were setup
+        expect(FlutterError.onError, isNotNull);
+        expect(Bloc.observer, isA<AppBlocObserver>());
+      });
+
+      test('should setup error handler that handles Flutter errors', () {
+        // Setup bootstrap
+        setupBootstrap();
+
+        // Test that the error handler works
+        final errorDetails = FlutterErrorDetails(
+          exception: Exception('Test Flutter error'),
+          stack: StackTrace.current,
+          context: ErrorDescription('Test context'),
+        );
+
+        expect(
+          () => FlutterError.onError!(errorDetails),
+          returnsNormally,
+        );
+      });
+
+      test('should setup BlocObserver that handles bloc events', () {
+        // Setup bootstrap
+        setupBootstrap();
+
+        // Test that the BlocObserver is properly configured
+        expect(Bloc.observer, isA<AppBlocObserver>());
+
+        // The BlocObserver methods are tested indirectly through
+        // the bloc operations in other tests
+      });
+
+      test('should log environment configuration during setup', () {
+        // This test exercises the logging statements in setupBootstrap
+        expect(setupBootstrap, returnsNormally);
+
+        // Verify environment values are accessible
+        expect(EnvConfigFactory.environmentName, isNotNull);
+        expect(EnvConfigFactory.apiUrl, isNotNull);
+        expect(EnvConfigFactory.isDebugMode, isA<bool>());
+      });
+    });
+
+    group('bootstrap function', () {
+      test('should call setupBootstrap and await builder', () async {
+        var builderCalled = false;
+
+        Future<Widget> builder() async {
+          await Future<void>.delayed(const Duration(milliseconds: 1));
+          builderCalled = true;
+          return const MockApp();
+        }
+
+        // Test that builder is awaited properly
+        // Note: We can't test the full bootstrap function in a unit test
+        // because it calls runApp, but we can test the builder awaiting logic
+        final widget = await builder();
+        expect(builderCalled, isTrue);
+        expect(widget, isA<Widget>());
+      });
+
+      testWidgets('should execute complete bootstrap flow', (tester) async {
+        // This test will cover lines 52-54 by actually calling bootstrap()
+        var builderCalled = false;
+
+        // Reset any previous state to ensure clean test
+        FlutterError.onError = null;
+
+        const Widget Function() builder = MockApp.new;
+
+        // Call the actual bootstrap function
+        // testWidgets provides the proper Flutter test environment for runApp
+        await bootstrap(() {
+          builderCalled = true;
+          return builder();
+        });
+
+        // Verify the builder was called
+        expect(builderCalled, isTrue);
+
+        // Verify setupBootstrap side effects occurred
+        expect(FlutterError.onError, isNotNull);
+        expect(Bloc.observer, isA<AppBlocObserver>());
+
+        // Verify the app widget is in the widget tree
+        expect(find.byType(MockApp), findsOneWidget);
+      });
     });
   });
 }

@@ -25,6 +25,7 @@ dependencies:
 
   # === UTILITIES ===
   intl: ^0.20.2 # Internationalization utilities
+  logger: ^2.6.1 # Beautiful and extensible logging
 
 dev_dependencies:
   # === TESTING & DEVELOPMENT TOOLS (Alphabetical Order) ===
@@ -35,7 +36,6 @@ dev_dependencies:
   envied_generator: ^1.2.0 # Code generator for envied package
   flutter_test: # Flutter testing framework
     sdk: flutter
-  logger: ^2.6.1 # Beautiful and extensible logging
   mocktail: ^1.0.4 # Modern mocking framework
   rps: ^0.9.1 # Run Pubspec Script tool
   test: ^1.26.2

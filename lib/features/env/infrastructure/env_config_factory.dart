@@ -134,9 +134,6 @@ class EnvConfigFactory {
   /// Gets the environment configuration repository instance.
   static EnvConfigRepository get repository => _repository;
 
-  /// Gets the cached environment configuration.
-  static Environment get cachedConfig => currentEnvironment;
-
   /// Gets the API URL from the current environment.
   static String get apiUrl => currentEnvironment.apiUrl;
 

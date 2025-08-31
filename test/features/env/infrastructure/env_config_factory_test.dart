@@ -138,9 +138,9 @@ void main() {
     });
   });
 
-  group('Performance & Caching (TDD Red Phase - These should FAIL)', () {
+  group('Performance & Caching', () {
     test('should return same Environment instance for repeated calls', () {
-      // This test will FAIL - current implementation creates new instances
+      // Verify that Environment.current provides proper singleton behavior
       final env1 = EnvConfigFactory.currentEnvironment;
       final env2 = EnvConfigFactory.currentEnvironment;
 
@@ -152,8 +152,7 @@ void main() {
     });
 
     test('should cache environment properties for fast access', () {
-      // This test will FAIL - current implementation calls static getters
-      // repeatedly
+      // Performance test to ensure cached property access is efficient
       final stopwatch = Stopwatch()..start();
 
       // Multiple property access should be fast due to caching
@@ -174,22 +173,13 @@ void main() {
         reason: 'Cached access should be sub-millisecond for 1000 calls',
       );
     });
-
-    test('should provide cached config object for batch access', () {
-      // This test will FAIL - no such method exists yet
-      expect(
-        () => EnvConfigFactory.cachedConfig,
-        returnsNormally,
-        reason: 'Should provide cached config for batch property access',
-      );
-    });
   });
 
   group(
-    'Repository Pattern Integration (TDD Red Phase - These should FAIL)',
+    'Repository Pattern Integration',
     () {
       test('should provide EnvConfigRepository implementation', () {
-        // This test will FAIL - no repository implementation exists
+        // Verify that the factory provides a repository implementation
         expect(
           () => EnvConfigFactory.repository,
           returnsNormally,
@@ -198,7 +188,7 @@ void main() {
       });
 
       test('repository should implement EnvConfigRepository interface', () {
-        // This test will FAIL - no repository getter exists
+        // Verify that the repository properly implements the interface
         final repo = EnvConfigFactory.repository;
         expect(repo.apiUrl, isNotEmpty);
         expect(repo.appName, isNotEmpty);
