@@ -10,20 +10,29 @@ environment:
   flutter: ">=3.24.0" # Minimum Flutter version
 
 dependencies:
+  # === STATE MANAGEMENT ===
   bloc: ^9.0.0 # Business Logic Component pattern
+
+  # === ENVIRONMENT & CONFIGURATION ===
   envied: ^1.2.0 # Secure environment variable management
+
+  # === CORE UI FRAMEWORK ===
   flutter:
     sdk: flutter
   flutter_bloc: ^9.1.1 # Flutter integration for BLoC
   flutter_localizations:
     sdk: flutter # Flutter localization support
+
+  # === DEPENDENCY INJECTION ===
   get_it: ^8.0.2 # Service locator for dependency injection
   injectable: ^2.5.1 # Code generation for dependency injection
+
+  # === UTILITIES ===
   intl: ^0.20.2 # Internationalization utilities
   logger: ^2.6.1 # Beautiful and extensible logging
 
 dev_dependencies:
-  # === TESTING & DEVELOPMENT TOOLS (Alphabetical Order) ===
+  # === TESTING & DEVELOPMENT TOOLS ===
   bloc_test: ^10.0.0 # Testing utilities for BLoC
   build_runner: ^2.4.13 # Build system for code generation
   conventional_commit: ^0.6.1+1 # Git commit message linting
@@ -34,7 +43,7 @@ dev_dependencies:
   injectable_generator: ^2.8.1 # Code generator for injectable package
   mocktail: ^1.0.4 # Modern mocking framework
   rps: ^0.9.1 # Run Pubspec Script tool
-  test: ^1.26.2
+  test: ^1.26.2 # Dart testing framework
   very_good_analysis: ^9.0.0 # Very Good Ventures linting rules
 
 flutter:

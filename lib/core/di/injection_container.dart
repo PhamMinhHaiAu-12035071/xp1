@@ -8,13 +8,27 @@ import 'injection_container.config.dart';
 /// Global service locator instance
 final GetIt getIt = GetIt.instance;
 
+/// Exception thrown when dependency injection initialization fails.
+class DependencyInjectionException implements Exception {
+  /// Creates a dependency injection exception with the given error.
+  const DependencyInjectionException(this.originalError);
+
+  /// The original error that caused the dependency injection failure.
+  final Object originalError;
+
+  @override
+  String toString() =>
+      'DependencyInjectionException: Failed to initialize dependency '
+      'injection: $originalError';
+}
+
 /// Configures dependency injection for the application
 @InjectableInit()
 Future<void> configureDependencies() async {
   try {
     getIt.init();
   } catch (e) {
-    // Basic error handling for DI initialization
-    throw Exception('Failed to initialize dependency injection: $e');
+    // Specific error handling for DI initialization
+    throw DependencyInjectionException(e);
   }
 }

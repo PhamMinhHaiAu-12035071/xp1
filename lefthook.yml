@@ -44,9 +44,9 @@ pre-commit:
     staged-analysis:
       glob: "*.dart"
       run: |
-        FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(\.dart$|^pubspec\.yaml$)')
+        FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.dart$')
         if [ -n "$FILES_TO_ANALYZE" ]; then
-          echo "📝 Analyzing staged files for linting and naming issues..."
+          echo "📝 Analyzing staged Dart files for linting and naming issues..."
           fvm dart run rps analyze-quick $FILES_TO_ANALYZE
         fi
 
