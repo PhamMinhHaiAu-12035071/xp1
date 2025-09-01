@@ -5,3 +5,26 @@ targets:
         options:
           # Override environment file path from CLI using --define
           override: true
+        generate_for:
+          # Only scan env files - much faster
+          - lib/features/env/env_*.dart
+      injectable_generator|injectable_builder:
+        options:
+          auto_register: true
+          # Performance: Focus only on DI-related files
+          generate_for:
+            - lib/core/di/*.dart
+            - lib/core/**/app_module.dart
+            - lib/**/infrastructure/*.dart
+        # Performance: Exclude test and generated files
+        enabled: true
+    # Performance: Limit source scanning
+    sources:
+      include:
+        - $package$
+        - lib/**
+        - pubspec.yaml
+      exclude:
+        - test/**
+        - .dart_tool/**
+        - build/**

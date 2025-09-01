@@ -1,3 +1,5 @@
+import 'package:injectable/injectable.dart';
+
 import 'package:xp1/features/env/domain/env_config_repository.dart';
 import 'package:xp1/features/env/infrastructure/env_config_factory.dart';
 
@@ -6,6 +8,7 @@ import 'package:xp1/features/env/infrastructure/env_config_factory.dart';
 ///
 /// This repository acts as a bridge between the domain layer and the
 /// infrastructure layer, delegating configuration access to the factory.
+@Singleton(as: EnvConfigRepository)
 class EnvConfigRepositoryImpl implements EnvConfigRepository {
   @override
   String get apiUrl => EnvConfigFactory.apiUrl;

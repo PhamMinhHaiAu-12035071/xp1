@@ -3,7 +3,6 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
-
 import 'package:xp1/counter/counter.dart';
 
 import '../../helpers/helpers.dart';
@@ -56,6 +55,22 @@ void main() {
       );
       await tester.tap(find.byIcon(Icons.remove));
       verify(() => counterCubit.decrement()).called(1);
+    });
+  });
+
+  group('CounterText', () {
+    late CounterCubit counterCubit;
+
+    setUp(() {
+      counterCubit = MockCounterCubit();
+    });
+
+    testWidgets('displays current count from cubit', (tester) async {
+      when(() => counterCubit.state).thenReturn(42);
+      await tester.pumpApp(
+        BlocProvider.value(value: counterCubit, child: const CounterText()),
+      );
+      expect(find.text('42'), findsOneWidget);
     });
   });
 }

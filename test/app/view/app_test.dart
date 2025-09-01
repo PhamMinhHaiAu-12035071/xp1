@@ -5,8 +5,18 @@ import 'package:flutter_test/flutter_test.dart';
 import 'package:xp1/app/app.dart';
 import 'package:xp1/counter/counter.dart';
 
+import '../../helpers/helpers.dart';
+
 void main() {
   group('App', () {
+    setUpAll(() async {
+      await TestDependencyContainer.setupTestDependencies();
+    });
+
+    tearDownAll(() async {
+      await TestDependencyContainer.resetTestDependencies();
+    });
+
     testWidgets('renders CounterPage', (tester) async {
       await tester.pumpWidget(App());
       expect(find.byType(CounterPage), findsOneWidget);

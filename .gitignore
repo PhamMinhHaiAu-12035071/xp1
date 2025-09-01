@@ -121,6 +121,9 @@ app.*.map.json
 # Generated l10n files
 lib/l10n/gen/
 
+# Generated dependency injection files
+lib/core/di/injection_container.config.dart
+
 # Node.js/npm related
 node_modules/
 npm-debug.log*

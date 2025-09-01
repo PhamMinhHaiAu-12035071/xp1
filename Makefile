@@ -41,7 +41,7 @@ analyze:
 
 test:
 	@echo "🧪 Running tests via RPS..."
-	@fvm flutter pub run rps test
+	@very_good test
 
 # Test coverage commands using very_good CLI
 test-coverage:

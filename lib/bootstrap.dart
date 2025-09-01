@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:xp1/core/di/injection_container.dart';
 import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 import 'package:xp1/features/env/infrastructure/env_config_factory.dart';
 
@@ -50,6 +51,7 @@ void setupBootstrap() {
 
 /// App bootstrap with error handling, bloc observation, and widget builder.
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
+  await configureDependencies();
   setupBootstrap();
   runApp(await builder());
 }

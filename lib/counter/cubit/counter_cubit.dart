@@ -1,6 +1,8 @@
 import 'package:bloc/bloc.dart';
+import 'package:injectable/injectable.dart';
 
 /// Counter state management with increment and decrement operations.
+@Injectable()
 class CounterCubit extends Cubit<int> {
   /// Creates counter with initial value of 0.
   CounterCubit() : super(0);
