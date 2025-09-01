@@ -58,21 +58,62 @@ runs:
     - name: 🔧 Install FVM (if needed)
       shell: bash
       run: |
-        # Install FVM if not cached
-        if ! command -v fvm &> /dev/null; then
+        # Install FVM if not cached or not accessible
+        if ! command -v fvm &> /dev/null || [ ! -d "$HOME/.fvm" ]; then
+          echo "📥 Installing FVM..."
           curl -fsSL https://fvm.app/install.sh | bash
+          
+          # Ensure proper sourcing for FVM
+          if [ -f "$HOME/.bashrc" ]; then
+            source "$HOME/.bashrc"
+          fi
+          if [ -f "$HOME/.zshrc" ]; then
+            source "$HOME/.zshrc"
+          fi
         fi
+
+        # Add FVM to PATH and export environment variables
         export PATH="$HOME/.fvm/bin:$PATH"
         echo "$HOME/.fvm/bin" >> $GITHUB_PATH
+        echo "FVM_HOME=$HOME/.fvm" >> $GITHUB_ENV
+
+        # Verify FVM installation
+        if command -v fvm &> /dev/null; then
+          echo "✅ FVM is accessible at: $(which fvm)"
+          fvm --version
+        else
+          echo "❌ FVM installation failed"
+          exit 1
+        fi
 
     - name: 🔧 Setup Flutter with FVM (optimized)
       id: setup
       shell: bash
       run: |
-        # Ensure FVM in PATH
+        # Ensure FVM in PATH with multiple fallbacks
         export PATH="$HOME/.fvm/bin:$PATH"
 
+        # Debug PATH information
+        echo "🔍 Current PATH: $PATH"
+        echo "🏠 HOME directory: $HOME"
+        echo "📁 FVM directory exists: $([ -d "$HOME/.fvm" ] && echo "YES" || echo "NO")"
+
+        # Verify FVM accessibility
+        if ! command -v fvm &> /dev/null; then
+          echo "⚠️  FVM not in PATH, trying direct execution..."
+          export PATH="$HOME/.fvm/bin:$PATH"
+          
+          if [ -f "$HOME/.fvm/bin/fvm" ]; then
+            echo "✅ Found FVM binary at $HOME/.fvm/bin/fvm"
+          else
+            echo "❌ FVM binary not found"
+            ls -la "$HOME/.fvm/" || echo "FVM directory doesn't exist"
+            exit 1
+          fi
+        fi
+
         # Fast Flutter setup with smart caching
+        echo "🔧 Setting up Flutter ${{ inputs.flutter-version }}..."
         if [ -d "$HOME/.fvm/versions/${{ inputs.flutter-version }}" ]; then
           echo "✅ Flutter ${{ inputs.flutter-version }} found in cache"
           fvm use ${{ inputs.flutter-version }} --force --skip-setup
@@ -82,33 +123,70 @@ runs:
           fvm use ${{ inputs.flutter-version }} --force
         fi
 
-        # Add Flutter and Dart binaries to PATH (critical fix)
-        FLUTTER_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin"
-        DART_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin/cache/dart-sdk/bin"
+        # Set up Flutter paths with multiple fallback strategies
+        FLUTTER_VERSION_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}"
+        FLUTTER_BIN_PATH="$FLUTTER_VERSION_PATH/bin"
+        DART_BIN_PATH="$FLUTTER_VERSION_PATH/bin/cache/dart-sdk/bin"
 
+        # Alternative paths for different FVM configurations
+        if [ ! -d "$FLUTTER_BIN_PATH" ]; then
+          # Try alternative FVM directory structure
+          FLUTTER_BIN_PATH="$HOME/.fvm/default/bin"
+          DART_BIN_PATH="$HOME/.fvm/default/bin/cache/dart-sdk/bin"
+        fi
+
+        # Verify Flutter installation path exists
+        if [ ! -d "$FLUTTER_BIN_PATH" ]; then
+          echo "❌ Flutter binary path not found at: $FLUTTER_BIN_PATH"
+          echo "📁 Available FVM versions:"
+          ls -la "$HOME/.fvm/versions/" || echo "No versions directory"
+          exit 1
+        fi
+
+        # Add Flutter and Dart binaries to PATH for current and future steps
         echo "$FLUTTER_BIN_PATH" >> $GITHUB_PATH
         echo "$DART_BIN_PATH" >> $GITHUB_PATH
         export PATH="$FLUTTER_BIN_PATH:$DART_BIN_PATH:$PATH"
 
-        # Verify both Flutter and Dart are accessible
+        # Set environment variables for persistence
+        echo "FLUTTER_ROOT=$FLUTTER_VERSION_PATH" >> $GITHUB_ENV
+        echo "FLUTTER_HOME=$FLUTTER_VERSION_PATH" >> $GITHUB_ENV
+        echo "DART_HOME=$FLUTTER_VERSION_PATH/bin/cache/dart-sdk" >> $GITHUB_ENV
+
+        # Wait a moment for PATH to propagate
+        sleep 2
+
+        # Verify both Flutter and Dart are accessible with detailed debugging
+        echo "🔍 Verifying Flutter installation..."
         if command -v flutter &> /dev/null; then
-          echo "✅ Flutter is accessible at: $(which flutter)"
-          flutter --version
+          FLUTTER_LOCATION=$(which flutter)
+          echo "✅ Flutter is accessible at: $FLUTTER_LOCATION"
+          flutter --version --suppress-analytics
+          flutter doctor --suppress-analytics | head -10
         else
           echo "❌ Flutter not found in PATH after setup"
+          echo "🔍 Current PATH: $PATH"
+          echo "📁 Flutter binary exists: $([ -f "$FLUTTER_BIN_PATH/flutter" ] && echo "YES" || echo "NO")"
+          ls -la "$FLUTTER_BIN_PATH/" || echo "Flutter bin directory doesn't exist"
           exit 1
         fi
 
+        echo "🔍 Verifying Dart installation..."
         if command -v dart &> /dev/null; then
-          echo "✅ Dart is accessible at: $(which dart)"
+          DART_LOCATION=$(which dart)
+          echo "✅ Dart is accessible at: $DART_LOCATION"
           dart --version
         else
           echo "❌ Dart not found in PATH after setup"
+          echo "🔍 Current PATH: $PATH"
+          echo "📁 Dart binary exists: $([ -f "$DART_BIN_PATH/dart" ] && echo "YES" || echo "NO")"
+          ls -la "$DART_BIN_PATH/" || echo "Dart bin directory doesn't exist"
           exit 1
         fi
 
         # Set output
-        echo "flutter-path=$HOME/.fvm/versions/${{ inputs.flutter-version }}" >> $GITHUB_OUTPUT
+        echo "flutter-path=$FLUTTER_VERSION_PATH" >> $GITHUB_OUTPUT
+        echo "🎉 Flutter and Dart setup completed successfully!"
 
     - name: 🗂️ Cache pub dependencies
       if: inputs.install-deps == 'true'
@@ -139,18 +217,40 @@ runs:
       if: inputs.install-deps == 'true'
       shell: bash
       run: |
-        # Ensure FVM, Flutter, and Dart are in PATH
-        FLUTTER_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin"
-        DART_BIN_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}/bin/cache/dart-sdk/bin"
+        # Ensure all paths are set with fallback strategies
+        FLUTTER_VERSION_PATH="$HOME/.fvm/versions/${{ inputs.flutter-version }}"
+        FLUTTER_BIN_PATH="$FLUTTER_VERSION_PATH/bin"
+        DART_BIN_PATH="$FLUTTER_VERSION_PATH/bin/cache/dart-sdk/bin"
+
+        # Alternative paths for different FVM configurations
+        if [ ! -d "$FLUTTER_BIN_PATH" ]; then
+          FLUTTER_BIN_PATH="$HOME/.fvm/default/bin"
+          DART_BIN_PATH="$HOME/.fvm/default/bin/cache/dart-sdk/bin"
+        fi
+
         export PATH="$HOME/.fvm/bin:$FLUTTER_BIN_PATH:$DART_BIN_PATH:$PATH"
+
+        # Debug information
+        echo "🔍 Dependencies setup - PATH verification"
+        echo "📍 Flutter binary path: $FLUTTER_BIN_PATH"
+        echo "📍 Dart binary path: $DART_BIN_PATH"
+        echo "🔍 Current PATH: $PATH"
 
         # Verify both Flutter and Dart are accessible before running pub get
         if command -v flutter &> /dev/null && command -v dart &> /dev/null; then
           echo "✅ Flutter ready for pub get: $(which flutter)"
           echo "✅ Dart ready for pub get: $(which dart)"
+          
+          # Use fvm flutter to ensure version consistency
+          echo "📦 Running flutter pub get..."
           fvm flutter pub get --suppress-analytics
+          
+          echo "✅ Dependencies installed successfully"
         else
           echo "❌ Flutter or Dart not accessible for pub get"
+          echo "🔍 Flutter available: $(command -v flutter &> /dev/null && echo "YES" || echo "NO")"
+          echo "🔍 Dart available: $(command -v dart &> /dev/null && echo "YES" || echo "NO")"
+          echo "🔍 Current PATH: $PATH"
           exit 1
         fi
 

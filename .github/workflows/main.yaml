@@ -68,7 +68,18 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
 
       - name: 🔍 Validate dependencies
-        run: flutter pub run rps validate-deps
+        run: |
+          # Ensure Flutter is accessible for RPS commands
+          export PATH="$HOME/.fvm/bin:$PATH"
+
+          if ! command -v flutter &> /dev/null; then
+            echo "❌ Flutter not accessible for RPS commands"
+            echo "🔍 Current PATH: $PATH"
+            exit 1
+          fi
+
+          echo "✅ Flutter ready for RPS: $(which flutter)"
+          flutter pub run rps validate-deps
 
   license-compliance:
     needs: paths-filter
@@ -118,13 +129,26 @@ jobs:
           echo "⏰ Starting code generation at $(date)"
           start_time=$(date +%s)
 
+          # Ensure Flutter and Dart are in PATH for build_runner
+          export PATH="$HOME/.fvm/bin:$PATH"
+
+          # Verify flutter is accessible
+          if ! command -v flutter &> /dev/null; then
+            echo "❌ Flutter not found in PATH"
+            echo "🔍 Current PATH: $PATH"
+            exit 1
+          fi
+
+          echo "✅ Flutter accessible at: $(which flutter)"
+          echo "🔧 Using Flutter version: $(flutter --version --suppress-analytics | head -1)"
+
           # Check if generated files exist and are up-to-date
           if [ -f ".dart_tool/build/entrypoint/build.dart.snapshot" ] && [ -f "lib/core/di/injection_container.config.dart" ]; then
             echo "🔄 Incremental build (cache hit)"
-            fvm flutter pub run build_runner build --release --verbose
+            flutter pub run build_runner build --release --verbose
           else
             echo "🆕 Full build (cache miss or first run)"
-            fvm flutter pub run build_runner build --delete-conflicting-outputs --release --verbose
+            flutter pub run build_runner build --delete-conflicting-outputs --release --verbose
           fi
 
           end_time=$(date +%s)
