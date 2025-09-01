@@ -1,71 +1,73 @@
 # lefthook.yml
-# Simplified git hooks - avoid conflicts between commands
+# Official git hooks only - custom commands moved to scripts/ and Makefile
 
-# Lightweight pre-commit - only essential checks
+# Official git hooks with scripts + Makefile integration
 pre-commit:
-  parallel: false # Sequential to avoid conflicts
+  parallel: true
   commands:
-    # Combined format + analysis (lightweight)
-    format-and-analyze:
+    # Format and fix code first (staged files only)
+    rps-pre-commit:
       glob: "*.dart"
-      run: |
-        echo "🎨 Formatting and analyzing staged Dart files..."
-        # Format staged files only
-        STAGED_FILES=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.dart$')
-        if [ -n "$STAGED_FILES" ]; then
-          echo "📝 Formatting staged files: $STAGED_FILES"
-          fvm dart format $STAGED_FILES --set-exit-if-changed
-          git add $STAGED_FILES
-        fi
-        # Quick analysis on staged files
-        fvm dart analyze --fatal-infos
+      run: fvm dart run rps pre-commit
       stage_fixed: true
-
-    # Spell check on staged files
-    spell-check:
+    # Quick spell check on staged files
+    spell-check-quick:
       glob: "*.md"
       run: |
-        STAGED_MD=$(git diff --cached --name-only --diff-filter=ACMR | grep '\.md$')
-        if [ -n "$STAGED_MD" ]; then
-          echo "📝 Spell checking staged files..."
-          npx cspell --config cspell.json $STAGED_MD --no-progress || \
-          echo "⚠️ Fix spelling issues before committing"
-        fi
-
-    # License check when pubspec changes
-    license-check:
+        npx cspell --config cspell.json {staged_files} --no-progress || \
+        echo "⚠️ Fix spelling issues"
+    # Quick format check (fast)
+    format-check:
+      glob: "*.dart"
+      run: fvm dart run rps format-check
+    # Quick analysis (staged files only)
+    analyze-quick:
+      glob: "*.dart"
+      run: fvm dart run rps analyze-quick
+    # Quick license check cho staged changes
+    license-quick:
       glob: "pubspec.yaml"
       run: |
         if git diff --cached --name-only | grep -q "pubspec.yaml"; then
           echo "📦 pubspec.yaml changed, checking licenses..."
           fvm dart run rps license-check
         fi
+    # Dependency validation when pubspec.yaml changes
+    deps-check-on-pubspec-change:
+      glob: "pubspec.yaml"
+      run: |
+        if git diff --cached --name-only | grep -q "pubspec.yaml"; then
+          echo "📦 pubspec.yaml changed, validating dependencies..."
+          fvm dart run rps validate-deps
+        fi
+    # Analyze staged files for linting and naming convention issues
+    staged-analysis:
+      glob: "*.dart"
+      run: |
+        FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '(\.dart$|^pubspec\.yaml$)')
+        if [ -n "$FILES_TO_ANALYZE" ]; then
+          echo "📝 Analyzing staged files for linting and naming issues..."
+          fvm dart run rps analyze-quick $FILES_TO_ANALYZE
+        fi
 
 pre-push:
   parallel: false
   commands:
-    # Quick environment generation (lightweight)
-    generate-env-dev:
-      run: |
-        echo "🔧 Generating development environment..."
-        fvm dart run rps generate-env-dev
-
-    # Quick checks before push (not full CI)
-    quick-checks:
-      run: |
-        echo "⚡ Running quick pre-push checks..."
-        # Quick license check
-        fvm dart run rps license-check
-        # Quick dependency validation
-        fvm dart run rps validate-deps
-        # Quick naming validation
-        fvm dart run rps analyze-quick
-
-    # Bash script tests (keep lightweight)
+    # Run bash script tests first (TDD validation)
     bash-script-tests:
-      run: |
-        echo "🧪 Testing bash scripts..."
-        npm test
+      run: npm test
+    # Full license compliance check trước khi push
+    license-compliance:
+      run: fvm dart run rps license-check
+    # Run complete CI pipeline via Makefile
+    full-ci-pipeline:
+      run: make local-ci
+    # Full dependency validation before push
+    validate-dependencies:
+      run: fvm dart run rps validate-deps
+    # Complete naming conventions validation
+    naming-validation:
+      run: make naming-check
 
 commit-msg:
   commands:

@@ -6,25 +6,6 @@ concurrency:
 
 env:
   FLUTTER_VERSION: "3.35.1" # Should match .fvmrc flutter version
-  # 🔧 CI Environment Variables (DRY principle - defined once, used everywhere)
-  # Development Environment
-  DEV_API_URL: "https://dev-api.xp1.com/api/v1"
-  DEV_APP_NAME: "XP1 Development CI"
-  DEV_ENVIRONMENT_NAME: "development"
-  DEV_IS_DEBUG_MODE: "true"
-  DEV_API_TIMEOUT_MS: "30000"
-  # Staging Environment
-  STAGING_API_URL: "https://staging-api.xp1.com/api"
-  STAGING_APP_NAME: "XP1 Staging"
-  STAGING_ENVIRONMENT_NAME: "staging"
-  STAGING_IS_DEBUG_MODE: "false"
-  STAGING_API_TIMEOUT_MS: "20000"
-  # Production Environment
-  PROD_API_URL: "https://api.xp1.com/api"
-  PROD_APP_NAME: "XP1"
-  PROD_ENVIRONMENT_NAME: "production"
-  PROD_IS_DEBUG_MODE: "false"
-  PROD_API_TIMEOUT_MS: "15000"
 
 on:
   push:
@@ -46,8 +27,6 @@ jobs:
     runs-on: ubuntu-latest
     outputs:
       pubspec-changed: ${{ steps.filter.outputs.pubspec }}
-      dart-changed: ${{ steps.filter.outputs.dart }}
-      docs-changed: ${{ steps.filter.outputs.docs }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -56,230 +35,58 @@ jobs:
           filters: |
             pubspec:
               - 'pubspec.yaml'
-              - 'pubspec.lock'
-            dart:
-              - 'lib/**/*.dart'
-              - 'test/**/*.dart'
-              - 'tool/**/*.dart'
-            docs:
-              - '**/*.md'
-              - 'doc/**/*'
-
-  # 🔧 Development Environment Setup (DRY: setup once, reused by all jobs)
-  setup:
-    name: 🔧 Development Environment Setup
-    runs-on: ubuntu-latest
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
-
-      # 🐦 Setup Flutter first (no FVM in CI)
-      - name: 🐦 Setup Flutter
-        uses: subosito/flutter-action@v2
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: "stable"
-          cache: true
-
-      # 🧹 Clean and prepare environment
-      - name: 🧹 Clean environment
-        run: flutter clean
-
-      # 🔧 Setup envied environment with composite action
-      - name: 🔧 Setup Envied Environment
-        uses: ./.github/actions/setup-envied
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          environment-mode: "all"
-          very-good-cli: "true"
-          # Pass environment variables explicitly to action
-          dev-api-url: ${{ env.DEV_API_URL }}
-          dev-app-name: ${{ env.DEV_APP_NAME }}
-          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
-          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
-          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
-          staging-api-url: ${{ env.STAGING_API_URL }}
-          staging-app-name: ${{ env.STAGING_APP_NAME }}
-          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
-          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
-          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
-          prod-api-url: ${{ env.PROD_API_URL }}
-          prod-app-name: ${{ env.PROD_APP_NAME }}
-          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
-          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
-          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
-
-      # ✅ Success
-      - name: ✅ Setup completed
-        run: |
-          echo "🎉 Development environment setup finished!"
-          echo "✅ Flutter: $(flutter --version | head -1)"
-          echo "✅ Very Good CLI: $(very_good --version)"
 
   semantic-pull-request:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
 
   dependency-validation:
-    name: 🔍 Dependency Validation
-    needs: [paths-filter, setup]
+    needs: paths-filter
     if: needs.paths-filter.outputs.pubspec-changed == 'true' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Envied Environment
-        uses: ./.github/actions/setup-envied
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          environment-mode: "all"
-          very-good-cli: "false"
-          # Pass environment variables explicitly to action
-          dev-api-url: ${{ env.DEV_API_URL }}
-          dev-app-name: ${{ env.DEV_APP_NAME }}
-          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
-          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
-          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
-          staging-api-url: ${{ env.STAGING_API_URL }}
-          staging-app-name: ${{ env.STAGING_APP_NAME }}
-          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
-          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
-          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
-          prod-api-url: ${{ env.PROD_API_URL }}
-          prod-app-name: ${{ env.PROD_APP_NAME }}
-          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
-          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
-          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
 
       - name: 🔍 Validate dependencies
         run: flutter pub run rps validate-deps
 
   license-compliance:
-    name: 🔐 License Compliance
-    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Envied Environment
-        uses: ./.github/actions/setup-envied
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          environment-mode: "all"
-          very-good-cli: "true"
-          # Pass environment variables explicitly to action
-          dev-api-url: ${{ env.DEV_API_URL }}
-          dev-app-name: ${{ env.DEV_APP_NAME }}
-          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
-          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
-          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
-          staging-api-url: ${{ env.STAGING_API_URL }}
-          staging-app-name: ${{ env.STAGING_APP_NAME }}
-          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
-          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
-          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
-          prod-api-url: ${{ env.PROD_API_URL }}
-          prod-app-name: ${{ env.PROD_APP_NAME }}
-          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
-          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
-          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
+          cache: true
+
+      - name: 🔧 Setup Very Good CLI
+        run: dart pub global activate very_good_cli
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
 
       - name: 🔐 Check license compliance
         run: make license-ci
 
-  # Main CI Pipeline (depends on setup)
-  ci:
-    name: 🚀 Flutter CI Pipeline
-    needs: [paths-filter, setup]
-    if: needs.paths-filter.outputs.dart-changed == 'true' || github.event_name == 'push'
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
-
-      - name: 🔧 Setup Envied Environment
-        uses: ./.github/actions/setup-envied
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          environment-mode: "all"
-          very-good-cli: "true"
-          # Pass environment variables explicitly to action
-          dev-api-url: ${{ env.DEV_API_URL }}
-          dev-app-name: ${{ env.DEV_APP_NAME }}
-          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
-          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
-          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
-          staging-api-url: ${{ env.STAGING_API_URL }}
-          staging-app-name: ${{ env.STAGING_APP_NAME }}
-          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
-          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
-          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
-          prod-api-url: ${{ env.PROD_API_URL }}
-          prod-app-name: ${{ env.PROD_APP_NAME }}
-          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
-          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
-          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
-
-      # 🧹 Clean environment (but keep generated files)
-      - name: 🧹 Clean environment
-        run: flutter clean
-
-      # 📦 Ensure dependencies are installed
-      - name: 📦 Install dependencies
-        run: |
-          echo "📦 Installing Flutter dependencies..."
-          flutter pub get --verbose
-          echo "✅ Dependencies installed"
-
-      # ✅ Verify envied files from setup job
-      - name: ✅ Verify envied files from setup
-        run: |
-          echo "✅ Verifying envied files generated by setup job..."
-          echo "🔍 Checking for envied .g.dart files:"
-          find lib -name "*env*.g.dart" -type f | sort || {
-            echo "❌ No envied .g.dart files found!"
-            echo "🔍 Listing all files in env directory:"
-            ls -la lib/features/env/
-            echo "🔍 Checking if build_runner was run in setup job..."
-            echo "⚠️ Build_runner may have failed in setup job - files not generated"
-            exit 1
-          }
-          echo "📄 Found generated .g.dart files:"
-          find lib -name "*env*.g.dart" -type f -exec ls -la {} \;
-          echo "✅ Envied files verified successfully"
-
-      # 🔍 Check code quality
-      - name: 🔍 Format Check
-        run: dart format --set-exit-if-changed .
-
-      # 🔍 Analyze Code with debug output
-      - name: 🔍 Analyze Code
-        run: |
-          echo "🔍 Running flutter analyze with debug output..."
-          flutter analyze --fatal-infos 2>&1 || {
-            echo "❌ Analysis failed. Checking for envied-related errors..."
-            flutter analyze lib/features/env/ --fatal-infos 2>&1 || echo "⚠️ Env directory analysis failed"
-            echo "🔍 Checking if .g.dart files exist..."
-            find lib -name "*.g.dart" -type f
-            echo "🔍 Checking environment variables..."
-            env | grep -E "(API_URL|APP_NAME|ENVIRONMENT_NAME|IS_DEBUG_MODE|API_TIMEOUT_MS)" || echo "⚠️ No env vars found"
-            exit 1
-          }
-
-      # 🧪 Run tests with Very Good CLI
-      - name: 🧪 Run Tests
-        run: very_good test --coverage
-
-      # ✅ Success
-      - name: ✅ All Checks Passed
-        run: echo "🎉 Flutter CI pipeline completed successfully!"
+  build:
+    uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
+    with:
+      flutter_version: ${{ env.FLUTTER_VERSION }}
+      build_runner: true
 
   spell-check:
-    name: 📝 Spell Check
-    needs: [paths-filter, setup]
-    if: needs.paths-filter.outputs.docs-changed == 'true' || github.event_name == 'push'
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
     with:
       includes: |
