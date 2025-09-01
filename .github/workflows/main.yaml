@@ -6,6 +6,12 @@ concurrency:
 
 env:
   FLUTTER_VERSION: "3.35.1" # Should match .fvmrc flutter version
+  # 🔧 CI Environment Variables (DRY principle - defined once, used everywhere)
+  API_URL: "https://dev-api.xp1.com/api/v1"
+  APP_NAME: "XP1 Development CI"
+  ENVIRONMENT_NAME: "development"
+  IS_DEBUG_MODE: "true"
+  API_TIMEOUT_MS: "30000"
 
 on:
   push:
@@ -46,7 +52,7 @@ jobs:
               - '**/*.md'
               - 'doc/**/*'
 
-  # 🔧 Development Environment Setup (optimized for development workflow)
+  # 🔧 Development Environment Setup (DRY: setup once, reused by all jobs)
   setup:
     name: 🔧 Development Environment Setup
     runs-on: ubuntu-latest
@@ -74,20 +80,20 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Environment files are pre-generated and committed (.env files are gitignored)
-      - name: 🔧 Verify development environment files
+      # 🔧 Generate environment files with system variables (inherits workflow env)
+      - name: 🔧 Generate development environment
         run: |
-          echo "✅ Checking committed .g.dart files..."
-          ls -la lib/features/env/*.g.dart || echo "⚠️  No .g.dart files found"
+          echo "✅ Using CI environment variables: API_URL=$API_URL, APP_NAME=$APP_NAME"
+          dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
-      # ✅ Verify development setup completed
+      # ✅ Verify development setup completed  
       - name: ✅ Verify development setup
         run: |
           echo "🎉 Development environment setup finished!"
-          echo "✅ Flutter version: $(flutter --version | head -1)"
+          echo "✅ Flutter: $(flutter --version | head -1)"
           echo "✅ Very Good CLI: $(very_good --version)"
-          echo "✅ Pre-committed environment files:"
-          ls -la lib/features/env/*.g.dart | wc -l | xargs echo "  .g.dart files count:"
+          echo "✅ Environment: $ENVIRONMENT_NAME"
+          echo "✅ Generated files: $(ls -la lib/features/env/*.g.dart | wc -l) .g.dart files"
 
   semantic-pull-request:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
@@ -111,9 +117,8 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Environment files are pre-generated and committed
-      - name: 🔧 Verify environment files
-        run: ls -la lib/features/env/*.g.dart
+      - name: 🔧 Generate environment files
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
       - name: 🔍 Validate dependencies
         run: flutter pub run rps validate-deps
@@ -136,9 +141,8 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Environment files are pre-generated and committed
-      - name: 🔧 Verify environment files
-        run: ls -la lib/features/env/*.g.dart
+      - name: 🔧 Generate environment files
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
       - name: 🔧 Setup Very Good CLI
         run: dart pub global activate very_good_cli
@@ -170,9 +174,8 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Environment files are pre-generated and committed
-      - name: 🔧 Verify environment files
-        run: ls -la lib/features/env/*.g.dart
+      - name: 🔧 Generate environment files
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
       # 🔍 Check code quality
       - name: 🔍 Format Check
