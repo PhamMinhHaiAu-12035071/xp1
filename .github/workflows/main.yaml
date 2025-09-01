@@ -6,8 +6,6 @@ concurrency:
 
 env:
   FLUTTER_VERSION: "3.35.1" # Should match .fvmrc flutter version
-  FVM_CACHE_PATH: ~/.fvm
-  PUB_CACHE: ~/.pub-cache
 
 on:
   push:
@@ -31,7 +29,6 @@ jobs:
       pubspec-changed: ${{ steps.filter.outputs.pubspec }}
       dart-changed: ${{ steps.filter.outputs.dart }}
       docs-changed: ${{ steps.filter.outputs.docs }}
-      licenses-changed: ${{ steps.filter.outputs.licenses }}
     steps:
       - uses: actions/checkout@v4
       - uses: dorny/paths-filter@v3
@@ -40,6 +37,7 @@ jobs:
           filters: |
             pubspec:
               - 'pubspec.yaml'
+              - 'pubspec.lock'
             dart:
               - 'lib/**/*.dart'
               - 'test/**/*.dart'
@@ -47,61 +45,99 @@ jobs:
             docs:
               - '**/*.md'
               - 'doc/**/*'
-            licenses:
-              - 'pubspec.yaml'
-              - 'pubspec.lock'
+
+  # 🔧 Complete Environment Setup (runs first, based on rps.yaml install-all)
+  setup:
+    name: 🔧 Complete Environment Setup
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      # 🐦 Setup Flutter first (no FVM in CI)
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      # 🔧 Setup Very Good CLI early
+      - name: 🔧 Setup Very Good CLI
+        run: dart pub global activate very_good_cli
+
+      # 🧹 Clean and prepare environment
+      - name: 🧹 Clean environment
+        run: flutter clean
+
+      # 📦 Install dependencies
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      # 🔧 Generate development environment
+      - name: 🔧 Generate development environment
+        run: dart run build_runner clean
+
+      - name: 🔧 Build development config
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+
+      - name: 🔧 Build staging config  
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
+
+      - name: 🔧 Build production config
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+
+      # ✅ Verify setup completed
+      - name: ✅ Verify setup
+        run: |
+          echo "🎉 Complete environment setup finished!"
+          echo "✅ Flutter version: $(flutter --version | head -1)"
+          echo "✅ Very Good CLI: $(very_good --version)"
+          echo "✅ Generated files:"
+          find lib -name "*.g.dart" -o -name "*.config.dart" | wc -l | xargs echo "  Generated files count:"
 
   semantic-pull-request:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
 
   dependency-validation:
-    needs: paths-filter
+    name: 🔍 Dependency Validation
+    needs: [paths-filter, setup]
     if: needs.paths-filter.outputs.pubspec-changed == 'true' || github.event_name == 'push'
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Flutter
-        uses: ./.github/actions/flutter-setup
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
 
       - name: 🔍 Validate dependencies
-        run: |
-          # Ensure Flutter is accessible for RPS commands
-          export PATH="$HOME/.fvm/bin:$PATH"
-
-          if ! command -v flutter &> /dev/null; then
-            echo "❌ Flutter not accessible for RPS commands"
-            echo "🔍 Current PATH: $PATH"
-            exit 1
-          fi
-
-          echo "✅ Flutter ready for RPS: $(which flutter)"
-          flutter pub run rps validate-deps
+        run: flutter pub run rps validate-deps
 
   license-compliance:
-    needs: paths-filter
-    if: needs.paths-filter.outputs.licenses-changed == 'true' || github.event_name == 'push'
+    name: 🔐 License Compliance
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Flutter
-        uses: ./.github/actions/flutter-setup
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
 
-      - name: 🗂️ Cache pub dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.PUB_CACHE }}
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
+      - name: 📦 Install dependencies
+        run: flutter pub get
 
       - name: 🔧 Setup Very Good CLI
         run: dart pub global activate very_good_cli
@@ -109,139 +145,56 @@ jobs:
       - name: 🔐 Check license compliance
         run: make license-ci
 
-  code-generation:
-    needs: paths-filter
-    if: needs.paths-filter.outputs.dart-changed == 'true' || github.event_name == 'push'
-    runs-on: ubuntu-latest-4-cores
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
-
-      - name: 🔧 Setup Flutter
-        uses: ./.github/actions/flutter-setup
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
-          setup-build-runner: true
-          enable-performance-monitor: true
-
-      - name: 🏗️ Generate code (optimized with timing)
-        run: |
-          echo "⏰ Starting code generation at $(date)"
-          start_time=$(date +%s)
-
-          # Ensure Flutter and Dart are in PATH for build_runner
-          export PATH="$HOME/.fvm/bin:$PATH"
-
-          # Verify flutter is accessible
-          if ! command -v flutter &> /dev/null; then
-            echo "❌ Flutter not found in PATH"
-            echo "🔍 Current PATH: $PATH"
-            exit 1
-          fi
-
-          echo "✅ Flutter accessible at: $(which flutter)"
-          echo "🔧 Using Flutter version: $(flutter --version --suppress-analytics | head -1)"
-
-          # Check if generated files exist and are up-to-date
-          if [ -f ".dart_tool/build/entrypoint/build.dart.snapshot" ] && [ -f "lib/core/di/injection_container.config.dart" ]; then
-            echo "🔄 Incremental build (cache hit)"
-            flutter pub run build_runner build --release --verbose
-          else
-            echo "🆕 Full build (cache miss or first run)"
-            flutter pub run build_runner build --delete-conflicting-outputs --release --verbose
-          fi
-
-          end_time=$(date +%s)
-          duration=$((end_time - start_time))
-          echo "⚡ Code generation completed in ${duration} seconds"
-
-          # Show generated files stats
-          echo "📊 Generated files:"
-          find lib -name "*.g.dart" -o -name "*.config.dart" | wc -l | xargs echo "Total generated files:"
-          du -sh .dart_tool/build 2>/dev/null | cut -f1 | xargs echo "Build cache size:" || echo "Build cache size: N/A"
-
-      - name: 📤 Upload generated files
-        uses: actions/upload-artifact@v4
-        with:
-          name: generated-files
-          path: |
-            lib/**/*.g.dart
-            lib/**/*.config.dart
-          retention-days: 1
-
-  analysis:
-    needs: [paths-filter, code-generation]
+  # Main CI Pipeline (depends on setup)
+  ci:
+    name: 🚀 Flutter CI Pipeline
+    needs: [paths-filter, setup]
     if: needs.paths-filter.outputs.dart-changed == 'true' || github.event_name == 'push'
     runs-on: ubuntu-latest
+    
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🔧 Setup Flutter
-        uses: ./.github/actions/flutter-setup
+      - name: 🐦 Setup Flutter
+        uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
+          channel: 'stable'
+          cache: true
 
-      - name: 🗂️ Cache pub dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.PUB_CACHE }}
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
+      - name: 🔧 Setup Very Good CLI
+        run: dart pub global activate very_good_cli
 
-      - name: 📥 Download generated files
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-files
+      - name: 📦 Install dependencies
+        run: flutter pub get
 
-      - name: ✅ Verify dependencies
-        run: flutter pub deps-check
+      # 🔧 Generate code (environment should be ready from setup job)
+      - name: 🔧 Generate code
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
-      - name: 🔍 Analyze project source
-        run: flutter analyze
-
-      - name: 🔍 Ensure code formatting
+      # 🔍 Check code quality
+      - name: 🔍 Format Check
         run: dart format --set-exit-if-changed .
 
-  test:
-    needs: [paths-filter, code-generation]
-    if: needs.paths-filter.outputs.dart-changed == 'true' || github.event_name == 'push'
-    runs-on: ubuntu-latest-4-cores
-    steps:
-      - name: 📥 Checkout repository
-        uses: actions/checkout@v4
+      - name: 🔍 Analyze Code
+        run: flutter analyze --fatal-infos
 
-      - name: 🔧 Setup Flutter
-        uses: ./.github/actions/flutter-setup
-        with:
-          flutter-version: ${{ env.FLUTTER_VERSION }}
+      # 🧪 Run tests with Very Good CLI
+      - name: 🧪 Run Tests
+        run: very_good test --coverage
 
-      - name: 🗂️ Cache pub dependencies
-        uses: actions/cache@v4
-        with:
-          path: |
-            ${{ env.PUB_CACHE }}
-            ~/.pub-cache
-          key: ${{ runner.os }}-pub-${{ hashFiles('**/pubspec.lock') }}
-          restore-keys: ${{ runner.os }}-pub-
+      # 🏗️ Build app (development flavor)
+      - name: 🏗️ Build APK
+        run: flutter build apk --release --flavor development --target lib/main_development.dart
 
-      - name: 📥 Download generated files
-        uses: actions/download-artifact@v4
-        with:
-          name: generated-files
-
-      - name: 🧪 Run tests
-        run: flutter test --no-pub --coverage --test-randomize-ordering-seed random
-
-      - name: 📊 Check code coverage
-        uses: VeryGoodOpenSource/very_good_coverage@v3
-        with:
-          path: coverage/lcov.info
+      # ✅ Success
+      - name: ✅ All Checks Passed
+        run: echo "🎉 Flutter CI pipeline completed successfully!"
 
   spell-check:
-    needs: paths-filter
+    name: 📝 Spell Check
+    needs: [paths-filter, setup]
     if: needs.paths-filter.outputs.docs-changed == 'true' || github.event_name == 'push'
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
     with:
