@@ -101,7 +101,7 @@ runs:
       shell: bash
       run: |
         echo "🏗️ Generating envied code..."
-        dart run build_runner build --delete-conflicting-outputs --verbose
+        flutter pub run build_runner build --delete-conflicting-outputs --verbose
         echo "✅ Envied code generation completed"
 
     - name: ✅ Verify envied setup
