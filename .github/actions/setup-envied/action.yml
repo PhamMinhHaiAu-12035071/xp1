@@ -1,0 +1,130 @@
+name: "Setup Envied Environment"
+description: "Setup Flutter with envied code generation from .example templates"
+
+inputs:
+  flutter-version:
+    description: "Flutter version to use"
+    required: true
+    default: "3.35.1"
+  environment-mode:
+    description: "Environment mode: all (default), development-only"
+    required: false
+    default: "all"
+  very-good-cli:
+    description: "Whether to install Very Good CLI"
+    required: false
+    default: "true"
+
+runs:
+  using: "composite"
+  steps:
+    - name: 🐦 Setup Flutter
+      uses: subosito/flutter-action@v2
+      with:
+        flutter-version: ${{ inputs.flutter-version }}
+        channel: "stable"
+        cache: true
+
+    - name: 🔧 Setup Very Good CLI
+      if: ${{ inputs.very-good-cli == 'true' }}
+      shell: bash
+      run: dart pub global activate very_good_cli
+
+    - name: 📦 Install dependencies
+      shell: bash
+      run: flutter pub get
+
+    - name: 🔧 Generate environment files
+      shell: bash
+      run: |
+        echo "🔧 Setting up envied environment files..."
+
+        if [[ "${{ inputs.environment-mode }}" == "all" ]]; then
+          echo "🌍 Creating all environment files..."
+          
+          # Generate development.env
+          cp lib/features/env/development.env.example lib/features/env/development.env
+          sed -i "s|API_URL=.*|API_URL=${DEV_API_URL}|g" lib/features/env/development.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${DEV_APP_NAME}|g" lib/features/env/development.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${DEV_ENVIRONMENT_NAME}|g" lib/features/env/development.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${DEV_IS_DEBUG_MODE}|g" lib/features/env/development.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${DEV_API_TIMEOUT_MS}|g" lib/features/env/development.env
+          
+          # Generate staging.env
+          cp lib/features/env/staging.env.example lib/features/env/staging.env
+          sed -i "s|API_URL=.*|API_URL=${STAGING_API_URL}|g" lib/features/env/staging.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${STAGING_APP_NAME}|g" lib/features/env/staging.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${STAGING_ENVIRONMENT_NAME}|g" lib/features/env/staging.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${STAGING_IS_DEBUG_MODE}|g" lib/features/env/staging.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${STAGING_API_TIMEOUT_MS}|g" lib/features/env/staging.env
+          
+          # Generate production.env
+          cp lib/features/env/production.env.example lib/features/env/production.env
+          sed -i "s|API_URL=.*|API_URL=${PROD_API_URL}|g" lib/features/env/production.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${PROD_APP_NAME}|g" lib/features/env/production.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${PROD_ENVIRONMENT_NAME}|g" lib/features/env/production.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${PROD_IS_DEBUG_MODE}|g" lib/features/env/production.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${PROD_API_TIMEOUT_MS}|g" lib/features/env/production.env
+          
+          echo "✅ All environment files created"
+        else
+          echo "🚀 Creating development.env only..."
+          cp lib/features/env/development.env.example lib/features/env/development.env
+          sed -i "s|API_URL=.*|API_URL=${DEV_API_URL}|g" lib/features/env/development.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${DEV_APP_NAME}|g" lib/features/env/development.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${DEV_ENVIRONMENT_NAME}|g" lib/features/env/development.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${DEV_IS_DEBUG_MODE}|g" lib/features/env/development.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${DEV_API_TIMEOUT_MS}|g" lib/features/env/development.env
+          echo "✅ Development environment file created"
+        fi
+
+    - name: 🏗️ Generate envied code
+      shell: bash
+      run: |
+        echo "🏗️ Generating envied code..."
+        dart run build_runner build --delete-conflicting-outputs
+        echo "✅ Envied code generation completed"
+
+    - name: ✅ Verify envied setup
+      shell: bash
+      run: |
+        echo "📋 Verifying envied setup..."
+
+        if [[ "${{ inputs.environment-mode }}" == "all" ]]; then
+          # Verify all .env files
+          for env in development staging production; do
+            if [ -f "lib/features/env/${env}.env" ]; then
+              echo "  ✅ ${env}.env exists"
+            else
+              echo "  ❌ ${env}.env missing"
+              exit 1
+            fi
+          done
+          
+          # Verify all generated files
+          for env in env_development env_staging env_production; do
+            if [ -f "lib/features/env/${env}.g.dart" ]; then
+              echo "  ✅ ${env}.g.dart generated"
+            else
+              echo "  ❌ ${env}.g.dart missing"
+              exit 1
+            fi
+          done
+        else
+          # Verify development only
+          if [ -f "lib/features/env/development.env" ]; then
+            echo "  ✅ development.env exists"
+          else
+            echo "  ❌ development.env missing"
+            exit 1
+          fi
+          
+          if [ -f "lib/features/env/env_development.g.dart" ]; then
+            echo "  ✅ env_development.g.dart generated"
+          else
+            echo "  ❌ env_development.g.dart missing"
+            exit 1
+          fi
+        fi
+
+        echo "✅ Envied setup verified successfully!"

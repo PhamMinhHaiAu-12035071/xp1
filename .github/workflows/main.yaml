@@ -7,11 +7,24 @@ concurrency:
 env:
   FLUTTER_VERSION: "3.35.1" # Should match .fvmrc flutter version
   # 🔧 CI Environment Variables (DRY principle - defined once, used everywhere)
-  API_URL: "https://dev-api.xp1.com/api/v1"
-  APP_NAME: "XP1 Development CI"
-  ENVIRONMENT_NAME: "development"
-  IS_DEBUG_MODE: "true"
-  API_TIMEOUT_MS: "30000"
+  # Development Environment
+  DEV_API_URL: "https://dev-api.xp1.com/api/v1"
+  DEV_APP_NAME: "XP1 Development CI"
+  DEV_ENVIRONMENT_NAME: "development"
+  DEV_IS_DEBUG_MODE: "true"
+  DEV_API_TIMEOUT_MS: "30000"
+  # Staging Environment
+  STAGING_API_URL: "https://staging-api.xp1.com/api"
+  STAGING_APP_NAME: "XP1 Staging"
+  STAGING_ENVIRONMENT_NAME: "staging"
+  STAGING_IS_DEBUG_MODE: "false"
+  STAGING_API_TIMEOUT_MS: "20000"
+  # Production Environment
+  PROD_API_URL: "https://api.xp1.com/api"
+  PROD_APP_NAME: "XP1"
+  PROD_ENVIRONMENT_NAME: "production"
+  PROD_IS_DEBUG_MODE: "false"
+  PROD_API_TIMEOUT_MS: "15000"
 
 on:
   push:
@@ -65,35 +78,27 @@ jobs:
         uses: subosito/flutter-action@v2
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
+          channel: "stable"
           cache: true
-
-      # 🔧 Setup Very Good CLI early
-      - name: 🔧 Setup Very Good CLI
-        run: dart pub global activate very_good_cli
 
       # 🧹 Clean and prepare environment
       - name: 🧹 Clean environment
         run: flutter clean
 
-      # 📦 Install dependencies
-      - name: 📦 Install dependencies
-        run: flutter pub get
+      # 🔧 Setup envied environment with composite action
+      - name: 🔧 Setup Envied Environment
+        uses: ./.github/actions/setup-envied
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          environment-mode: "all"
+          very-good-cli: "true"
 
-      # 🔧 Generate environment files with system variables (inherits workflow env)
-      - name: 🔧 Generate development environment
-        run: |
-          echo "✅ Using CI environment variables: API_URL=$API_URL, APP_NAME=$APP_NAME"
-          dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
-
-      # ✅ Verify development setup completed  
-      - name: ✅ Verify development setup
+      # ✅ Success
+      - name: ✅ Setup completed
         run: |
           echo "🎉 Development environment setup finished!"
           echo "✅ Flutter: $(flutter --version | head -1)"
           echo "✅ Very Good CLI: $(very_good --version)"
-          echo "✅ Environment: $ENVIRONMENT_NAME"
-          echo "✅ Generated files: $(ls -la lib/features/env/*.g.dart | wc -l) .g.dart files"
 
   semantic-pull-request:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
@@ -107,18 +112,12 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐦 Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: 🔧 Setup Envied Environment
+        uses: ./.github/actions/setup-envied
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
-          cache: true
-
-      - name: 📦 Install dependencies
-        run: flutter pub get
-
-      - name: 🔧 Generate environment files
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+          environment-mode: "development-only"
+          very-good-cli: "false"
 
       - name: 🔍 Validate dependencies
         run: flutter pub run rps validate-deps
@@ -131,21 +130,12 @@ jobs:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐦 Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: 🔧 Setup Envied Environment
+        uses: ./.github/actions/setup-envied
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
-          cache: true
-
-      - name: 📦 Install dependencies
-        run: flutter pub get
-
-      - name: 🔧 Generate environment files
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
-
-      - name: 🔧 Setup Very Good CLI
-        run: dart pub global activate very_good_cli
+          environment-mode: "development-only"
+          very-good-cli: "true"
 
       - name: 🔐 Check license compliance
         run: make license-ci
@@ -156,26 +146,17 @@ jobs:
     needs: [paths-filter, setup]
     if: needs.paths-filter.outputs.dart-changed == 'true' || github.event_name == 'push'
     runs-on: ubuntu-latest
-    
+
     steps:
       - name: 📥 Checkout repository
         uses: actions/checkout@v4
 
-      - name: 🐦 Setup Flutter
-        uses: subosito/flutter-action@v2
+      - name: 🔧 Setup Envied Environment
+        uses: ./.github/actions/setup-envied
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          channel: 'stable'
-          cache: true
-
-      - name: 🔧 Setup Very Good CLI
-        run: dart pub global activate very_good_cli
-
-      - name: 📦 Install dependencies
-        run: flutter pub get
-
-      - name: 🔧 Generate environment files
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+          environment-mode: "development-only"
+          very-good-cli: "true"
 
       # 🔍 Check code quality
       - name: 🔍 Format Check
