@@ -53,6 +53,9 @@ pre-commit:
 pre-push:
   parallel: false
   commands:
+    # Generate environment files first (CRITICAL: must run before analysis)
+    generate-env-dev:
+      run: fvm dart run rps generate-env-dev
     # Run bash script tests first (TDD validation)
     bash-script-tests:
       run: npm test

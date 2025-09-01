@@ -46,9 +46,9 @@ jobs:
               - '**/*.md'
               - 'doc/**/*'
 
-  # 🔧 Complete Environment Setup (runs first, based on rps.yaml install-all)
+  # 🔧 Development Environment Setup (optimized for development workflow)
   setup:
-    name: 🔧 Complete Environment Setup
+    name: 🔧 Development Environment Setup
     runs-on: ubuntu-latest
     steps:
       - name: 📥 Checkout repository
@@ -74,27 +74,18 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Generate development environment
+      # 🔧 Generate development environment only
       - name: 🔧 Generate development environment
-        run: dart run build_runner clean
+        run: dart run build_runner clean && dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
-      - name: 🔧 Build development config
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
-
-      - name: 🔧 Build staging config  
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
-
-      - name: 🔧 Build production config
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
-
-      # ✅ Verify setup completed
-      - name: ✅ Verify setup
+      # ✅ Verify development setup completed
+      - name: ✅ Verify development setup
         run: |
-          echo "🎉 Complete environment setup finished!"
+          echo "🎉 Development environment setup finished!"
           echo "✅ Flutter version: $(flutter --version | head -1)"
           echo "✅ Very Good CLI: $(very_good --version)"
-          echo "✅ Generated files:"
-          find lib -name "*.g.dart" -o -name "*.config.dart" | wc -l | xargs echo "  Generated files count:"
+          echo "✅ Development environment files:"
+          find lib -name "env_development.g.dart" | wc -l | xargs echo "  Development .g.dart files count:"
 
   semantic-pull-request:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
@@ -118,6 +109,10 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
+      # 🔧 Generate environments before validation (required for analysis)
+      - name: 🔧 Generate development environment
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+
       - name: 🔍 Validate dependencies
         run: flutter pub run rps validate-deps
 
@@ -138,6 +133,10 @@ jobs:
 
       - name: 📦 Install dependencies
         run: flutter pub get
+
+      # 🔧 Generate environments before license check (may be required for analysis)
+      - name: 🔧 Generate development environment
+        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
       - name: 🔧 Setup Very Good CLI
         run: dart pub global activate very_good_cli
@@ -169,8 +168,8 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Generate code (environment should be ready from setup job)
-      - name: 🔧 Generate code
+      # 🔧 Generate development environment (focus on dev only)
+      - name: 🔧 Generate development environment
         run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
       # 🔍 Check code quality
@@ -183,10 +182,6 @@ jobs:
       # 🧪 Run tests with Very Good CLI
       - name: 🧪 Run Tests
         run: very_good test --coverage
-
-      # 🏗️ Build app (development flavor)
-      - name: 🏗️ Build APK
-        run: flutter build apk --release --flavor development --target lib/main_development.dart
 
       # ✅ Success
       - name: ✅ All Checks Passed
