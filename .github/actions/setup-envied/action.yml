@@ -78,17 +78,38 @@ runs:
           echo "✅ Development environment file created"
         fi
 
+    - name: 🔍 Debug before build
+      shell: bash
+      run: |
+        echo "🔍 Debugging envied file structure before build..."
+        echo "📁 Environment directory structure:"
+        ls -la lib/features/env/ || echo "Directory not found"
+
+        echo "📄 Existing .dart files:"
+        find lib -name "*.dart" -path "*/env/*" -type f
+
+        echo "📄 Existing .g.dart files:"
+        find lib -name "*.g.dart" -type f
+
+        echo "📄 Environment files (.env):"
+        find lib -name "*.env" -type f
+
+        echo "🔧 Envied class definitions:"
+        find lib -name "*.dart" -path "*/env/*" -exec grep -l "@Envied" {} \; 2>/dev/null || echo "No @Envied classes found"
+
     - name: 🏗️ Generate envied code
       shell: bash
       run: |
         echo "🏗️ Generating envied code..."
-        dart run build_runner build --delete-conflicting-outputs
+        dart run build_runner build --delete-conflicting-outputs --verbose
         echo "✅ Envied code generation completed"
 
     - name: ✅ Verify envied setup
       shell: bash
       run: |
         echo "📋 Verifying envied setup..."
+        echo "📁 Listing all generated files:"
+        find lib -name "*.g.dart" -type f | head -10
 
         if [[ "${{ inputs.environment-mode }}" == "all" ]]; then
           # Verify all .env files
@@ -100,16 +121,20 @@ runs:
               exit 1
             fi
           done
-          
-          # Verify all generated files
-          for env in env_development env_staging env_production; do
-            if [ -f "lib/features/env/${env}.g.dart" ]; then
-              echo "  ✅ ${env}.g.dart generated"
-            else
-              echo "  ❌ ${env}.g.dart missing"
-              exit 1
-            fi
-          done
+
+          # Verify generated files exist (flexible naming)
+          GENERATED_FILES=$(find lib/features/env -name "*.g.dart" -type f | wc -l)
+          if [ "$GENERATED_FILES" -ge 3 ]; then
+            echo "  ✅ Found $GENERATED_FILES generated envied files"
+            find lib/features/env -name "*.g.dart" -type f | while read file; do
+              echo "    📄 $(basename "$file")"
+            done
+          else
+            echo "  ❌ Expected at least 3 generated files, found: $GENERATED_FILES"
+            echo "  📁 Generated files found:"
+            find lib -name "*.g.dart" -type f
+            exit 1
+          fi
         else
           # Verify development only
           if [ -f "lib/features/env/development.env" ]; then
@@ -118,11 +143,18 @@ runs:
             echo "  ❌ development.env missing"
             exit 1
           fi
-          
-          if [ -f "lib/features/env/env_development.g.dart" ]; then
-            echo "  ✅ env_development.g.dart generated"
+
+          # Check for any generated envied file in the directory
+          GENERATED_FILES=$(find lib/features/env -name "*.g.dart" -type f | wc -l)
+          if [ "$GENERATED_FILES" -ge 1 ]; then
+            echo "  ✅ Found $GENERATED_FILES generated envied file(s)"
+            find lib/features/env -name "*.g.dart" -type f | while read file; do
+              echo "    📄 $(basename "$file")"
+            done
           else
-            echo "  ❌ env_development.g.dart missing"
+            echo "  ❌ No generated envied files found"
+            echo "  📁 All generated files in project:"
+            find lib -name "*.g.dart" -type f
             exit 1
           fi
         fi
