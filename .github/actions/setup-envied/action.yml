@@ -14,6 +14,67 @@ inputs:
     description: "Whether to install Very Good CLI"
     required: false
     default: "true"
+  # Environment Variables for .env file generation
+  dev-api-url:
+    description: "Development API URL"
+    required: false
+    default: "https://dev-api.xp1.com/api/v1"
+  dev-app-name:
+    description: "Development App Name"
+    required: false
+    default: "XP1 Development"
+  dev-environment-name:
+    description: "Development Environment Name"
+    required: false
+    default: "development"
+  dev-is-debug-mode:
+    description: "Development Debug Mode"
+    required: false
+    default: "true"
+  dev-api-timeout-ms:
+    description: "Development API Timeout"
+    required: false
+    default: "30000"
+  staging-api-url:
+    description: "Staging API URL"
+    required: false
+    default: "https://staging-api.xp1.com/api"
+  staging-app-name:
+    description: "Staging App Name"
+    required: false
+    default: "XP1 Staging"
+  staging-environment-name:
+    description: "Staging Environment Name"
+    required: false
+    default: "staging"
+  staging-is-debug-mode:
+    description: "Staging Debug Mode"
+    required: false
+    default: "false"
+  staging-api-timeout-ms:
+    description: "Staging API Timeout"
+    required: false
+    default: "20000"
+  prod-api-url:
+    description: "Production API URL"
+    required: false
+    default: "https://api.xp1.com/api"
+  prod-app-name:
+    description: "Production App Name"
+    required: false
+    default: "XP1"
+  prod-environment-name:
+    description: "Production Environment Name"
+    required: false
+    default: "production"
+  prod-is-debug-mode:
+    description: "Production Debug Mode"
+    required: false
+    default: "false"
+  prod-api-timeout-ms:
+    description: "Production API Timeout"
+    required: false
+    default: "15000"
 
 runs:
   using: "composite"
@@ -44,37 +105,37 @@ runs:
           
           # Generate development.env
           cp lib/features/env/development.env.example lib/features/env/development.env
-          sed -i "s|API_URL=.*|API_URL=${DEV_API_URL}|g" lib/features/env/development.env
-          sed -i "s|APP_NAME=.*|APP_NAME=${DEV_APP_NAME}|g" lib/features/env/development.env
-          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${DEV_ENVIRONMENT_NAME}|g" lib/features/env/development.env
-          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${DEV_IS_DEBUG_MODE}|g" lib/features/env/development.env
-          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${DEV_API_TIMEOUT_MS}|g" lib/features/env/development.env
-          
+          sed -i "s|API_URL=.*|API_URL=${{ inputs.dev-api-url }}|g" lib/features/env/development.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${{ inputs.dev-app-name }}|g" lib/features/env/development.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${{ inputs.dev-environment-name }}|g" lib/features/env/development.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${{ inputs.dev-is-debug-mode }}|g" lib/features/env/development.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${{ inputs.dev-api-timeout-ms }}|g" lib/features/env/development.env
+
           # Generate staging.env
           cp lib/features/env/staging.env.example lib/features/env/staging.env
-          sed -i "s|API_URL=.*|API_URL=${STAGING_API_URL}|g" lib/features/env/staging.env
-          sed -i "s|APP_NAME=.*|APP_NAME=${STAGING_APP_NAME}|g" lib/features/env/staging.env
-          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${STAGING_ENVIRONMENT_NAME}|g" lib/features/env/staging.env
-          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${STAGING_IS_DEBUG_MODE}|g" lib/features/env/staging.env
-          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${STAGING_API_TIMEOUT_MS}|g" lib/features/env/staging.env
-          
+          sed -i "s|API_URL=.*|API_URL=${{ inputs.staging-api-url }}|g" lib/features/env/staging.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${{ inputs.staging-app-name }}|g" lib/features/env/staging.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${{ inputs.staging-environment-name }}|g" lib/features/env/staging.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${{ inputs.staging-is-debug-mode }}|g" lib/features/env/staging.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${{ inputs.staging-api-timeout-ms }}|g" lib/features/env/staging.env
+
           # Generate production.env
           cp lib/features/env/production.env.example lib/features/env/production.env
-          sed -i "s|API_URL=.*|API_URL=${PROD_API_URL}|g" lib/features/env/production.env
-          sed -i "s|APP_NAME=.*|APP_NAME=${PROD_APP_NAME}|g" lib/features/env/production.env
-          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${PROD_ENVIRONMENT_NAME}|g" lib/features/env/production.env
-          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${PROD_IS_DEBUG_MODE}|g" lib/features/env/production.env
-          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${PROD_API_TIMEOUT_MS}|g" lib/features/env/production.env
+          sed -i "s|API_URL=.*|API_URL=${{ inputs.prod-api-url }}|g" lib/features/env/production.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${{ inputs.prod-app-name }}|g" lib/features/env/production.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${{ inputs.prod-environment-name }}|g" lib/features/env/production.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${{ inputs.prod-is-debug-mode }}|g" lib/features/env/production.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${{ inputs.prod-api-timeout-ms }}|g" lib/features/env/production.env
           
           echo "✅ All environment files created"
         else
           echo "🚀 Creating development.env only..."
           cp lib/features/env/development.env.example lib/features/env/development.env
-          sed -i "s|API_URL=.*|API_URL=${DEV_API_URL}|g" lib/features/env/development.env
-          sed -i "s|APP_NAME=.*|APP_NAME=${DEV_APP_NAME}|g" lib/features/env/development.env
-          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${DEV_ENVIRONMENT_NAME}|g" lib/features/env/development.env
-          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${DEV_IS_DEBUG_MODE}|g" lib/features/env/development.env
-          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${DEV_API_TIMEOUT_MS}|g" lib/features/env/development.env
+          sed -i "s|API_URL=.*|API_URL=${{ inputs.dev-api-url }}|g" lib/features/env/development.env
+          sed -i "s|APP_NAME=.*|APP_NAME=${{ inputs.dev-app-name }}|g" lib/features/env/development.env
+          sed -i "s|ENVIRONMENT_NAME=.*|ENVIRONMENT_NAME=${{ inputs.dev-environment-name }}|g" lib/features/env/development.env
+          sed -i "s|IS_DEBUG_MODE=.*|IS_DEBUG_MODE=${{ inputs.dev-is-debug-mode }}|g" lib/features/env/development.env
+          sed -i "s|API_TIMEOUT_MS=.*|API_TIMEOUT_MS=${{ inputs.dev-api-timeout-ms }}|g" lib/features/env/development.env
           echo "✅ Development environment file created"
         fi
 

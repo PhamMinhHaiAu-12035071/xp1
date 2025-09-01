@@ -92,6 +92,22 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           environment-mode: "all"
           very-good-cli: "true"
+          # Pass environment variables explicitly to action
+          dev-api-url: ${{ env.DEV_API_URL }}
+          dev-app-name: ${{ env.DEV_APP_NAME }}
+          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
+          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
+          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
+          staging-api-url: ${{ env.STAGING_API_URL }}
+          staging-app-name: ${{ env.STAGING_APP_NAME }}
+          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
+          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
+          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
+          prod-api-url: ${{ env.PROD_API_URL }}
+          prod-app-name: ${{ env.PROD_APP_NAME }}
+          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
+          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
+          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
 
       # ✅ Success
       - name: ✅ Setup completed
@@ -118,6 +134,22 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           environment-mode: "all"
           very-good-cli: "false"
+          # Pass environment variables explicitly to action
+          dev-api-url: ${{ env.DEV_API_URL }}
+          dev-app-name: ${{ env.DEV_APP_NAME }}
+          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
+          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
+          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
+          staging-api-url: ${{ env.STAGING_API_URL }}
+          staging-app-name: ${{ env.STAGING_APP_NAME }}
+          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
+          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
+          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
+          prod-api-url: ${{ env.PROD_API_URL }}
+          prod-app-name: ${{ env.PROD_APP_NAME }}
+          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
+          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
+          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
 
       - name: 🔍 Validate dependencies
         run: flutter pub run rps validate-deps
@@ -136,6 +168,22 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           environment-mode: "all"
           very-good-cli: "true"
+          # Pass environment variables explicitly to action
+          dev-api-url: ${{ env.DEV_API_URL }}
+          dev-app-name: ${{ env.DEV_APP_NAME }}
+          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
+          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
+          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
+          staging-api-url: ${{ env.STAGING_API_URL }}
+          staging-app-name: ${{ env.STAGING_APP_NAME }}
+          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
+          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
+          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
+          prod-api-url: ${{ env.PROD_API_URL }}
+          prod-app-name: ${{ env.PROD_APP_NAME }}
+          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
+          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
+          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
 
       - name: 🔐 Check license compliance
         run: make license-ci
@@ -157,17 +205,55 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           environment-mode: "all"
           very-good-cli: "true"
+          # Pass environment variables explicitly to action
+          dev-api-url: ${{ env.DEV_API_URL }}
+          dev-app-name: ${{ env.DEV_APP_NAME }}
+          dev-environment-name: ${{ env.DEV_ENVIRONMENT_NAME }}
+          dev-is-debug-mode: ${{ env.DEV_IS_DEBUG_MODE }}
+          dev-api-timeout-ms: ${{ env.DEV_API_TIMEOUT_MS }}
+          staging-api-url: ${{ env.STAGING_API_URL }}
+          staging-app-name: ${{ env.STAGING_APP_NAME }}
+          staging-environment-name: ${{ env.STAGING_ENVIRONMENT_NAME }}
+          staging-is-debug-mode: ${{ env.STAGING_IS_DEBUG_MODE }}
+          staging-api-timeout-ms: ${{ env.STAGING_API_TIMEOUT_MS }}
+          prod-api-url: ${{ env.PROD_API_URL }}
+          prod-app-name: ${{ env.PROD_APP_NAME }}
+          prod-environment-name: ${{ env.PROD_ENVIRONMENT_NAME }}
+          prod-is-debug-mode: ${{ env.PROD_IS_DEBUG_MODE }}
+          prod-api-timeout-ms: ${{ env.PROD_API_TIMEOUT_MS }}
+
+      # 🧹 Clean before generating code
+      - name: 🧹 Clean environment
+        run: flutter clean
 
       # 🏗️ Ensure generated code is ready (idempotent)
       - name: 🏗️ Generate code (idempotent)
-        run: flutter pub run build_runner build --delete-conflicting-outputs
+        run: flutter pub run build_runner build --delete-conflicting-outputs --verbose
+
+      # 🔍 Debug: Check generated files
+      - name: 🔍 Debug generated files
+        run: |
+          echo "🔍 Checking generated files after build_runner..."
+          ls -la lib/features/env/
+          find lib -name "*.g.dart" -type f | head -10
 
       # 🔍 Check code quality
       - name: 🔍 Format Check
         run: dart format --set-exit-if-changed .
 
+      # 🔍 Analyze Code with debug output
       - name: 🔍 Analyze Code
-        run: flutter analyze --fatal-infos
+        run: |
+          echo "🔍 Running flutter analyze with debug output..."
+          flutter analyze --fatal-infos 2>&1 || {
+            echo "❌ Analysis failed. Checking for envied-related errors..."
+            flutter analyze lib/features/env/ --fatal-infos 2>&1 || echo "⚠️ Env directory analysis failed"
+            echo "🔍 Checking if .g.dart files exist..."
+            find lib -name "*.g.dart" -type f
+            echo "🔍 Checking environment variables..."
+            env | grep -E "(API_URL|APP_NAME|ENVIRONMENT_NAME|IS_DEBUG_MODE|API_TIMEOUT_MS)" || echo "⚠️ No env vars found"
+            exit 1
+          }
 
       # 🧪 Run tests with Very Good CLI
       - name: 🧪 Run Tests
