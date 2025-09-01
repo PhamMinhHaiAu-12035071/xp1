@@ -74,9 +74,11 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Generate development environment only
-      - name: 🔧 Generate development environment
-        run: dart run build_runner clean && dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+      # 🔧 Environment files are pre-generated and committed (.env files are gitignored)
+      - name: 🔧 Verify development environment files
+        run: |
+          echo "✅ Checking committed .g.dart files..."
+          ls -la lib/features/env/*.g.dart || echo "⚠️  No .g.dart files found"
 
       # ✅ Verify development setup completed
       - name: ✅ Verify development setup
@@ -84,8 +86,8 @@ jobs:
           echo "🎉 Development environment setup finished!"
           echo "✅ Flutter version: $(flutter --version | head -1)"
           echo "✅ Very Good CLI: $(very_good --version)"
-          echo "✅ Development environment files:"
-          find lib -name "env_development.g.dart" | wc -l | xargs echo "  Development .g.dart files count:"
+          echo "✅ Pre-committed environment files:"
+          ls -la lib/features/env/*.g.dart | wc -l | xargs echo "  .g.dart files count:"
 
   semantic-pull-request:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/semantic_pull_request.yml@v1
@@ -109,9 +111,9 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Generate environments before validation (required for analysis)
-      - name: 🔧 Generate development environment
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+      # 🔧 Environment files are pre-generated and committed
+      - name: 🔧 Verify environment files
+        run: ls -la lib/features/env/*.g.dart
 
       - name: 🔍 Validate dependencies
         run: flutter pub run rps validate-deps
@@ -134,9 +136,9 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Generate environments before license check (may be required for analysis)
-      - name: 🔧 Generate development environment
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+      # 🔧 Environment files are pre-generated and committed
+      - name: 🔧 Verify environment files
+        run: ls -la lib/features/env/*.g.dart
 
       - name: 🔧 Setup Very Good CLI
         run: dart pub global activate very_good_cli
@@ -168,9 +170,9 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
-      # 🔧 Generate development environment (focus on dev only)
-      - name: 🔧 Generate development environment
-        run: dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+      # 🔧 Environment files are pre-generated and committed
+      - name: 🔧 Verify environment files
+        run: ls -la lib/features/env/*.g.dart
 
       # 🔍 Check code quality
       - name: 🔍 Format Check
