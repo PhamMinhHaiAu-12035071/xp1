@@ -158,6 +158,10 @@ jobs:
           environment-mode: "all"
           very-good-cli: "true"
 
+      # 🏗️ Ensure generated code is ready (idempotent)
+      - name: 🏗️ Generate code (idempotent)
+        run: flutter pub run build_runner build --delete-conflicting-outputs
+
       # 🔍 Check code quality
       - name: 🔍 Format Check
         run: dart format --set-exit-if-changed .
