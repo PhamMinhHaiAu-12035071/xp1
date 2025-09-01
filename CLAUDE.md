@@ -119,6 +119,7 @@ This project implements a sophisticated environment management system using seal
 ### Environment Usage Patterns
 
 **Standard Access (90% of cases):**
+
 ```dart
 final apiUrl = EnvConfigFactory.apiUrl;
 final appName = EnvConfigFactory.appName;
@@ -126,6 +127,7 @@ final isDebug = EnvConfigFactory.isDebugMode;
 ```
 
 **Environment-Specific Access:**
+
 ```dart
 // For testing or cross-environment operations
 final devConfig = const Development();
@@ -483,15 +485,16 @@ make test-coverage
 ### 🚫 **What Must Be English**
 
 #### **Code Content**
+
 ```dart
-// ❌ WRONG: Vietnamese comments
-/// Quản lý trạng thái counter với increment và decrement
+// ❌ WRONG: Non-English comments
+/// [Non-English documentation example]
 class CounterCubit extends Cubit<int> {
-  /// Tạo một CounterCubit với giá trị ban đầu là 0
+  /// [Non-English constructor documentation]
   CounterCubit() : super(0);
-  
-  /// Tăng giá trị counter lên 1
-  void increment() => emit(state + 1); // Tăng số lên
+
+  /// [Non-English method documentation]
+  void increment() => emit(state + 1); // [Non-English comment]
 }
 
 // ✅ CORRECT: English comments and documentation
@@ -499,30 +502,38 @@ class CounterCubit extends Cubit<int> {
 class CounterCubit extends Cubit<int> {
   /// Creates a CounterCubit with initial state of 0.
   CounterCubit() : super(0);
-  
+
   /// Increments the counter value by 1.
   void increment() => emit(state + 1); // Increment the value
 }
 ```
 
 #### **Documentation Files**
+
 ```markdown
-❌ WRONG: Vietnamese markdown content
-# Cấu Hình Environment với Envied
-## Tổng Quan
-Hệ thống quản lý multiple environments...
+❌ WRONG: Non-English markdown content
+
+# [Non-English Environment Configuration Title]
+
+## [Non-English Overview Section]
+
+[Non-English environment management description]...
 
 ✅ CORRECT: English markdown content
+
 # Environment Configuration with Envied
+
 ## Overview
+
 Multiple environment management system...
 ```
 
 #### **Comments and Strings**
+
 ```dart
-// ❌ WRONG: Vietnamese strings and comments
-const appTitle = 'Ứng Dụng Đếm Số'; // Tiêu đề ứng dụng
-// TODO: Thêm tính năng reset counter
+// ❌ WRONG: Non-English strings and comments
+const appTitle = '[Non-English App Title]'; // [Non-English comment]
+// TODO: [Non-English task description]
 
 // ✅ CORRECT: English strings and comments
 const appTitle = 'Counter Application'; // Application title
@@ -552,6 +563,7 @@ Our cspell configuration enforces English-only content:
 ```
 
 **When spell check fails:**
+
 1. Convert non-English content to English
 2. Add technical terms to `cspell.json` words array if needed
 3. Never suppress spell check with ignore comments
@@ -576,15 +588,15 @@ dart run rps analyze                    # Check for linting issues
 4. **Error Messages**: Use English for user-facing messages
 5. **Test Descriptions**: Write test cases in English
 
-#### **Common Translation Patterns:**
+#### **Common English Documentation Patterns:**
 
-| Vietnamese | English | Usage |
-|------------|---------|--------|
-| `Tổng quan` | `Overview` | Documentation sections |
-| `Cấu hình` | `Configuration` | Settings and setup |
-| `Kiến trúc` | `Architecture` | System design |
-| `Sử dụng` | `Usage` | How-to guides |
-| `Khắc phục sự cố` | `Troubleshooting` | Error resolution |
+| English Term      | Usage                  | Context                     |
+| ----------------- | ---------------------- | --------------------------- |
+| `Overview`        | Documentation sections | High-level introductions    |
+| `Configuration`   | Settings and setup     | System configuration guides |
+| `Architecture`    | System design          | Technical architecture docs |
+| `Usage`           | How-to guides          | Implementation instructions |
+| `Troubleshooting` | Error resolution       | Problem-solving guides      |
 
 ### 🚨 **Pre-Commit English Validation**
 
@@ -603,21 +615,24 @@ dart run rps pre-commit  # Must pass for English compliance
 ### 📚 **English Documentation Standards**
 
 #### **Markdown Files:**
+
 - Use clear, professional English
 - Follow standard technical writing conventions
 - Prefer active voice over passive voice
 - Use consistent terminology throughout
 
 #### **Code Documentation:**
+
 - Use complete sentences for class/method documentation
 - Follow Dart documentation standards with `///`
 - Include parameter descriptions with `[paramName]` syntax
 - Provide usage examples in English
 
 #### **Error Messages:**
+
 ```dart
-// ❌ WRONG: Mixed languages
-throw Exception('Lỗi khi load config');
+// ❌ WRONG: Non-English error messages
+throw Exception('[Non-English error message]');
 
 // ✅ CORRECT: English error messages
 throw ConfigurationException('Failed to load configuration');
@@ -626,16 +641,19 @@ throw ConfigurationException('Failed to load configuration');
 ### 🔧 **Tools for English Compliance**
 
 #### **Editor Integration:**
+
 - VS Code: Install "Code Spell Checker" extension
 - Set language to English in editor settings
 - Enable real-time spell checking
 
 #### **Git Hooks:**
+
 - Pre-commit hooks run spell check automatically
 - Blocks commits with non-English content
 - Provides immediate feedback on language issues
 
 #### **CI/CD Integration:**
+
 - GitHub Actions runs spell check on all markdown files
 - Fails build if non-English content is detected
 - Generates reports of language compliance issues

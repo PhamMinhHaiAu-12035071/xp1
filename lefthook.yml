@@ -56,7 +56,7 @@ pre-push:
     # Run bash script tests first (TDD validation)
     bash-script-tests:
       run: npm test
-    # Full license compliance check trước khi push
+    # Full license compliance check before push
     license-compliance:
       run: fvm dart run rps license-check
     # Run complete CI pipeline via Makefile
