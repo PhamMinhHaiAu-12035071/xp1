@@ -31,8 +31,10 @@ targets:
     # Performance: Limit source scanning
     sources:
       include:
+        - $package$
         - lib/**
         - pubspec.yaml
       exclude:
         - test/**
         - .dart_tool/**
+        - build/**
