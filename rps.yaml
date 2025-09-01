@@ -52,8 +52,8 @@ scripts:
   clean: "fvm flutter clean && fvm flutter pub get"
   reset: "fvm flutter clean && fvm flutter pub get && fvm flutter pub run build_runner build --delete-conflicting-outputs"
 
-  # Git hooks simulation
-  pre-commit: "fvm dart format lib/ test/ --set-exit-if-changed && fvm dart analyze --fatal-infos && make test"
+  # Git hooks simulation (lightweight - tests moved to lefthook)
+  pre-commit: "fvm dart format lib/ test/ --set-exit-if-changed && fvm dart analyze --fatal-infos"
 
   # Team setup commands
   setup: "fvm flutter pub get && lefthook install"
