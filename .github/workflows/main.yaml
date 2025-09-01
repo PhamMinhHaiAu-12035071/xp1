@@ -116,7 +116,7 @@ jobs:
         uses: ./.github/actions/setup-envied
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          environment-mode: "development-only"
+          environment-mode: "all"
           very-good-cli: "false"
 
       - name: 🔍 Validate dependencies
@@ -134,7 +134,7 @@ jobs:
         uses: ./.github/actions/setup-envied
         with:
           flutter-version: ${{ env.FLUTTER_VERSION }}
-          environment-mode: "development-only"
+          environment-mode: "all"
           very-good-cli: "true"
 
       - name: 🔐 Check license compliance
