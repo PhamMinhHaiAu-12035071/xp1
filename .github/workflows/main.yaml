@@ -226,16 +226,78 @@ jobs:
       - name: 🧹 Clean environment
         run: flutter clean
 
+      # 🧹 Clear build cache before generation
+      - name: 🧹 Clear build cache
+        run: |
+          echo "🧹 Clearing build cache..."
+          rm -rf .dart_tool/build
+          rm -rf .dart_tool/pub/bin/build_runner
+          echo "✅ Build cache cleared"
+
       # 🏗️ Ensure generated code is ready (idempotent)
       - name: 🏗️ Generate code (idempotent)
-        run: flutter pub run build_runner build --delete-conflicting-outputs --verbose
+        run: |
+          echo "🏗️ Starting build_runner generation..."
+          flutter pub run build_runner clean
+          flutter pub run build_runner build --delete-conflicting-outputs --verbose 2>&1 || {
+            echo "❌ build_runner failed with exit code $?"
+            echo "🔍 Checking for common issues..."
+            if [ ! -f "lib/features/env/development.env" ]; then
+              echo "❌ development.env file missing"
+            fi
+            if [ ! -f "lib/features/env/staging.env" ]; then
+              echo "❌ staging.env file missing"
+            fi
+            if [ ! -f "lib/features/env/production.env" ]; then
+              echo "❌ production.env file missing"
+            fi
+            exit 1
+          }
+          echo "✅ build_runner completed successfully"
+
+      # 🔍 Debug: Check environment before generation
+      - name: 🔍 Debug before generation
+        run: |
+          echo "🔍 Checking environment files before build_runner..."
+          ls -la lib/features/env/
+          echo "📄 Environment files content:"
+          for env_file in development staging production; do
+            if [ -f "lib/features/env/${env_file}.env" ]; then
+              echo "✅ ${env_file}.env exists:"
+              cat "lib/features/env/${env_file}.env"
+            else
+              echo "❌ ${env_file}.env missing"
+            fi
+          done
+          echo "📄 Dart files part directives:"
+          for dart_file in env_development.dart env_staging.dart env_production.dart; do
+            if [ -f "lib/features/env/${dart_file}" ]; then
+              echo "📝 ${dart_file} part directive:"
+              grep -n "part " "lib/features/env/${dart_file}" || echo "  No part directive found"
+            else
+              echo "❌ ${dart_file} missing"
+            fi
+          done
 
       # 🔍 Debug: Check generated files
       - name: 🔍 Debug generated files
         run: |
           echo "🔍 Checking generated files after build_runner..."
           ls -la lib/features/env/
-          find lib -name "*.g.dart" -type f | head -10
+          echo "📄 Generated .g.dart files:"
+          find lib -name "*.g.dart" -type f | while read file; do
+            echo "📝 $file"
+            head -5 "$file"
+          done
+          if [ ! -f "lib/features/env/env_development.g.dart" ]; then
+            echo "❌ env_development.g.dart not found!"
+            exit 1
+          else
+            echo "✅ env_development.g.dart exists, checking content:"
+            head -10 "lib/features/env/env_development.g.dart"
+            echo "Checking for _EnvDev class:"
+            grep -n "_EnvDev" "lib/features/env/env_development.g.dart" || echo "❌ _EnvDev class not found"
+          fi
 
       # 🔍 Check code quality
       - name: 🔍 Format Check
