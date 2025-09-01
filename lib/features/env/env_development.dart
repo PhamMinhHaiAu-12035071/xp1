@@ -10,7 +10,7 @@ part 'env_development.g.dart';
 /// The implementation uses the `development.env` file for development-specific
 /// configuration values. Never access these values directly in features.
 /// Instead, inject the [EnvConfigRepository] through DI.
-@Envied(path: 'lib/features/env/development.env', environment: true)
+@Envied(path: 'lib/features/env/development.env')
 final class EnvDev {
   /// Base API URL for backend communication.
   /// This is the primary endpoint for all API requests.
