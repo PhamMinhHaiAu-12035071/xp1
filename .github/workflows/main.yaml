@@ -56,8 +56,19 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
+      - name: 🏗️ Setup environment files
+        run: |
+          cp lib/features/env/development.env.example lib/features/env/development.env
+          cp lib/features/env/staging.env.example lib/features/env/staging.env
+          cp lib/features/env/production.env.example lib/features/env/production.env
+
+      - name: 🏗️ Generate code
+        run: |
+          dart run build_runner clean
+          dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+
       - name: 🔍 Validate dependencies
-        run: flutter pub run rps validate-deps
+        run: dart run dependency_validator
 
   license-compliance:
     runs-on: ubuntu-latest
@@ -77,6 +88,17 @@ jobs:
       - name: 📦 Install dependencies
         run: flutter pub get
 
+      - name: 🏗️ Setup environment files
+        run: |
+          cp lib/features/env/development.env.example lib/features/env/development.env
+          cp lib/features/env/staging.env.example lib/features/env/staging.env
+          cp lib/features/env/production.env.example lib/features/env/production.env
+
+      - name: 🏗️ Generate code
+        run: |
+          dart run build_runner clean
+          dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+
       - name: 🔐 Check license compliance
         run: make license-ci
 
@@ -84,6 +106,12 @@ jobs:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/flutter_package.yml@v1
     with:
       flutter_version: "3.35.1"
+      setup: |
+        cp lib/features/env/development.env.example lib/features/env/development.env
+        cp lib/features/env/staging.env.example lib/features/env/staging.env
+        cp lib/features/env/production.env.example lib/features/env/production.env
+        dart run build_runner clean
+        dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
