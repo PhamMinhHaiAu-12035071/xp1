@@ -1,9 +1,9 @@
 // Ignore for testing purposes
 // ignore_for_file: prefer_const_constructors
 
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xp1/app/app.dart';
-import 'package:xp1/counter/counter.dart';
 
 import '../../helpers/helpers.dart';
 
@@ -17,9 +17,16 @@ void main() {
       await TestDependencyContainer.resetTestDependencies();
     });
 
-    testWidgets('renders CounterPage', (tester) async {
+    testWidgets('should render login page', (tester) async {
       await tester.pumpWidget(App());
-      expect(find.byType(CounterPage), findsOneWidget);
+      await tester.pumpAndSettle();
+      expect(find.text('Hello World - Login'), findsOneWidget);
+    });
+
+    testWidgets('should have MaterialApp with router', (tester) async {
+      await tester.pumpWidget(App());
+      final app = tester.widget<MaterialApp>(find.byType(MaterialApp));
+      expect(app.routerConfig, isNotNull);
     });
   });
 }

@@ -6,6 +6,69 @@ This document outlines the development standards, best practices, and guidelines
 
 ## 🏗️ Architecture Guidelines
 
+### Navigation System Implementation
+
+#### Auto Route Configuration
+
+```dart
+// ✅ Good: Type-safe route configuration
+@AutoRouterConfig()
+class AppRouter extends RootStackRouter {
+  @override
+  RouteType get defaultRouteType => const RouteType.adaptive();
+
+  @override
+  List<AutoRouteGuard> get guards => [AuthGuard()];
+
+  @override
+  List<AutoRoute> get routes => [
+    AutoRoute(
+      page: LoginRoute.page,
+      path: '/login',
+      initial: true,
+    ),
+    AutoRoute(
+      page: MainWrapperRoute.page,
+      path: '/main',
+      children: [
+        AutoRoute(page: HomeRoute.page, path: 'home'),
+        AutoRoute(page: ProfileRoute.page, path: 'profile'),
+      ],
+    ),
+  ];
+}
+
+// ❌ Avoid: String-based navigation
+Navigator.pushNamed(context, '/profile');
+Navigator.pushReplacementNamed(context, '/home');
+```
+
+#### Route Guards Implementation
+
+```dart
+// ✅ Good: Clean guard implementation
+class AuthGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    if (isAuthenticated) {
+      resolver.next();
+    } else {
+      router.pushAndClearStack(const LoginRoute());
+    }
+  }
+}
+
+// ❌ Avoid: Heavy operations in guards
+class BadAuthGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) async {
+    // ❌ Don't make API calls in guards
+    final isAuth = await authApi.checkToken();
+    // This blocks navigation
+  }
+}
+```
+
 ### BLoC Pattern Implementation
 
 #### Cubit Structure
@@ -64,29 +127,66 @@ class CounterText extends StatelessWidget {
 
 ### Feature Organization
 
-#### Directory Structure
+#### Directory Structure (Updated for Navigation)
 
 ```
 feature_name/
+├── presentation/
+│   └── pages/
+│       ├── feature_page.dart
+│       └── widgets/
+│           ├── feature_widget.dart
+│           └── feature_card.dart
 ├── cubit/
 │   ├── feature_cubit.dart
 │   └── feature_state.dart
-├── view/
-│   ├── feature_page.dart
-│   └── widgets/
-│       ├── feature_widget.dart
-│       └── feature_card.dart
 ├── models/
 │   └── feature_model.dart
-└── feature.dart  # Barrel export
+└── feature.dart  # Barrel export (optional)
+```
+
+#### Navigation Data Structures (Linus Principle)
+
+```dart
+// ✅ Good: Eliminate special cases with data structures
+class NavTabConfig {
+  const NavTabConfig({
+    required this.route,
+    required this.icon,
+    required this.label,
+  });
+
+  final PageRouteInfo route;
+  final IconData icon;
+  final String label;
+}
+
+// Single source of truth for navigation tabs
+static const List<NavTabConfig> _navTabs = [
+  NavTabConfig(route: HomeRoute(), icon: Icons.home, label: 'Home'),
+  NavTabConfig(route: ProfileRoute(), icon: Icons.person, label: 'Profile'),
+];
+
+// Generate both routes and navigation items from same data
+AutoTabsScaffold(
+  routes: _navTabs.map((tab) => tab.route).toList(),
+  bottomNavigationBuilder: (_, tabsRouter) {
+    return BottomNavigationBar(
+      items: _navTabs.map((tab) => BottomNavigationBarItem(
+        icon: Icon(tab.icon),
+        label: tab.label,
+      )).toList(),
+    );
+  },
+)
 ```
 
 #### Barrel Exports
 
 ```dart
 // ✅ Good: Clean barrel export
+export 'presentation/pages/counter_page.dart';
 export 'cubit/counter_cubit.dart';
-export 'view/counter_page.dart';
 ```
 
 ## 📝 Code Style Guidelines
@@ -386,6 +486,85 @@ final config = EnvConfigFactory.currentEnvironment
 
 ## 🧪 Testing Guidelines
 
+### Navigation Testing (Auto Route)
+
+#### Route Testing
+
+```dart
+// ✅ Good: Navigation flow testing
+testWidgets('should navigate to main when login succeeds', (tester) async {
+  await tester.pumpAppWithRouter(const SizedBox());
+  await tester.pumpAndSettle();
+
+  final loginButton = find.byType(ElevatedButton);
+  await tester.tap(loginButton);
+  await tester.pumpAndSettle();
+
+  expect(find.byType(LoginPage), findsNothing);
+});
+
+// ✅ Good: Route guard testing
+testWidgets('should redirect to login when not authenticated', (tester) async {
+  // Set up unauthenticated state
+  await tester.pumpAppWithRouter(const SizedBox());
+
+  // Try to access protected route
+  context.router.push(const ProfileRoute());
+  await tester.pumpAndSettle();
+
+  // Should be redirected to login
+  expect(find.byType(LoginPage), findsOneWidget);
+});
+```
+
+#### Page Testing with Helpers (DRY Compliance)
+
+```dart
+// ✅ Good: Use PageTestHelpers to eliminate duplication
+void main() {
+  group('HomePage', () {
+    PageTestHelpers.testStandardPage<HomePage>(
+      const HomePage(),
+      'Hello World - Home',
+      () => const HomePage(),
+      (key) => HomePage(key: key),
+    );
+  });
+}
+
+// ✅ Good: Comprehensive testing with navigation
+void main() {
+  group('AttendancePage', () {
+    PageTestHelpers.testComprehensivePage<AttendancePage>(
+      const AttendancePage(),
+      'Hello World - Attendance',
+      () => const AttendancePage(),
+      (key) => AttendancePage(key: key),
+      pageRoute: '/main/attendance',
+    );
+  });
+}
+
+// ❌ Avoid: Code duplication (violates DRY principle)
+group('ProfilePage', () {
+  testWidgets('should render ProfilePage widget', (tester) async {
+    await tester.pumpApp(const ProfilePage());
+    expect(find.byType(ProfilePage), findsOneWidget);
+  });
+
+  testWidgets('should render Scaffold', (tester) async {
+    await tester.pumpApp(const ProfilePage());
+    expect(find.byType(Scaffold), findsOneWidget);
+  });
+
+  testWidgets('should display hello world text', (tester) async {
+    await tester.pumpApp(const ProfilePage());
+    expect(find.text('Hello World - Profile'), findsOneWidget);
+  });
+  // ... 20+ more duplicate tests (BAD!)
+});
+```
+
 ### Unit Testing (Very Good Analysis Standards)
 
 #### Cubit Testing
@@ -513,14 +692,39 @@ void main() {
 
 ```
 test/
-├── feature_name/
-│   ├── cubit/
-│   │   └── feature_cubit_test.dart
-│   └── view/
-│       └── feature_page_test.dart
+├── features/
+│   ├── authentication/
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── login_page_test.dart
+│   ├── home/
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── home_page_test.dart
+│   ├── attendance/
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── attendance_page_test.dart
+│   ├── profile/
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── profile_page_test.dart
+│   ├── statistics/
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── statistics_page_test.dart
+│   ├── features/
+│   │   └── presentation/
+│   │       └── pages/
+│   │           └── features_page_test.dart
+│   └── main_navigation/
+│       └── presentation/
+│           └── pages/
+│               └── main_wrapper_page_test.dart
 └── helpers/
     ├── helpers.dart
-    └── pump_app.dart
+    ├── pump_app.dart
+    └── page_test_helpers.dart     # DRY testing utilities
 ```
 
 ## 🌐 Internationalization Guidelines

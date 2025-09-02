@@ -32,6 +32,10 @@ dart run rps run-prod        # Production environment
 dart run rps generate-env-dev      # Generate development config
 dart run rps generate-env-staging  # Generate staging config
 dart run rps generate-env-prod     # Generate production config
+
+# Navigation & Auto Route commands
+dart run build_runner build        # Generate route files after route changes
+dart run build_runner watch        # Auto-generate on route file changes
 ```
 
 ### Build Commands
@@ -65,9 +69,18 @@ make setup                  # Complete project setup
 
 ## Code Architecture
 
+### Navigation System with Auto Route
+
+This project implements a sophisticated navigation system using auto_route for type-safe navigation:
+
+- **Auto Route**: Type-safe navigation with code generation (`lib/core/routing/app_router.dart`)
+- **Route Guards**: Authentication guards for protected routes (`lib/core/guards/auth_guard.dart`)
+- **Nested Navigation**: Bottom navigation with nested routes (`lib/features/main_navigation/`)
+- **Route Constants**: Centralized route definitions (`lib/core/constants/route_constants.dart`)
+
 ### Multi-Environment System
 
-This project implements a sophisticated environment management system using sealed classes and factory patterns:
+This project also implements environment management using sealed classes and factory patterns:
 
 - **Environment Detection**: Compile-time environment switching via `--dart-define=ENVIRONMENT=<env>`
 - **Sealed Classes**: Type-safe environment configurations (`lib/features/env/infrastructure/env_config_factory.dart:12`)
@@ -83,11 +96,19 @@ This project implements a sophisticated environment management system using seal
 - **Environments**: Separate files for dev/staging/production configurations
 - **Bootstrap Integration**: Environment logging at app startup (`lib/bootstrap.dart:35-40`)
 
+#### Navigation Structure
+
+- **Auto Route Configuration**: Centralized route configuration with type safety (`lib/core/routing/app_router.dart`)
+- **Route Guards**: Authentication and authorization guards (`lib/core/guards/auth_guard.dart`)
+- **Nested Routes**: Bottom navigation with nested child routes
+- **Route Constants**: Centralized route path definitions (`lib/core/constants/route_constants.dart`)
+
 #### Application Structure
 
 - **Bootstrap Pattern**: Centralized app initialization with error handling and BLoC observation (`lib/bootstrap.dart`)
 - **Multi-Entry Points**: Separate main files for each environment (`lib/main_*.dart`)
 - **Feature-Based Organization**: Code organized by feature domains under `lib/features/`
+- **Page Testing**: Standardized page testing with reusable helpers (`test/helpers/page_test_helpers.dart`)
 
 #### State Management
 
@@ -97,6 +118,8 @@ This project implements a sophisticated environment management system using seal
 ### Testing Strategy
 
 - **Environment Testing**: Comprehensive tests for all three environments (`test/features/env/`)
+- **Page Testing**: Standardized page testing with `PageTestHelpers` for DRY compliance
+- **Navigation Testing**: Router-enabled testing for navigation flows
 - **Integration Tests**: Full environment workflow validation
 - **Repository Pattern Testing**: Mock implementations for testability
 
@@ -118,7 +141,27 @@ This project implements a sophisticated environment management system using seal
 
 ### Environment Usage Patterns
 
-**Standard Access (90% of cases):**
+**Navigation Usage (Most Common):**
+
+```dart
+// Declarative navigation with type safety
+context.router.push(const HomeRoute());
+context.router.pushAndClearStack(const LoginRoute());
+
+// Route guard implementation
+class AuthGuard extends AutoRouteGuard {
+  @override
+  void onNavigation(NavigationResolver resolver, StackRouter router) {
+    if (isAuthenticated) {
+      resolver.next();
+    } else {
+      router.pushAndClearStack(const LoginRoute());
+    }
+  }
+}
+```
+
+**Environment Access (Configuration):**
 
 ```dart
 final apiUrl = EnvConfigFactory.apiUrl;
@@ -126,15 +169,16 @@ final appName = EnvConfigFactory.appName;
 final isDebug = EnvConfigFactory.isDebugMode;
 ```
 
-**Environment-Specific Access:**
+**Testing Patterns (DRY Compliance):**
 
 ```dart
-// For testing or cross-environment operations
-final devConfig = const Development();
-final stagingUrl = EnvConfigFactory.getApiUrlForEnvironment(const Staging());
-
-// Bootstrap integration
-void main() => bootstrap(() => App(environment: Environment.current));
+// Standardized page testing
+PageTestHelpers.testStandardPage<HomePage>(
+  const HomePage(),
+  'Hello World - Home',
+  () => const HomePage(),
+  (key) => HomePage(key: key),
+);
 ```
 
 ## ⚡ Quick Command Reference
@@ -154,6 +198,10 @@ dart run rps generate-env-prod && dart run rps run-prod
 
 # Emergency fixes
 flutter clean && flutter pub get && dart run rps generate-env-dev
+
+# Navigation testing
+flutter test test/features/*/presentation/pages/   # Test all page implementations
+flutter test test/helpers/                        # Test page helpers
 ```
 
 ## Development Workflow
