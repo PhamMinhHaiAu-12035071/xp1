@@ -39,7 +39,7 @@ dev_dependencies:
   build_runner: ^2.7.0 # Build system for code generation
   conventional_commit: ^0.6.1+1 # Git commit message linting
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
-  envied_generator: ^1.2.0 # Code generator for envied package
+  envied_generator: ^1.2.1 # Code generator for envied package
   flutter_test: # Flutter testing framework
     sdk: flutter
   injectable_generator: ^2.8.1 # Code generator for injectable package
