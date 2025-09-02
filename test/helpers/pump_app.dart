@@ -19,7 +19,7 @@ extension PumpApp on WidgetTester {
     );
   }
 
-  Future<void> pumpAppWithRouter(Widget widget) async {
+  Future<void> pumpAppWithRouter() async {
     // Setup test dependencies before rendering widgets
     await TestDependencyContainer.setupTestDependencies();
 

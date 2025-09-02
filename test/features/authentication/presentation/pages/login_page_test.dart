@@ -14,137 +14,61 @@ void main() {
       await TestDependencyContainer.resetTestDependencies();
     });
 
-    testWidgets('should render LoginPage widget', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(LoginPage), findsOneWidget);
-    });
+    // Use PageTestHelpers for standard page testing
+    PageTestHelpers.testStandardPage<LoginPage>(
+      const LoginPage(),
+      'Hello World - Login',
+      () => const LoginPage(),
+      (key) => LoginPage(key: key),
+      hasAppBar: true,
+    );
 
-    testWidgets('should render Scaffold', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(Scaffold), findsOneWidget);
-    });
+    // LoginPage-specific tests
+    group('LoginPage Specific Features', () {
+      testWidgets('should display AppBar with Login title', (tester) async {
+        await tester.pumpApp(const LoginPage());
+        expect(find.byType(AppBar), findsOneWidget);
+        expect(find.text('Login'), findsNWidgets(2));
+      });
 
-    testWidgets('should display AppBar with Login title', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(AppBar), findsOneWidget);
-      expect(find.text('Login'), findsNWidgets(2));
-    });
+      testWidgets('should have Column with MainAxisAlignment.center', (
+        tester,
+      ) async {
+        await tester.pumpApp(const LoginPage());
+        final column = tester.widget<Column>(find.byType(Column));
+        expect(column.mainAxisAlignment, MainAxisAlignment.center);
+      });
 
-    testWidgets('should display hello world text', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.text('Hello World - Login'), findsOneWidget);
-    });
+      testWidgets('should display Login button', (tester) async {
+        await tester.pumpApp(const LoginPage());
+        expect(find.byType(ElevatedButton), findsOneWidget);
+      });
 
-    testWidgets('should center the content', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(Center), findsOneWidget);
-    });
+      testWidgets('should have SizedBox between text and button', (
+        tester,
+      ) async {
+        await tester.pumpApp(const LoginPage());
+        final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox));
+        expect(sizedBox.height, 20);
+      });
 
-    testWidgets('should have Column with MainAxisAlignment.center', (
-      tester,
-    ) async {
-      await tester.pumpApp(const LoginPage());
-      final column = tester.widget<Column>(find.byType(Column));
-      expect(column.mainAxisAlignment, MainAxisAlignment.center);
-    });
+      testWidgets('should have button with onPressed callback', (
+        tester,
+      ) async {
+        await tester.pumpApp(const LoginPage());
+        final button = tester.widget<ElevatedButton>(
+          find.byType(ElevatedButton),
+        );
+        expect(button.onPressed, isNotNull);
+      });
 
-    testWidgets('should have correct text style', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      final textWidget = tester.widget<Text>(find.text('Hello World - Login'));
-      expect(textWidget.style?.fontSize, 24);
-    });
-
-    testWidgets('should display Login button', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(ElevatedButton), findsOneWidget);
-    });
-
-    testWidgets('should have SizedBox between text and button', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox));
-      expect(sizedBox.height, 20);
-    });
-
-    testWidgets('should create const constructor', (tester) async {
-      const page = LoginPage();
-      expect(page, isA<LoginPage>());
-    });
-
-    testWidgets('should support custom key', (tester) async {
-      const key = Key('login_page');
-      const page = LoginPage(key: key);
-      expect(page.key, key);
-    });
-
-    testWidgets('should be a StatelessWidget', (tester) async {
-      const page = LoginPage();
-      expect(page, isA<StatelessWidget>());
-    });
-
-    test('should have correct widget properties', () {
-      const page = LoginPage();
-      expect(page.runtimeType, LoginPage);
-    });
-
-    test('should have const constructor without key', () {
-      const page = LoginPage();
-      expect(page.key, isNull);
-    });
-
-    test('should have const constructor with key', () {
-      const key = Key('test_key');
-      const page = LoginPage(key: key);
-      expect(page.key, key);
-    });
-
-    test('should be instance of StatelessWidget', () {
-      const page = LoginPage();
-      expect(page, isA<StatelessWidget>());
-    });
-
-    test('should have proper type hierarchy', () {
-      const page = LoginPage();
-      expect(page, isA<Widget>());
-      expect(page, isA<StatelessWidget>());
-      expect(page, isA<LoginPage>());
-    });
-
-    testWidgets('should have AppBar in Scaffold', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(Scaffold), findsOneWidget);
-      expect(find.byType(AppBar), findsOneWidget);
-    });
-
-    testWidgets('should have body with Center widget', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(Center), findsOneWidget);
-    });
-
-    testWidgets('should have Column in Center', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(Column), findsOneWidget);
-    });
-
-    testWidgets('should have Text widget in Column', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.text('Hello World - Login'), findsOneWidget);
-    });
-
-    testWidgets('should have ElevatedButton in Column', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      expect(find.byType(ElevatedButton), findsOneWidget);
-    });
-
-    testWidgets('should have button with onPressed callback', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
-      expect(button.onPressed, isNotNull);
-    });
-
-    testWidgets('should have button with Text child', (tester) async {
-      await tester.pumpApp(const LoginPage());
-      final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
-      expect(button.child, isA<Text>());
+      testWidgets('should have button with Text child', (tester) async {
+        await tester.pumpApp(const LoginPage());
+        final button = tester.widget<ElevatedButton>(
+          find.byType(ElevatedButton),
+        );
+        expect(button.child, isA<Text>());
+      });
     });
 
     group('Navigation Integration Tests', () {
@@ -152,7 +76,7 @@ void main() {
         'should navigate to MainWrapperRoute when login button is tapped',
         (tester) async {
           // Use router-enabled app to test navigation (loads initial route)
-          await tester.pumpAppWithRouter(const SizedBox());
+          await tester.pumpAppWithRouter();
           await tester.pumpAndSettle();
 
           // Find and tap the login button
@@ -173,7 +97,7 @@ void main() {
         tester,
       ) async {
         // This test specifically targets the onPressed callback execution
-        await tester.pumpAppWithRouter(const SizedBox());
+        await tester.pumpAppWithRouter();
         await tester.pumpAndSettle();
 
         // Verify button exists

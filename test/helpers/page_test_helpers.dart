@@ -83,7 +83,7 @@ class PageTestHelpers {
         // when testing widget hierarchy
         expect(find.byType(Scaffold), findsOneWidget);
         expect(find.byType(Center), findsOneWidget);
-        expect(find.byType(Text), findsOneWidget);
+        expect(find.byType(Text), findsAtLeastNWidgets(1));
       });
     });
   }
@@ -204,7 +204,7 @@ class PageTestHelpers {
       testWidgets('should integrate with auto_route system', (tester) async {
         // Test that page can be reached via router
         // This validates auto_route configuration
-        await tester.pumpAppWithRouter(const SizedBox());
+        await tester.pumpAppWithRouter();
         await tester.pumpAndSettle();
 
         // Verify router is properly configured

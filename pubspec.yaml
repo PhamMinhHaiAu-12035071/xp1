@@ -51,4 +51,3 @@ dev_dependencies:
 flutter:
   generate: true # Enable code generation
   uses-material-design: true # Use Material Design icons
-# Test change

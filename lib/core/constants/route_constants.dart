@@ -1,23 +1,41 @@
 /// Route constants for the application navigation.
-class RouteConstants {
+///
+/// Abstract final class approach with inheritance prevention.
+/// Note: This approach goes against Dart best practices but provides
+/// a namespace for route constants while preventing inheritance.
+library;
+
+/// Route constants using abstract final class pattern.
+///
+/// This class cannot be instantiated or extended, providing a namespace
+/// for route constants while preventing inheritance.
+///
+/// Usage:
+/// - For top-level routes: `path: '/${RouteConstants.login}'`
+/// - For nested routes: `path: RouteConstants.home`
+/// - For programmatic navigation: `context.router.pushNamed('/${RouteConstants.login}')`
+abstract final class RouteConstants {
+  // Private constructor to prevent instantiation
+  const RouteConstants._();
+
   /// Login route path.
-  static const String login = '/login';
+  static const String login = 'login';
 
   /// Main navigation route path.
-  static const String main = '/main';
+  static const String mainWrapper = 'main';
 
   /// Home route path.
-  static const String home = '/home';
+  static const String home = 'home';
 
   /// Statistics route path.
-  static const String statistics = '/statistics';
+  static const String statistics = 'statistics';
 
   /// Attendance route path.
-  static const String attendance = '/attendance';
+  static const String attendance = 'attendance';
 
   /// Features route path.
-  static const String features = '/features';
+  static const String features = 'features';
 
   /// Profile route path.
-  static const String profile = '/profile';
+  static const String profile = 'profile';
 }

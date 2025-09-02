@@ -7,10 +7,10 @@ class App extends StatelessWidget {
   /// Creates app widget.
   const App({super.key});
 
+  static final _appRouter = AppRouter();
+
   @override
   Widget build(BuildContext context) {
-    final appRouter = AppRouter();
-
     return MaterialApp.router(
       theme: ThemeData(
         appBarTheme: AppBarTheme(
@@ -20,7 +20,7 @@ class App extends StatelessWidget {
       ),
       localizationsDelegates: AppLocalizations.localizationsDelegates,
       supportedLocales: AppLocalizations.supportedLocales,
-      routerConfig: appRouter.config(),
+      routerConfig: _appRouter.config(),
     );
   }
 }
