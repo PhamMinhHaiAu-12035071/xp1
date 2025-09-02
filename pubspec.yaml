@@ -15,7 +15,7 @@ dependencies:
   bloc: ^9.0.0 # Business Logic Component pattern
 
   # === ENVIRONMENT & CONFIGURATION ===
-  envied: ^1.2.0 # Secure environment variable management
+  envied: ^1.2.1 # Secure environment variable management
 
   # === CORE UI FRAMEWORK ===
   flutter:
