@@ -10,4 +10,6 @@ exclude:
 # Ignore specific packages
 ignore:
   - analyzer
+  - bloc_test
   - build_runner
+  - flutter_bloc # False positive - transitive dependency from bloc_test

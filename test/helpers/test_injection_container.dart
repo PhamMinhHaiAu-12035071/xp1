@@ -2,7 +2,6 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 
 import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
-import 'package:xp1/counter/cubit/counter_cubit.dart';
 import 'package:xp1/features/env/domain/env_config_repository.dart';
 
 /// Mock services for testing.
@@ -22,7 +21,6 @@ class TestDependencyContainer {
 
     // Register mock services
     GetIt.instance
-      ..registerFactory<CounterCubit>(CounterCubit.new)
       ..registerLazySingleton<ILoggerService>(MockLoggerService.new)
       ..registerLazySingleton<EnvConfigRepository>(MockEnvConfigRepository.new);
 
