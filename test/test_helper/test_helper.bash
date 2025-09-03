@@ -95,6 +95,15 @@ mock_npm_failure() {
     create_mock_command "npx" "error: npx command failed" 1
 }
 
+# Mock make commands
+mock_make_success() {
+    create_mock_command "make" ""
+}
+
+mock_make_failure() {
+    create_mock_command "make" "error: make command failed" 1
+}
+
 # Debug helpers for better developer experience
 debug_test() {
     [[ "$BATS_DEBUG" == "1" ]] && echo "DEBUG: $*" >&2

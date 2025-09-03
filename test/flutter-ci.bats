@@ -13,6 +13,7 @@ teardown() {
 @test "flutter-ci should pass when all steps succeed" {
     # Arrange
     mock_fvm_success
+    create_mock_command "make" ""
     
     # Act
     run bash "$BATS_TEST_DIRNAME/../scripts/flutter-ci.sh"
@@ -90,18 +91,19 @@ EOF
 }
 
 @test "flutter-ci should fail when tests fail" {
-    # Arrange
+    # Arrange - Mock both fvm (for other commands) and make (for test command)
     create_mock_command_with_args "fvm" ""
-    cat > "$TEST_TEMP_DIR/mocks/fvm" << 'EOF'
+    create_mock_command_with_args "make" ""
+    cat > "$TEST_TEMP_DIR/mocks/make" << 'EOF'
 #!/bin/bash
-if [[ "$*" == *"flutter test"* ]]; then
+if [[ "$*" == *"test"* ]]; then
     echo "Error: Tests failed"
     exit 1
 fi
 echo ""
 exit 0
 EOF
-    chmod +x "$TEST_TEMP_DIR/mocks/fvm"
+    chmod +x "$TEST_TEMP_DIR/mocks/make"
     
     # Act
     run bash "$BATS_TEST_DIRNAME/../scripts/flutter-ci.sh"
@@ -136,6 +138,7 @@ EOF
 @test "flutter-ci should display all expected status messages" {
     # Arrange
     mock_fvm_success
+    create_mock_command "make" ""
     
     # Act
     run bash "$BATS_TEST_DIRNAME/../scripts/flutter-ci.sh"
@@ -151,9 +154,10 @@ EOF
     assert_output --partial "✅ Flutter CI passed"
 }
 
-@test "flutter-ci should call fvm commands with correct arguments" {
+@test "flutter-ci should call fvm and make commands with correct arguments" {
     # Arrange
     create_mock_command_with_args "fvm" ""
+    create_mock_command_with_args "make" ""
     
     # Act
     run bash "$BATS_TEST_DIRNAME/../scripts/flutter-ci.sh"
@@ -163,6 +167,6 @@ EOF
     assert_mock_called_with "fvm" "flutter pub get"
     assert_mock_called_with "fvm" "flutter analyze --fatal-infos"
     assert_mock_called_with "fvm" "dart format lib/ test/ --set-exit-if-changed --output=none"
-    assert_mock_called_with "fvm" "flutter test"
+    assert_mock_called_with "make" "test"
     assert_mock_called_with "fvm" "flutter pub publish --dry-run"
 }
