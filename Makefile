@@ -29,28 +29,58 @@ local-ci: test-scripts semantic-check flutter-ci
 # Quick development commands
 check:
 	@echo "✅ Quick development check..."
-	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart format lib/ test/ || true
+	@if git diff --quiet lib/ test/; then \
+		echo "✅ Code formatted successfully."; \
+	else \
+		echo "❌ Code formatting required."; \
+		exit 1; \
+	fi
 	@fvm dart analyze --fatal-infos
 
 check-strict:
 	@echo "🔍 Strict development check..."
-	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart format lib/ test/ || true
+	@if git diff --quiet lib/ test/; then \
+		echo "✅ Code formatted successfully."; \
+	else \
+		echo "❌ Code formatting required."; \
+		exit 1; \
+	fi
 	@fvm dart analyze --fatal-infos --fatal-warnings
 
 check-all:
 	@echo "🔍 Complete development check..."
-	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart format lib/ test/ || true
+	@if git diff --quiet lib/ test/; then \
+		echo "✅ Code formatted successfully."; \
+	else \
+		echo "❌ Code formatting required."; \
+		exit 1; \
+	fi
 	@fvm dart analyze --fatal-infos
 	@fvm dart run dependency_validator
 	@very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"
 
 format:
 	@echo "🎨 Formatting code..."
-	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart format lib/ test/
+	@if git diff --quiet lib/ test/; then \
+		echo "✅ Code is already formatted."; \
+	else \
+		echo "✅ Code has been formatted."; \
+	fi
 
 format-check:
 	@echo "🔍 Checking code format..."
-	@fvm dart format lib/ test/ --set-exit-if-changed --output=none
+	@fvm dart format lib/ test/ || true
+	@if git diff --quiet lib/ test/; then \
+		echo "✅ Code is properly formatted."; \
+	else \
+		echo "❌ Code is not properly formatted."; \
+		git diff --name-only lib/ test/; \
+		exit 1; \
+	fi
 
 analyze:
 	@echo "🔍 Analyzing code..."
@@ -213,7 +243,13 @@ reset:
 # Git hooks and commit commands
 pre-commit:
 	@echo "🚀 Running pre-commit checks..."
-	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart format lib/ test/ || true
+	@if git diff --quiet lib/ test/; then \
+		echo "✅ Code formatted successfully."; \
+	else \
+		echo "❌ Code formatting required."; \
+		exit 1; \
+	fi
 	@fvm dart analyze --fatal-infos
 	@make test
 
@@ -260,7 +296,12 @@ naming-check:
 naming-fix:
 	@echo "🔧 Applying naming fixes..."
 	@fvm dart fix --apply
-	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart format lib/ test/ || true
+	@if git diff --quiet lib/ test/; then \
+		echo "✅ Code formatted after naming fixes."; \
+	else \
+		echo "✅ Code has been formatted after naming fixes."; \
+	fi
 	@echo "✅ Naming fixes applied"
 
 naming-docs:

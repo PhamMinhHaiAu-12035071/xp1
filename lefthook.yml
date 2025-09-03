@@ -16,10 +16,11 @@ pre-commit:
       run: |
         npx cspell --config cspell.json {staged_files} --no-progress || \
         echo "⚠️ Fix spelling issues"
-    # Quick format check (fast)
-    format-check:
+    # Format code automatically (staged files only)
+    format-code:
       glob: "*.dart"
-      run: make format-check
+      run: make format
+      stage_fixed: true
     # Quick analysis (staged files only)
     analyze-quick:
       glob: "*.dart"
