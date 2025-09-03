@@ -11,6 +11,9 @@
 3. 🔥 **lines_longer_than_80_chars** - Break long lines immediately
 4. 🔥 **prefer_const_constructors** - Add `const` wherever possible
 5. 🔥 **avoid_print** - Replace with `Console.info()` or proper logging
+6. 🔥 **no_adjacent_strings_in_list** - Extract long strings to variables
+7. 🔥 **avoid_equals_and_hash_code_on_mutable_classes** - Use @immutable annotation
+8. 🔥 **prefer_const_literals_to_create_immutables** - Use const literals in @immutable classes
 
 ## 🏗️ Navigation & Auto Route Patterns
 
@@ -426,3 +429,384 @@ Navigator.push(context, MaterialPageRoute(
 8. **Keep guards lightweight** - no heavy async operations
 
 Following these navigation patterns ensures scalable, maintainable, and well-tested navigation throughout the application.
+
+## 🚨 String Handling - Prevent Adjacent Strings Linter Errors
+
+### no_adjacent_strings_in_list - Extract Long Strings to Variables
+
+**THE RULE:** When creating long strings that exceed 80 characters in list literals, extract them to variables instead of using adjacent string concatenation within the list.
+
+```dart
+// ❌ LINT ERROR: no_adjacent_strings_in_list
+final messages = [
+  'Some message',
+  '📏 Rules: ${ValidationTypes.minDescriptionLength}-'
+  '${ValidationTypes.maxDescriptionLength} characters for description',  // Adjacent strings in list
+  'Another message',
+];
+
+// ✅ CORRECT: Extract long strings to variables
+final descriptionRule = '📏 Rules: ${ValidationTypes.minDescriptionLength}-'
+    '${ValidationTypes.maxDescriptionLength} characters for description';
+
+final messages = [
+  'Some message',
+  descriptionRule,  // Clean reference
+  'Another message',
+];
+
+// ✅ ALTERNATIVE: Use single interpolated string if under 80 chars
+final messages = [
+  'Some message',
+  '📏 Rules: ${ValidationTypes.minDescriptionLength}-${ValidationTypes.maxDescriptionLength} chars',
+  'Another message',
+];
+```
+
+**Why This Rule Exists:**
+
+- Adjacent strings in lists can be confusing to read
+- Makes it unclear whether strings should be separate list items or concatenated
+- Improves code clarity and maintainability
+- Prevents accidental concatenation when separate items were intended
+
+**Quick Fix Strategy:**
+
+1. **Extract to variable** - Create a descriptively named variable above the list
+2. **Use the variable** - Reference the variable in the list instead of inline strings
+3. **Proper formatting** - Use proper string concatenation outside the list context
+
+**Real-World Example from Error Formatter:**
+
+```dart
+// ❌ BEFORE: Adjacent strings causing linter error
+static void showConventionalCommitHelp() {
+  final messages = [
+    '✅ Correct format: type(scope): description',
+    '',
+    '📏 Rules:',
+    '   • ${ValidationTypes.minDescriptionLength}-'
+        '${ValidationTypes.maxDescriptionLength} characters for description',  // ❌ Adjacent strings
+    '   • Lowercase description',
+  ];
+}
+
+// ✅ AFTER: Extracted to descriptive variable
+static void showConventionalCommitHelp() {
+  final descriptionRule = '   • ${ValidationTypes.minDescriptionLength}-'
+      '${ValidationTypes.maxDescriptionLength} characters for description';
+
+  final messages = [
+    '✅ Correct format: type(scope): description',
+    '',
+    '📏 Rules:',
+    descriptionRule,  // ✅ Clean and readable
+    '   • Lowercase description',
+  ];
+}
+```
+
+**Benefits of This Approach:**
+
+- ✅ **Lint compliant** - No more no_adjacent_strings_in_list errors
+- ✅ **More readable** - Clear variable names explain the string's purpose
+- ✅ **Reusable** - Variables can be reused in multiple places
+- ✅ **Maintainable** - Changes only need to be made in one place
+- ✅ **Testable** - Variables can be unit tested independently
+
+**Remember:** This rule specifically applies to **list literals**. Adjacent strings are perfectly fine in regular variable assignments and other contexts.
+
+## 🚨 Immutability - Prevent Equals/HashCode Override Errors
+
+### avoid_equals_and_hash_code_on_mutable_classes - Use @immutable Annotation
+
+**THE RULE:** When overriding `==` and `hashCode` methods, the class must be annotated with `@immutable` to ensure proper immutability guarantees.
+
+```dart
+// ❌ LINT ERROR: avoid_equals_and_hash_code_on_mutable_classes
+class User {
+  final String name;
+  final int age;
+
+  const User(this.name, this.age);
+
+  @override
+  bool operator ==(Object other) => other is User && other.name == name && other.age == age;
+
+  @override
+  int get hashCode => Object.hash(name, age);
+}
+
+// ✅ CORRECT: Add @immutable annotation
+import 'package:meta/meta.dart';
+
+@immutable
+class User {
+  final String name;
+  final int age;
+
+  const User(this.name, this.age);
+
+  @override
+  bool operator ==(Object other) => other is User && other.name == name && other.age == age;
+
+  @override
+  int get hashCode => Object.hash(name, age);
+}
+```
+
+**Why This Rule Exists:**
+
+- Ensures proper immutability contracts in Dart
+- Prevents bugs from mutable state comparisons
+- Required by Dart's type system for value objects
+- Enables compiler optimizations for immutable objects
+
+**When to Use @immutable:**
+
+- ✅ **Value Objects** - Data classes that represent values (Point, Color, ValidationResult)
+- ✅ **Configuration Classes** - Immutable settings and preferences
+- ✅ **DTOs** - Data transfer objects that shouldn't change
+- ✅ **Constants** - Classes that represent constant values
+
+**When NOT to Use @immutable:**
+
+- ❌ **Business Logic Classes** - Classes with mutable state and behavior
+- ❌ **UI State Classes** - State management classes that need to change
+- ❌ **Service Classes** - Classes that manage external resources
+- ❌ **Controllers/Presenters** - Classes that coordinate actions
+
+**Real-World Example from ValidationResult:**
+
+```dart
+// ❌ BEFORE: Mutable class with equals/hashCode override
+class ValidationResult {
+  final bool isValid;
+  final String message;
+  final Map<String, dynamic> details;
+
+  @override
+  bool operator ==(Object other) => other is ValidationResult && other.isValid == isValid && other.message == message;
+
+  @override
+  int get hashCode => Object.hash(isValid, message);
+}
+
+// ✅ AFTER: Immutable class with proper annotation
+import 'package:meta/meta.dart';
+
+@immutable
+class ValidationResult {
+  final bool isValid;
+  final String message;
+  final Map<String, dynamic> details;
+
+  @override
+  bool operator ==(Object other) => other is ValidationResult && other.isValid == isValid && other.message == message;
+
+  @override
+  int get hashCode => Object.hash(isValid, message);
+}
+```
+
+**Quick Fix Strategy:**
+
+1. **Add import** - `import 'package:meta/meta.dart';`
+2. **Add annotation** - `@immutable` before class declaration
+3. **Use const literals** - Use `const {}` instead of `{}` in @immutable classes
+4. **Verify immutability** - Ensure all fields are final and truly immutable
+
+**Benefits of @immutable:**
+
+- ✅ **Type Safety** - Compiler guarantees immutability
+- ✅ **Performance** - Enables compiler optimizations
+- ✅ **Thread Safety** - Immutable objects are inherently thread-safe
+- ✅ **Predictability** - No unexpected state changes
+- ✅ **Testability** - Easier to test with known state
+
+**Common Pitfalls:**
+
+```dart
+// ❌ PITFALL: Mutable collections in immutable class
+@immutable
+class Config {
+  final List<String> items;  // ❌ List is mutable
+  final Map<String, String> settings;  // ❌ Map is mutable
+
+  Config(this.items, this.settings);  // Items can be modified externally!
+}
+
+// ✅ SOLUTION: Use immutable collections or defensive copying
+@immutable
+class Config {
+  final List<String> items;
+  final Map<String, String> settings;
+
+  Config(List<String> items, Map<String, String> settings)
+      : items = List.unmodifiable(items),        // ✅ Immutable copy
+        settings = Map.unmodifiable(settings);   // ✅ Immutable copy
+}
+
+// ✅ BONUS: Use const literals in @immutable classes
+@immutable
+class ValidationResult {
+  final bool isValid;
+  final String message;
+  final Map<String, dynamic> details;
+
+  ValidationResult.success(String message, {Map<String, dynamic>? details})
+      : this._(true, message, details ?? const {});  // ✅ const literal
+
+  const ValidationResult._(this.isValid, this.message, this.details);
+}
+```
+
+**Remember:** `@immutable` is a contract. Breaking it with mutable state will lead to bugs and violates the type system's guarantees.
+
+## 🚨 Const Literals - Prevent Immutability Contract Violations
+
+### prefer_const_literals_to_create_immutables - Use const Literals in @immutable Classes
+
+**THE RULE:** When passing literal collections (lists, maps, sets) to constructors of `@immutable` classes, use `const` literals instead of regular literals to maintain immutability guarantees.
+
+```dart
+// ❌ LINT ERROR: prefer_const_literals_to_create_immutables
+@immutable
+class ValidationResult {
+  final Map<String, dynamic> details;
+  final List<String> errors;
+
+  ValidationResult.failure(String message)
+      : this._(false, message, {}, []);  // ❌ Regular literals
+}
+
+// ✅ CORRECT: Use const literals
+@immutable
+class ValidationResult {
+  final Map<String, dynamic> details;
+  final List<String> errors;
+
+  ValidationResult.failure(String message)
+      : this._(false, message, const {}, const []);  // ✅ const literals
+}
+```
+
+**Why This Rule Exists:**
+
+- Ensures proper immutability contracts in `@immutable` classes
+- Prevents accidental mutation of literal collections
+- Required by Dart's type system for proper immutability
+- Enables compiler optimizations for truly immutable objects
+
+**When to Use const Literals:**
+
+- ✅ **All literal collections** in `@immutable` classes
+- ✅ **Empty collections** (`{}`, `[]`, `{}`) in `@immutable` constructors
+- ✅ **Static collections** that never change
+- ✅ **Default values** in `@immutable` class constructors
+
+**When NOT to Use const (but still need care):**
+
+- ❌ **Dynamic collections** that need to be modified before assignment
+- ❌ **Collections from parameters** (use defensive copying instead)
+
+**Real-World Example from Validator Interface:**
+
+```dart
+// ❌ BEFORE: Regular literals in @immutable context
+abstract class TextValidator implements IValidator<String> {
+  @override
+  ValidationResult validate(String input) {
+    if (input.isEmpty) {
+      return ValidationResult.failure(
+        'Input cannot be empty',
+        errors: [  // ❌ Should be const
+          ValidationError(...),
+        ],
+      );
+    }
+  }
+}
+
+// ✅ AFTER: Const literals for immutability
+abstract class TextValidator implements IValidator<String> {
+  @override
+  ValidationResult validate(String input) {
+    if (input.isEmpty) {
+      return ValidationResult.failure(
+        'Input cannot be empty',
+        errors: const [  // ✅ const literal
+          ValidationError(...),
+        ],
+      );
+    }
+  }
+}
+```
+
+**Quick Fix Strategy:**
+
+1. **Add const keyword** - Prefix literal collections with `const`
+2. **Check all literals** - Review all `{}` and `[]` in `@immutable` classes
+3. **Verify immutability** - Ensure the const literal matches the intent
+4. **Use defensive copying** - For dynamic collections, use `List.unmodifiable()`
+
+**Common Patterns:**
+
+```dart
+// ✅ Pattern 1: Empty collections
+@immutable
+class Result {
+  final List<String> items;
+  final Map<String, int> counts;
+
+  Result.empty()
+      : items = const [],        // ✅ const empty list
+        counts = const {};       // ✅ const empty map
+}
+
+// ✅ Pattern 2: Static collections
+@immutable
+class Config {
+  final List<String> supportedTypes;
+  final Map<String, String> defaults;
+
+  Config()
+      : supportedTypes = const ['json', 'xml'],  // ✅ const static list
+        defaults = const {'format': 'json'};     // ✅ const static map
+}
+
+// ✅ Pattern 3: Defensive copying for dynamic data
+@immutable
+class UserData {
+  final List<String> permissions;
+  final Map<String, dynamic> metadata;
+
+  UserData(List<String> perms, Map<String, dynamic> meta)
+      : permissions = List.unmodifiable(perms),  // ✅ Immutable copy
+        metadata = Map.unmodifiable(meta);       // ✅ Immutable copy
+}
+```
+
+**Benefits of const Literals:**
+
+- ✅ **Type Safety** - Compiler guarantees true immutability
+- ✅ **Performance** - Compiler can optimize const literals
+- ✅ **Memory Efficiency** - Const literals are shared across instances
+- ✅ **Thread Safety** - Const objects are inherently thread-safe
+- ✅ **Predictability** - No unexpected mutations possible
+
+**About one_member_abstracts Warning:**
+
+```dart
+// This warning can be safely ignored for interfaces used in DI
+// ignore: one_member_abstracts
+abstract class IValidator<T> {
+  ValidationResult validate(T input);
+}
+
+// Reason: Interfaces with single methods are common in dependency injection
+// and provide better testability and maintainability than function types
+```
+
+**Remember:** `const` literals are the foundation of true immutability in Dart. Always use them when creating literal collections in `@immutable` classes to maintain the immutability contract.

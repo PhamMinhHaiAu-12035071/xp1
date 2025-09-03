@@ -9,33 +9,45 @@ environment:
   sdk: ">=3.8.0 <4.0.0" # Dart SDK range
   flutter: ">=3.24.0" # Minimum Flutter version
 
-# ignore_for_file: sort_pub_dependencies
 dependencies:
+  # === CORE FRAMEWORK ===
   flutter:
     sdk: flutter
   flutter_localizations:
-    sdk: flutter # Flutter localization support
+    sdk: flutter
 
   # === STATE MANAGEMENT ===
   bloc: ^9.0.0 # Business Logic Component pattern
   flutter_bloc: ^9.1.1 # Flutter integration for BLoC
+  hydrated_bloc: ^10.1.1 # Persistent BLoC state management
+  replay_bloc: ^0.3.0 # Undo/Redo functionality for BLoC
+
+  # === FUNCTIONAL PROGRAMMING ===
+  equatable: ^2.0.5 # Value equality for immutable objects
+  fpdart: ^1.1.0 # Functional programming for Dart
 
   # === DEPENDENCY INJECTION ===
   get_it: ^8.0.2 # Service locator for dependency injection
   injectable: ^2.5.1 # Code generation for dependency injection
 
-  # === ENVIRONMENT MANAGEMENT ===
-  envied: ^1.2.0 # Secure environment variable management
-
   # === NAVIGATION ===
   auto_route: ^10.1.2 # Declarative routing solution
+
+  # === ANNOTATIONS & CODEGEN ===
+  freezed_annotation: ^3.1.0 # Annotations for Freezed code generation
+  json_annotation: ^4.8.1 # Annotations for JSON serialization
+  meta: ^1.16.0 # Metadata annotations for Dart
+
+  # === ENVIRONMENT MANAGEMENT ===
+  envied: ^1.2.0 # Secure environment variable management
 
   # === UTILITIES ===
   intl: ^0.20.2 # Internationalization utilities
   logger: ^2.6.1 # Beautiful and extensible logging
 
 dev_dependencies:
-  flutter_test: # Flutter testing framework
+  # === CORE TESTING ===
+  flutter_test:
     sdk: flutter
   test: ^1.26.2 # Dart testing framework
 
@@ -43,16 +55,18 @@ dev_dependencies:
   auto_route_generator: ^10.2.4 # Code generator for auto_route package
   build_runner: ^2.7.1 # Build system for code generation
   envied_generator: ^1.2.0 # Code generator for envied package
+  freezed: ^3.2.0 # Code generator for immutable data classes
   injectable_generator: ^2.6.1 # Code generator for injectable package
+  json_serializable: ^6.7.1 # Code generator for JSON serialization
 
   # === TESTING FRAMEWORKS ===
+  bdd_steps: # BDD test steps package
+    path: packages/bdd_steps
   bdd_widget_test: ^2.0.1 # BDD framework for widget tests
   bloc_test: ^10.0.0 # Testing utilities for BLoC
   mocktail: ^1.0.4 # Modern mocking framework
 
   # === DEVELOPMENT TOOLS ===
-  bdd_steps: # BDD test steps package
-    path: packages/bdd_steps
   conventional_commit: ^0.6.1+1 # Git commit message linting
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
   very_good_analysis: ^9.0.0 # Very Good Ventures linting rules

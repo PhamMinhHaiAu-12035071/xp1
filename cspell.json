@@ -39,7 +39,10 @@
     "unvalidated",
     "nbsp",
     "fvmrc",
-    "verygoodcore"
+    "verygoodcore",
+
+    "fpdart",
+    "userspace"
   ],
   "ignorePaths": [
     "build/**",

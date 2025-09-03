@@ -33,6 +33,11 @@ make generate-env-dev        # Generate development config
 make generate-env-staging    # Generate staging config
 make generate-env-prod       # Generate production config
 
+# Code Generation commands (Freezed, JSON, Routes)
+dart run build_runner build --delete-conflicting-outputs  # Generate all code
+dart run build_runner watch --delete-conflicting-outputs   # Auto-generate on changes
+dart run build_runner clean                                # Clean generated files
+
 # Navigation & Auto Route commands
 dart run build_runner build        # Generate route files after route changes
 dart run build_runner watch        # Auto-generate on route file changes
@@ -113,7 +118,16 @@ This project also implements environment management using sealed classes and fac
 #### State Management
 
 - **BLoC Pattern**: Using flutter_bloc for state management
+- **Hydrated BLoC**: Persistent state management with automatic serialization
+- **Replay BLoC**: Undo/Redo functionality for state management
 - **Observer Pattern**: Global BLoC observation for debugging (`lib/bootstrap.dart:9-24`)
+
+#### Data Modeling
+
+- **Freezed**: Immutable data classes with code generation
+- **JSON Serialization**: Automatic JSON serialization with json_serializable
+- **Functional Programming**: Error handling with Either types (fpdart)
+- **Value Equality**: Object comparison with equatable
 
 ### Testing Strategy
 
@@ -158,6 +172,54 @@ class AuthGuard extends AutoRouteGuard {
       router.pushAndClearStack(const LoginRoute());
     }
   }
+}
+```
+
+**Data Modeling (Freezed + JSON):**
+
+```dart
+// Freezed model with JSON support
+@freezed
+class UserModel with _$UserModel {
+  const factory UserModel({
+    required String id,
+    required String name,
+    String? email,
+    @Default(false) bool isActive,
+  }) = _UserModel;
+
+  factory UserModel.fromJson(Map<String, Object?> json) =>
+      _$UserModelFromJson(json);
+}
+
+// Freezed union types for state
+@freezed
+class UserState with _$UserState {
+  const factory UserState.initial() = UserInitial;
+  const factory UserState.loading() = UserLoading;
+  const factory UserState.success(UserModel user) = UserSuccess;
+  const factory UserState.failure(String message) = UserFailure;
+}
+```
+
+**Functional Programming (Either Types):**
+
+```dart
+// Repository with Either for error handling
+abstract class UserRepository {
+  Future<Either<UserFailure, UserModel>> getUser(String id);
+}
+
+// BLoC integration with Either
+Future<void> fetchUser(String id) async {
+  emit(const UserState.loading());
+
+  final result = await _userRepository.getUser(id);
+
+  result.fold(
+    (failure) => emit(UserState.failure(failure.message)),
+    (user) => emit(UserState.success(user)),
+  );
 }
 ```
 
@@ -343,12 +405,12 @@ make pre-commit               # Complete pipeline
 
 ### 🚨 Command Reference for Claude Code
 
-| **When**            | **Commands**                                  | **Purpose**           | **Time** |
-| ------------------- | --------------------------------------------- | --------------------- | -------- |
-| **Start Session**   | `make check && make test`                     | Verify baseline       | 30s      |
-| **After Each Edit** | `make format && make analyze`                 | Continuous validation | 5s       |
-| **Before Response** | `make pre-commit`                             | Final validation      | 45s      |
-| **Emergency**       | `make format` + `flutter test`                | Minimum viable        | 10s      |
+| **When**            | **Commands**                   | **Purpose**           | **Time** |
+| ------------------- | ------------------------------ | --------------------- | -------- |
+| **Start Session**   | `make check && make test`      | Verify baseline       | 30s      |
+| **After Each Edit** | `make format && make analyze`  | Continuous validation | 5s       |
+| **Before Response** | `make pre-commit`              | Final validation      | 45s      |
+| **Emergency**       | `make format` + `flutter test` | Minimum viable        | 10s      |
 
 ### 🎨 Tool Usage Priority for Claude
 

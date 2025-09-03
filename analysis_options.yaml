@@ -46,3 +46,7 @@ linter:
     # Use relative imports for files within the same package (project style guide)
     # This overrides the very_good_analysis default of true
     always_use_package_imports: false
+
+    # Allow category-based dependency organization instead of strict alphabetical
+    # This allows better logical grouping of dependencies
+    sort_pub_dependencies: false

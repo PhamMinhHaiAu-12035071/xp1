@@ -40,6 +40,28 @@ _\*Xp1 works on iOS, Android, Web, and Windows._
 
 ---
 
+## Tech Stack 🛠️
+
+### State Management & Architecture
+
+- **BLoC Pattern**: Advanced state management with business logic separation
+- **Hydrated BLoC**: Persistent state management with automatic restoration
+- **Replay BLoC**: Undo/Redo functionality for enhanced user experience
+
+### Data Modeling & Serialization
+
+- **Freezed**: Type-safe immutable data classes with code generation
+- **JSON Serialization**: Automatic JSON handling with json_serializable
+- **Functional Programming**: Error handling with Either types (fpdart)
+
+### Development Tools
+
+- **Code Generation**: Automatic model and serialization generation
+- **Very Good Analysis**: 130+ strict linting rules for code quality
+- **Multi-Environment**: Development, staging, and production configurations
+
+---
+
 ## Quality Assurance 🛡️
 
 This project enforces strict quality standards to prevent production failures:
