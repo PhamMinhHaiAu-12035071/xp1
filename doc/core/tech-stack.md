@@ -63,10 +63,9 @@
 
 ### Functional Programming
 
-- **dartz**: ^0.10.1
-  - Functional programming utilities
-  - Either types for error handling
-  - Option types for null safety
+- Functional programming utilities
+- Either types for error handling
+- Option types for null safety
 - **fpdart**: ^1.1.0
   - Pure functional programming for Dart
   - Monads and functional composition
@@ -232,7 +231,7 @@ dart run build_runner build --delete-conflicting-outputs
 - `replay_bloc`: Undo/Redo functionality for BLoC
 - `freezed_annotation`: Annotations for immutable data classes
 - `json_annotation`: JSON serialization annotations
-- `dartz`: Functional programming utilities
+
 - `fpdart`: Pure functional programming for Dart
 - `equatable`: Value equality for immutable objects
 - `flutter_localizations`: Localization support

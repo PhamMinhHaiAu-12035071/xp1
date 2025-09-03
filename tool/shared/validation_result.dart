@@ -1,3 +1,4 @@
+import 'package:equatable/equatable.dart';
 import 'package:meta/meta.dart';
 
 import 'validation_types.dart';
@@ -6,7 +7,7 @@ import 'validation_types.dart';
 /// Encapsulates validation outcome with rich information for
 /// both success and failure scenarios.
 @immutable
-class ValidationResult {
+class ValidationResult extends Equatable {
   /// Private constructor to enforce factory pattern.
   const ValidationResult._({
     required this.isValid,
@@ -97,6 +98,9 @@ class ValidationResult {
   int get footerCount => details['footerCount'] as int? ?? 0;
 
   @override
+  List<Object?> get props => [isValid, message, details, errors];
+
+  @override
   String toString() {
     return 'ValidationResult('
         'isValid: $isValid, '
@@ -104,22 +108,11 @@ class ValidationResult {
         'errors: ${errors.length}'
         ')';
   }
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ValidationResult &&
-        other.isValid == isValid &&
-        other.message == message;
-  }
-
-  @override
-  int get hashCode => Object.hash(isValid, message);
 }
 
 /// Represents a specific validation error with type and context.
 @immutable
-class ValidationError {
+class ValidationError extends Equatable {
   const ValidationError(
     this.type,
     this.message, {
@@ -136,16 +129,8 @@ class ValidationError {
   final Map<String, dynamic> context;
 
   @override
+  List<Object?> get props => [type, message, context];
+
+  @override
   String toString() => 'ValidationError(${type.name}: $message)';
-
-  @override
-  bool operator ==(Object other) {
-    if (identical(this, other)) return true;
-    return other is ValidationError &&
-        other.type == type &&
-        other.message == message;
-  }
-
-  @override
-  int get hashCode => Object.hash(type, message);
 }

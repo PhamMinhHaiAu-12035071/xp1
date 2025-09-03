@@ -586,7 +586,7 @@ class ValidationResult {
   final Map<String, dynamic> details;
 
   @override
-  bool operator ==(Object other) => other is ValidationResult && other.isValid == isValid;
+  bool operator ==(Object other) => other is ValidationResult && other.isValid == isValid && other.message == message;
 
   @override
   int get hashCode => Object.hash(isValid, message);
@@ -602,7 +602,7 @@ class ValidationResult {
   final Map<String, dynamic> details;
 
   @override
-  bool operator ==(Object other) => other is ValidationResult && other.isValid == isValid;
+  bool operator ==(Object other) => other is ValidationResult && other.isValid == isValid && other.message == message;
 
   @override
   int get hashCode => Object.hash(isValid, message);

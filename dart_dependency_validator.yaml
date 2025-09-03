@@ -14,7 +14,7 @@ ignore:
   - build_runner
   - flutter_bloc # False positive - transitive dependency from bloc_test
   # State management packages (added for feat/#15_state-management)
-  - dartz # Functional programming utilities - planned for use
+
   - equatable # Value equality - planned for use with immutable objects
   - fpdart # Functional programming - planned for use
   - freezed_annotation # Code generation annotations - used by freezed

@@ -126,7 +126,7 @@ This project also implements environment management using sealed classes and fac
 
 - **Freezed**: Immutable data classes with code generation
 - **JSON Serialization**: Automatic JSON serialization with json_serializable
-- **Functional Programming**: Error handling with Either types (dartz/fpdart)
+- **Functional Programming**: Error handling with Either types (fpdart)
 - **Value Equality**: Object comparison with equatable
 
 ### Testing Strategy

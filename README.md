@@ -52,7 +52,7 @@ _\*Xp1 works on iOS, Android, Web, and Windows._
 
 - **Freezed**: Type-safe immutable data classes with code generation
 - **JSON Serialization**: Automatic JSON handling with json_serializable
-- **Functional Programming**: Error handling with Either types (dartz/fpdart)
+- **Functional Programming**: Error handling with Either types (fpdart)
 
 ### Development Tools
 

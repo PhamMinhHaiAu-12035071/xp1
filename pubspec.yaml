@@ -23,7 +23,6 @@ dependencies:
   replay_bloc: ^0.3.0 # Undo/Redo functionality for BLoC
 
   # === FUNCTIONAL PROGRAMMING ===
-  dartz: ^0.10.1 # Functional programming utilities
   equatable: ^2.0.5 # Value equality for immutable objects
   fpdart: ^1.1.0 # Functional programming for Dart
 

@@ -374,8 +374,8 @@ class UserModel with _$UserModel {
 ### Either Types for Error Handling
 
 ```dart
-// ✅ Good: Using dartz Either for error handling
-import 'package:dartz/dartz.dart';
+// ✅ Good: Using fpdart Either for error handling
+import 'package:fpdart/fpdart.dart';
 
 abstract class UserRepository {
   Future<Either<UserFailure, UserModel>> getUser(String id);
@@ -428,7 +428,7 @@ class UserCubit extends Cubit<UserState> {
 
 ```dart
 // ✅ Good: Using Option for better null handling
-import 'package:dartz/dartz.dart';
+import 'package:fpdart/fpdart.dart';
 
 class UserService {
   Option<UserModel> findUserByEmail(String email) {
