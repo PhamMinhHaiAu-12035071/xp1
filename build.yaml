@@ -1,6 +1,31 @@
 targets:
   $default:
     builders:
+      bdd_widget_test|featureBuilder:
+        options:
+          # Flutter Widget testing configuration
+          testMethodName: testWidgets
+          testerName: tester
+          testerType: WidgetTester
+          # Step folder configuration - relative to test folder
+          stepFolderName: step
+          # Use external steps from bdd_steps package - import individual files
+          externalSteps:
+            - package:bdd_steps/steps/the_app_is_running.dart
+            - package:bdd_steps/steps/i_am_logged_in.dart
+            - package:bdd_steps/steps/i_see_text.dart
+            - package:bdd_steps/steps/i_see_button.dart
+            - package:bdd_steps/steps/i_see_icon.dart
+            - package:bdd_steps/steps/i_tap_button.dart
+            - package:bdd_steps/steps/i_tap_icon.dart
+            - package:bdd_steps/steps/i_see_localized_content.dart
+          # Or alternatively, include all steps from bdd_options.yaml:
+          # include: package:bdd_steps/bdd_options.yaml
+          # Custom headers for generated test files
+          customHeaders:
+            - "import 'package:flutter/material.dart';"
+            - "import 'package:flutter_test/flutter_test.dart';"
+            - "import 'package:xp1/app/app.dart';"
       envied_generator|envied:
         options:
           # Override environment file path from CLI using --define
@@ -23,8 +48,9 @@ targets:
       include:
         - $package$
         - lib/**
+        - test/bdd/** # Include BDD test folder for generation
         - pubspec.yaml
       exclude:
-        - test/**
+        - test/test/** # Exclude the old nested test folder
         - .dart_tool/**
         - build/**

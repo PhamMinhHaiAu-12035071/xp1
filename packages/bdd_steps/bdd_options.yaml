@@ -1,0 +1,11 @@
+# BDD steps configuration
+# This file is used to configure which steps are available for external import
+externalSteps:
+  - package:bdd_steps/steps/the_app_is_running.dart
+  - package:bdd_steps/steps/i_am_logged_in.dart
+  - package:bdd_steps/steps/i_see_text.dart
+  - package:bdd_steps/steps/i_see_button.dart
+  - package:bdd_steps/steps/i_see_icon.dart
+  - package:bdd_steps/steps/i_tap_button.dart
+  - package:bdd_steps/steps/i_tap_icon.dart
+  - package:bdd_steps/steps/i_see_localized_content.dart

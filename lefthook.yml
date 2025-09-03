@@ -8,7 +8,7 @@ pre-commit:
     # Format and fix code first (staged files only)
     rps-pre-commit:
       glob: "*.dart"
-      run: fvm dart run rps pre-commit
+      run: make pre-commit
       stage_fixed: true
     # Quick spell check on staged files
     spell-check-quick:
@@ -19,18 +19,18 @@ pre-commit:
     # Quick format check (fast)
     format-check:
       glob: "*.dart"
-      run: fvm dart run rps format-check
+      run: make format-check
     # Quick analysis (staged files only)
     analyze-quick:
       glob: "*.dart"
-      run: fvm dart run rps analyze-quick
+      run: make analyze-quick
     # Quick license check cho staged changes
     license-quick:
       glob: "pubspec.yaml"
       run: |
         if git diff --cached --name-only | grep -q "pubspec.yaml"; then
           echo "📦 pubspec.yaml changed, checking licenses..."
-          fvm dart run rps license-check
+          make license-check
         fi
     # Dependency validation when pubspec.yaml changes
     deps-check-on-pubspec-change:
@@ -38,7 +38,7 @@ pre-commit:
       run: |
         if git diff --cached --name-only | grep -q "pubspec.yaml"; then
           echo "📦 pubspec.yaml changed, validating dependencies..."
-          fvm dart run rps validate-deps
+          make validate-deps
         fi
     # Analyze staged files for linting and naming convention issues
     staged-analysis:
@@ -47,7 +47,7 @@ pre-commit:
         FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.dart$')
         if [ -n "$FILES_TO_ANALYZE" ]; then
           echo "📝 Analyzing staged Dart files for linting and naming issues..."
-          fvm dart run rps analyze-quick $FILES_TO_ANALYZE
+          make analyze-quick $FILES_TO_ANALYZE
         fi
 
 pre-push:
@@ -58,13 +58,13 @@ pre-push:
       run: npm test
     # Full license compliance check trước khi push
     license-compliance:
-      run: fvm dart run rps license-check
+      run: make license-check
     # Run complete CI pipeline via Makefile
     full-ci-pipeline:
       run: make local-ci
     # Full dependency validation before push
     validate-dependencies:
-      run: fvm dart run rps validate-deps
+      run: make validate-deps
     # Complete naming conventions validation
     naming-validation:
       run: make naming-check

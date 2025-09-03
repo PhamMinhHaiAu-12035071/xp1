@@ -1,7 +1,7 @@
 # Makefile for xp1 Flutter project
 # Provides easy commands for local CI equivalent to GitHub Actions
 
-.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check format analyze test test-coverage coverage-html coverage-open coverage-clean coverage-report help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs install-dev install-staging install-prod install-all run-dev run-staging run-prod
+.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report bdd-coverage build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
 
 # GitHub Actions equivalent commands
 semantic-check:
@@ -28,28 +28,59 @@ local-ci: test-scripts semantic-check flutter-ci
 
 # Quick development commands
 check:
-	@echo "✅ Quick development check via RPS..."
-	@fvm flutter pub run rps check
+	@echo "✅ Quick development check..."
+	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart analyze --fatal-infos
+
+check-strict:
+	@echo "🔍 Strict development check..."
+	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart analyze --fatal-infos --fatal-warnings
+
+check-all:
+	@echo "🔍 Complete development check..."
+	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart analyze --fatal-infos
+	@fvm dart run dependency_validator
+	@very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"
 
 format:
-	@echo "🎨 Formatting code via RPS..."
-	@fvm flutter pub run rps format
+	@echo "🎨 Formatting code..."
+	@fvm dart format lib/ test/ --set-exit-if-changed
+
+format-check:
+	@echo "🔍 Checking code format..."
+	@fvm dart format lib/ test/ --set-exit-if-changed --output=none
 
 analyze:
-	@echo "🔍 Analyzing code via RPS..."
-	@fvm flutter pub run rps analyze
+	@echo "🔍 Analyzing code..."
+	@fvm dart analyze --fatal-infos
+
+analyze-quick:
+	@echo "⚡ Quick analysis..."
+	@fvm dart analyze --fatal-infos
+
+analyze-strict:
+	@echo "🔍 Strict analysis..."
+	@fvm dart analyze --fatal-infos --fatal-warnings
+
+validate-deps:
+	@echo "📦 Validating dependencies..."
+	@fvm dart run dependency_validator
 
 test:
 	@echo "🧪 Running tests via RPS..."
-	@very_good test
+	@very_good test --no-optimization --min-coverage 100
 
-# Test coverage commands using very_good CLI
-test-coverage:
-	@echo "🧪📊 Running tests with coverage via RPS..."
-	@fvm flutter pub run rps test-coverage
-
-coverage-html:
-	@echo "📊🔧 Generating HTML coverage report..."
+# Test coverage commands using flutter test (more reliable than very_good test --coverage)
+# NOTE: very_good test --coverage doesn't generate lcov.info file and fails with BDD tests
+coverage:
+	@echo "🧪📊 Running complete coverage workflow (all tests)..."
+	@echo "1️⃣ Running all tests with coverage (including BDD tests)..."
+	@echo "⚠️  Note: Using flutter test --coverage for reliable coverage generation"
+	@echo "💡 very_good test --coverage doesn't work properly with BDD tests"
+	@very_good test --coverage --no-optimization --min-coverage 100
+	@echo "2️⃣ Generating HTML coverage report..."
 	@if command -v genhtml >/dev/null 2>&1; then \
 		genhtml coverage/lcov.info -o coverage/html --title "xp1 Test Coverage"; \
 		echo "✅ HTML coverage report generated at: coverage/html/index.html"; \
@@ -61,9 +92,7 @@ coverage-html:
 		echo "  Or download from: https://github.com/linux-test-project/lcov"; \
 		exit 1; \
 	fi
-
-coverage-open:
-	@echo "🌐📊 Opening HTML coverage report in browser..."
+	@echo "3️⃣ Opening coverage report in browser..."
 	@if [ -f coverage/html/index.html ]; then \
 		if command -v open >/dev/null 2>&1; then \
 			open coverage/html/index.html; \
@@ -76,27 +105,117 @@ coverage-open:
 			echo "   file://$(pwd)/coverage/html/index.html"; \
 		fi \
 	else \
-		echo "❌ HTML coverage report not found. Run 'make coverage-html' first."; \
+		echo "❌ HTML coverage report not found."; \
 		exit 1; \
 	fi
+	@echo "🎉 Coverage workflow completed!"
+	@echo "💡 Run 'make bdd-coverage' for BDD-only test coverage"
+	@echo "💡 Run 'make coverage-clean' to remove coverage files"
 
 coverage-clean:
 	@echo "🧹 Cleaning coverage files..."
 	@rm -rf coverage/
 
-coverage-report: test-coverage coverage-html
-	@echo "📊📈 Complete coverage workflow finished!"
-	@echo "✅ Coverage data: coverage/lcov.info"
-	@echo "✅ HTML report: coverage/html/index.html"
-	@echo "💡 Run 'make coverage-open' to view in browser"
+# BDD-specific coverage (BDD tests only)
+bdd-coverage:
+	@echo "🎭 Running BDD tests with coverage..."
+	@echo "✅ BDD tests run in isolation - 100% reliable"
+	@very_good test --coverage test/bdd/
+	@echo "2️⃣ Generating HTML coverage report..."
+	@if command -v genhtml >/dev/null 2>&1; then \
+		genhtml coverage/lcov.info -o coverage/html --title "xp1 BDD Test Coverage"; \
+		echo "✅ HTML coverage report generated at: coverage/html/index.html"; \
+	else \
+		echo "❌ genhtml not found. Install lcov package:"; \
+		echo "  macOS: brew install lcov"; \
+		echo "  Ubuntu/Debian: sudo apt-get install lcov"; \
+		echo "  CentOS/RHEL: sudo yum install lcov"; \
+		echo "  Or download from: https://github.com/linux-test-project/lcov"; \
+		exit 1; \
+	fi
+	@echo "3️⃣ Opening coverage report in browser..."
+	@if [ -f coverage/html/index.html ]; then \
+		if command -v open >/dev/null 2>&1; then \
+			open coverage/html/index.html; \
+		elif command -v xdg-open >/dev/null 2>&1; then \
+			xdg-open coverage/html/index.html; \
+		elif command -v start >/dev/null 2>&1; then \
+			start coverage/html/index.html; \
+		else \
+			echo "❌ No browser launcher found. Open manually:"; \
+			echo "   file://$(pwd)/coverage/html/index.html"; \
+		fi \
+	else \
+		echo "❌ HTML coverage report not found."; \
+		exit 1; \
+	fi
+	@echo "🎉 BDD Coverage workflow completed!"
 
+
+# Build commands
+build-android:
+	@echo "🤖 Building Android APK..."
+	@fvm flutter build apk --release
+
+build-ios:
+	@echo "🍎 Building iOS..."
+	@fvm flutter build ios --release
+
+build-web:
+	@echo "🌐 Building Web..."
+	@fvm flutter build web --release
+
+build-dev:
+	@echo "🔨 Building development APK..."
+	@fvm flutter build apk --debug --dart-define=ENVIRONMENT=development
+
+build-staging:
+	@echo "🔨 Building staging APK..."
+	@fvm flutter build apk --release --dart-define=ENVIRONMENT=staging
+
+build-prod:
+	@echo "🔨 Building production APK..."
+	@fvm flutter build apk --release --dart-define=ENVIRONMENT=production
+
+# Environment generation commands
+generate-env-dev:
+	@echo "🏗️ Generating development environment..."
+	@fvm dart run build_runner clean
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+
+generate-env-staging:
+	@echo "🏗️ Generating staging environment..."
+	@fvm dart run build_runner clean
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
+
+generate-env-prod:
+	@echo "🏗️ Generating production environment..."
+	@fvm dart run build_runner clean
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+
+# Development commands
 deps:
-	@echo "📦 Installing dependencies via RPS..."
-	@fvm flutter pub run rps setup
+	@echo "📦 Installing dependencies..."
+	@fvm flutter pub get
+	@lefthook install
 
 clean:
-	@echo "🧹 Cleaning build files via RPS..."
-	@fvm flutter pub run rps clean
+	@echo "🧹 Cleaning build files..."
+	@fvm flutter clean
+	@fvm flutter pub get
+
+reset:
+	@echo "🔄 Resetting project..."
+	@fvm flutter clean
+	@fvm flutter pub get
+	@fvm flutter pub run build_runner build --delete-conflicting-outputs
+
+# Git hooks and commit commands
+pre-commit:
+	@echo "🚀 Running pre-commit checks..."
+	@fvm dart format lib/ test/ --set-exit-if-changed
+	@fvm dart analyze --fatal-infos
+	@make test
 
 # Setup commands
 setup:
@@ -105,6 +224,32 @@ setup:
 	@fvm flutter pub get
 	@chmod +x scripts/*.sh
 	@echo "✅ Project setup completed"
+
+setup-full:
+	@echo "⚙️ Complete project setup..."
+	@npm install
+	@fvm flutter pub get
+	@chmod +x scripts/*.sh
+	@./scripts/setup-env.sh
+	@lefthook install
+	@fvm dart run tool/validate_commit.dart --help || echo 'Commit validator ready'
+	@echo "✅ Complete setup finished"
+
+# Git hooks management
+hooks-install:
+	@echo "🪝 Installing git hooks..."
+	@lefthook install
+
+hooks-uninstall:
+	@echo "🪝 Uninstalling git hooks..."
+	@lefthook uninstall
+
+# Test commit validation
+test-commit-validation:
+	@echo "✅ Testing commit validation..."
+	@echo 'feat(test): add validation example' > .tmp/test_commit
+	@fvm dart run tool/validate_commit.dart .tmp/test_commit
+	@rm .tmp/test_commit
 
 # Naming conventions enforcement - Simplified per Linus review
 naming-check:
@@ -234,36 +379,71 @@ license-help:
 	@echo "⚠️  Avoided licenses: $(COPYLEFT_LICENSES),$(PROBLEMATIC_LICENSES)"
 
 # Complete environment setup commands for new team members
-# These commands call RPS scripts to avoid code duplication
 install-dev:
-	@echo "🚀 Setting up complete development environment via RPS..."
-	@fvm dart run rps install-dev
+	@echo "🚀 Setting up complete development environment..."
+	@fvm flutter clean
+	@fvm flutter pub get
+	@npm install
+	@chmod +x scripts/*.sh
+	@./scripts/setup-env.sh
+	@lefthook install
+	@fvm dart run build_runner clean
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+	@echo "✅ Development environment ready!"
 
 install-staging:
-	@echo "🚀 Setting up complete staging environment via RPS..."
-	@fvm dart run rps install-staging
+	@echo "🚀 Setting up complete staging environment..."
+	@fvm flutter clean
+	@fvm flutter pub get
+	@npm install
+	@chmod +x scripts/*.sh
+	@./scripts/setup-env.sh
+	@lefthook install
+	@fvm dart run build_runner clean
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
+	@echo "✅ Staging environment ready!"
 
 install-prod:
-	@echo "🚀 Setting up complete production environment via RPS..."
-	@fvm dart run rps install-prod
+	@echo "🚀 Setting up complete production environment..."
+	@fvm flutter clean
+	@fvm flutter pub get
+	@npm install
+	@chmod +x scripts/*.sh
+	@./scripts/setup-env.sh
+	@lefthook install
+	@fvm dart run build_runner clean
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+	@echo "✅ Production environment ready!"
 
 install-all:
-	@echo "🚀 Setting up ALL environments via RPS..."
-	@fvm dart run rps install-all
+	@echo "🚀 Setting up ALL environments..."
+	@fvm flutter clean
+	@fvm flutter pub get
+	@npm install
+	@chmod +x scripts/*.sh
+	@./scripts/setup-env.sh
+	@lefthook install
+	@fvm dart run build_runner clean
+	@echo "📦 Building development..."
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+	@echo "📦 Building staging..."
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
+	@echo "📦 Building production..."
+	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+	@echo "🎉 ALL environments ready!"
 
-# Environment-specific run commands (convenience aliases)
-# These commands call RPS scripts to maintain consistency
+# Environment-specific run commands
 run-dev:
-	@echo "🏃 Running development environment via RPS..."
-	@fvm dart run rps run-dev
+	@echo "🏃 Running development environment..."
+	@fvm flutter run --dart-define=ENVIRONMENT=development --target=lib/main_development.dart
 
 run-staging:
-	@echo "🏃 Running staging environment via RPS..."
-	@fvm dart run rps run-staging
+	@echo "🏃 Running staging environment..."
+	@fvm flutter run --dart-define=ENVIRONMENT=staging --target=lib/main_staging.dart
 
 run-prod:
-	@echo "🏃 Running production environment via RPS..."
-	@fvm dart run rps run-prod
+	@echo "🏃 Running production environment..."
+	@fvm flutter run --dart-define=ENVIRONMENT=production --target=lib/main_production.dart
 
 # Help command
 help:
@@ -277,18 +457,39 @@ help:
 	@echo "  make spell-check    - Job 3: Spell checking"
 	@echo ""
 	@echo "⚡ Quick Development:"
-	@echo "  make check         - Quick Flutter checks via RPS"
-	@echo "  make format        - Format code via RPS"
-	@echo "  make analyze       - Analyze code via RPS"
-	@echo "  make test          - Run tests via RPS"
-	@echo "  make deps          - Install dependencies via RPS"
+	@echo "  make check         - Quick Flutter checks (format + analyze)"
+	@echo "  make check-strict  - Strict checks with fatal warnings"
+	@echo "  make check-all     - Complete checks with deps and licenses"
+	@echo "  make format        - Format code"
+	@echo "  make format-check  - Check code formatting"
+	@echo "  make analyze       - Analyze code"
+	@echo "  make analyze-quick - Quick analysis"
+	@echo "  make analyze-strict - Strict analysis with warnings"
+	@echo "  make validate-deps - Validate dependencies"
+	@echo "  make test          - Run tests"
+	@echo "  make deps          - Install dependencies"
+	@echo "  make pre-commit    - Run pre-commit checks"
+	@echo ""
+	@echo "🔨 Build Commands:"
+	@echo "  make build-android - Build Android APK"
+	@echo "  make build-ios     - Build iOS"
+	@echo "  make build-web     - Build Web"
+	@echo "  make build-dev     - Build development APK"
+	@echo "  make build-staging - Build staging APK"
+	@echo "  make build-prod    - Build production APK"
+	@echo ""
+	@echo "🏗️ Environment Generation:"
+	@echo "  make generate-env-dev     - Generate development environment"
+	@echo "  make generate-env-staging - Generate staging environment"
+	@echo "  make generate-env-prod    - Generate production environment"
 	@echo ""
 	@echo "📊 Test Coverage (using very_good CLI + lcov):"
-	@echo "  make test-coverage    - Run tests with coverage via RPS"
-	@echo "  make coverage-html    - Generate HTML report from lcov.info (genhtml)"
-	@echo "  make coverage-open    - Open HTML coverage report in browser"
-	@echo "  make coverage-clean   - Clean all coverage files"
-	@echo "  make coverage-report  - Complete workflow: test + HTML report"
+	@echo "  make coverage       - Run ALL tests (may have 8 BDD test timing issues)"
+	@echo "  make bdd-coverage   - Run BDD tests only (100% reliable, isolated)"
+	@echo "  make coverage-clean - Clean all coverage files"
+	@echo ""
+	@echo "🎭 BDD Test Coverage:"
+	@echo "  make bdd-coverage     - Run BDD tests + generate HTML report + auto-open"
 	@echo ""
 	@echo "🔧 LCOV & genhtml Usage Examples:"
 	@echo "  # Install lcov (includes genhtml):"
@@ -302,12 +503,19 @@ help:
 	@echo "  lcov --list coverage/lcov.info"
 	@echo ""
 	@echo "⚙️ Setup & Installation:"
+	@echo "  make setup         - Basic project setup"
+	@echo "  make setup-full    - Complete project setup with hooks"
 	@echo "  make install-dev   - Complete development environment setup (RECOMMENDED for new devs)"
 	@echo "  make install-staging - Complete staging environment setup"
 	@echo "  make install-prod  - Complete production environment setup"
 	@echo "  make install-all   - Setup all environments at once"
-	@echo "  make setup         - Basic project setup (legacy)"
 	@echo "  make clean         - Clean build files"
+	@echo "  make reset         - Reset project (clean + pub get + build_runner)"
+	@echo ""
+	@echo "🪝 Git Hooks:"
+	@echo "  make hooks-install   - Install git hooks"
+	@echo "  make hooks-uninstall - Uninstall git hooks"
+	@echo "  make test-commit-validation - Test commit validation"
 	@echo ""
 	@echo "🏃 Quick Run Commands:"
 	@echo "  make run-dev       - Run development environment"

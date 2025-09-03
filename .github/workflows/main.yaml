@@ -144,13 +144,25 @@ jobs:
       - name: 🕵️ Analyze
         run: flutter analyze lib test
 
-      # Enable Very Good CLI
+      # Enable Very Good CLI (for other commands)
       - name: Activate Very Good CLI
         run: dart pub global activate very_good_cli
 
-      # Run tests by Very Good CLI
-      - name: Run tests
-        run: very_good test --coverage
+      # Install make (if not available) and setup scripts
+      - name: Setup build environment
+        run: |
+          # Install make if not available
+          if ! command -v make &> /dev/null; then
+            echo "Installing make..."
+            sudo apt-get update
+            sudo apt-get install -y make
+          fi
+          # Make scripts executable
+          chmod +x scripts/*.sh || true
+
+      # Run tests with coverage using Makefile
+      - name: Run tests with coverage
+        run: make coverage
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
