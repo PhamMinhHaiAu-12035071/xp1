@@ -36,7 +36,7 @@ dev_dependencies:
   # === TESTING & DEVELOPMENT TOOLS ===
   auto_route_generator: ^10.2.4
   bloc_test: ^10.0.0 # Testing utilities for BLoC
-  build_runner: ^2.7.0 # Build system for code generation
+  build_runner: ^2.7.1 # Build system for code generation
   conventional_commit: ^0.6.1+1 # Git commit message linting
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
   envied_generator: ^1.2.0 # Code generator for envied package
