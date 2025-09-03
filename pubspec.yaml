@@ -9,37 +9,52 @@ environment:
   sdk: ">=3.8.0 <4.0.0" # Dart SDK range
   flutter: ">=3.24.0" # Minimum Flutter version
 
+# ignore_for_file: sort_pub_dependencies
 dependencies:
-  # === CORE FRAMEWORK ===
-  auto_route: ^10.1.2 # Declarative routing solution
-  bloc: ^9.0.0 # Business Logic Component pattern
-  envied: ^1.2.0 # Secure environment variable management
   flutter:
     sdk: flutter
-  flutter_bloc: ^9.1.1 # Flutter integration for BLoC
   flutter_localizations:
     sdk: flutter # Flutter localization support
+
+  # === STATE MANAGEMENT ===
+  bloc: ^9.0.0 # Business Logic Component pattern
+  flutter_bloc: ^9.1.1 # Flutter integration for BLoC
+
+  # === DEPENDENCY INJECTION ===
   get_it: ^8.0.2 # Service locator for dependency injection
   injectable: ^2.5.1 # Code generation for dependency injection
+
+  # === ENVIRONMENT MANAGEMENT ===
+  envied: ^1.2.0 # Secure environment variable management
+
+  # === NAVIGATION ===
+  auto_route: ^10.1.2 # Declarative routing solution
+
+  # === UTILITIES ===
   intl: ^0.20.2 # Internationalization utilities
   logger: ^2.6.1 # Beautiful and extensible logging
 
 dev_dependencies:
-  # === TESTING & DEVELOPMENT TOOLS (Alphabetical Order) ===
-  auto_route_generator: ^10.2.4 # Code generator for auto_route package
-  bdd_steps: # BDD test steps package
-    path: packages/bdd_steps
-  bdd_widget_test: ^2.0.1 # BDD framework for widget tests
-  bloc_test: ^10.0.0 # Testing utilities for BLoC
-  build_runner: ^2.7.1 # Build system for code generation
-  conventional_commit: ^0.6.1+1 # Git commit message linting
-  dependency_validator: ^5.0.2 # Check unused/missing dependencies
-  envied_generator: ^1.2.0 # Code generator for envied package
   flutter_test: # Flutter testing framework
     sdk: flutter
-  injectable_generator: ^2.6.1 # Code generator for injectable package
-  mocktail: ^1.0.4 # Modern mocking framework
   test: ^1.26.2 # Dart testing framework
+
+  # === CODE GENERATION ===
+  auto_route_generator: ^10.2.4 # Code generator for auto_route package
+  build_runner: ^2.7.1 # Build system for code generation
+  envied_generator: ^1.2.0 # Code generator for envied package
+  injectable_generator: ^2.6.1 # Code generator for injectable package
+
+  # === TESTING FRAMEWORKS ===
+  bdd_widget_test: ^2.0.1 # BDD framework for widget tests
+  bloc_test: ^10.0.0 # Testing utilities for BLoC
+  mocktail: ^1.0.4 # Modern mocking framework
+
+  # === DEVELOPMENT TOOLS ===
+  bdd_steps: # BDD test steps package
+    path: packages/bdd_steps
+  conventional_commit: ^0.6.1+1 # Git commit message linting
+  dependency_validator: ^5.0.2 # Check unused/missing dependencies
   very_good_analysis: ^9.0.0 # Very Good Ventures linting rules
 
 flutter:

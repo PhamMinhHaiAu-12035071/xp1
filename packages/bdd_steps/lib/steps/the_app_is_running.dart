@@ -1,6 +1,8 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:xp1/app/app.dart';
 import 'package:xp1/core/di/injection_container.dart';
+import 'package:xp1/core/routing/app_router.dart';
+import 'package:xp1/l10n/l10n.dart';
 
 /// Launches the app and waits for it to fully initialize.
 ///
@@ -16,17 +18,39 @@ Future<void> theAppIsRunning(WidgetTester tester) async {
   // CRITICAL: Force clear ALL GetIt registrations including mocks
   // from page test setUpAll() callbacks
   await getIt.reset();
-  
-  // Small delay to ensure async operations complete
-  await tester.pump(const Duration(milliseconds: 50));
-  
+
+  // Brief pump to ensure GetIt reset completes before dependency injection
+  await tester.pump();
+
   // Configure REAL dependencies
   await configureDependencies();
-  
-  await tester.pumpWidget(const App());
+
+  // Create a fresh router instance for test isolation
+  // This ensures each test starts with clean navigation state
+  final freshRouter = AppRouter();
+
+  // Pump a fresh app instance with new router to ensure clean state
+  await tester.pumpWidget(
+    MaterialApp.router(
+      theme: ThemeData(
+        appBarTheme: const AppBarTheme(
+          backgroundColor: Colors.blue,
+        ),
+        useMaterial3: true,
+      ),
+      localizationsDelegates: AppLocalizations.localizationsDelegates,
+      supportedLocales: AppLocalizations.supportedLocales,
+      routerConfig: freshRouter.config(),
+    ),
+  );
+
+  // Wait for all asynchronous operations, animations, and router initialization
+  // to complete. This is more reliable than hardcoded delays as it adapts to
+  // actual app initialization time on different machines/environments.
   await tester.pumpAndSettle();
 
-  // Extended settling for router initialization
-  await tester.pump(const Duration(milliseconds: 100));
+  // Additional pump to ensure initial route is fully loaded
+  // This ensures the login page is displayed when tests expect it
+  await tester.pump();
   await tester.pumpAndSettle();
 }

@@ -419,9 +419,9 @@ license-help:
 	@echo "📋 Business-safe licenses: $(PERMISSIVE_LICENSES)"
 	@echo "⚠️  Avoided licenses: $(COPYLEFT_LICENSES),$(PROBLEMATIC_LICENSES)"
 
-# Complete environment setup commands for new team members
-install-dev:
-	@echo "🚀 Setting up complete development environment..."
+# Private helper target for common installation steps
+.PHONY: _install_common
+_install_common:
 	@fvm flutter clean
 	@fvm flutter pub get
 	@npm install
@@ -429,42 +429,25 @@ install-dev:
 	@./scripts/setup-env.sh
 	@lefthook install
 	@fvm dart run build_runner clean
+
+# Complete environment setup commands for new team members
+install-dev: _install_common
+	@echo "🚀 Setting up complete development environment..."
 	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 	@echo "✅ Development environment ready!"
 
-install-staging:
+install-staging: _install_common
 	@echo "🚀 Setting up complete staging environment..."
-	@fvm flutter clean
-	@fvm flutter pub get
-	@npm install
-	@chmod +x scripts/*.sh
-	@./scripts/setup-env.sh
-	@lefthook install
-	@fvm dart run build_runner clean
 	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
 	@echo "✅ Staging environment ready!"
 
-install-prod:
+install-prod: _install_common
 	@echo "🚀 Setting up complete production environment..."
-	@fvm flutter clean
-	@fvm flutter pub get
-	@npm install
-	@chmod +x scripts/*.sh
-	@./scripts/setup-env.sh
-	@lefthook install
-	@fvm dart run build_runner clean
 	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
 	@echo "✅ Production environment ready!"
 
-install-all:
+install-all: _install_common
 	@echo "🚀 Setting up ALL environments..."
-	@fvm flutter clean
-	@fvm flutter pub get
-	@npm install
-	@chmod +x scripts/*.sh
-	@./scripts/setup-env.sh
-	@lefthook install
-	@fvm dart run build_runner clean
 	@echo "📦 Building development..."
 	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 	@echo "📦 Building staging..."
