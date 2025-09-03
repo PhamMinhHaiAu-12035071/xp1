@@ -36,6 +36,45 @@
 - **flutter_bloc**: ^9.1.1
   - Flutter-specific BLoC implementation
   - Widget integration helpers
+- **hydrated_bloc**: ^10.1.1
+  - Persistent BLoC state management
+  - Automatic state restoration
+  - Local storage integration
+- **replay_bloc**: ^0.3.0
+  - Undo/Redo functionality for BLoC
+  - State history management
+  - Time-travel debugging support
+
+### Code Generation & Serialization
+
+- **freezed**: ^3.2.0 (dev)
+  - Immutable data classes generation
+  - Union types and sealed classes
+  - Deep equality and copy functionality
+- **freezed_annotation**: ^3.1.0
+  - Annotations for Freezed code generation
+  - Type-safe immutable models
+- **json_annotation**: ^4.8.1
+  - JSON serialization annotations
+  - Type-safe JSON handling
+- **json_serializable**: ^6.7.1 (dev)
+  - JSON serialization code generation
+  - Automatic fromJson/toJson methods
+
+### Functional Programming
+
+- **dartz**: ^0.10.1
+  - Functional programming utilities
+  - Either types for error handling
+  - Option types for null safety
+- **fpdart**: ^1.1.0
+  - Pure functional programming for Dart
+  - Monads and functional composition
+  - Advanced functional utilities
+- **equatable**: ^2.0.5
+  - Value equality for immutable objects
+  - Simplified equality comparisons
+  - Hash code generation
 
 ### Internationalization
 
@@ -169,8 +208,17 @@ flutter test test/helpers/
 # Generate localizations
 flutter gen-l10n --arb-dir="lib/l10n/arb"
 
-# Generate routes
-dart run build_runner build
+# Generate routes and data classes
+dart run build_runner build --delete-conflicting-outputs
+
+# Watch for changes during development
+dart run build_runner watch
+
+# Clean generated files
+dart run build_runner clean
+
+# Generate specific files (Freezed + JSON)
+dart run build_runner build --delete-conflicting-outputs
 ```
 
 ## Dependencies Management
@@ -180,12 +228,22 @@ dart run build_runner build
 - `auto_route`: Type-safe navigation system
 - `bloc`: State management core
 - `flutter_bloc`: Flutter BLoC integration
+- `hydrated_bloc`: Persistent BLoC state management
+- `replay_bloc`: Undo/Redo functionality for BLoC
+- `freezed_annotation`: Annotations for immutable data classes
+- `json_annotation`: JSON serialization annotations
+- `dartz`: Functional programming utilities
+- `fpdart`: Pure functional programming for Dart
+- `equatable`: Value equality for immutable objects
 - `flutter_localizations`: Localization support
 - `intl`: Internationalization utilities
+- `meta`: Metadata annotations for Dart
 
 ### Development Dependencies
 
 - `auto_route_generator`: Route code generation
+- `freezed`: Immutable data classes generation
+- `json_serializable`: JSON serialization code generation
 - `bloc_test`: BLoC testing utilities
 - `build_runner`: Code generation system
 - `flutter_test`: Flutter testing framework

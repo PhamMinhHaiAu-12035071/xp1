@@ -1,0 +1,121 @@
+---
+alwaysApply: true
+description: Ensures documentation stays in sync with code changes and new features
+---
+
+# Documentation Synchronization Rule
+
+## 🚨 CRITICAL REMINDER: Always Update Documentation
+
+**MANDATORY**: When making ANY of the following changes, you MUST update relevant documentation files to prevent outdated information:
+
+### 📦 When Adding/Removing Dependencies in [pubspec.yaml](mdc:pubspec.yaml):
+
+**Required Updates:**
+
+- [ ] **[doc/core/tech-stack.md](mdc:doc/core/tech-stack.md)** - Add new packages to relevant sections
+- [ ] **[CLAUDE.md](mdc:CLAUDE.md)** - Update development commands and usage patterns
+- [ ] **[README.md](mdc:README.md)** - Update tech stack overview if significant
+- [ ] **[doc/core/development-guidelines.md](mdc:doc/core/development-guidelines.md)** - Add coding patterns for new packages
+
+### 🏗️ When Adding New Features/Architecture Patterns:
+
+**Required Updates:**
+
+- [ ] **[doc/core/architecture.md](mdc:doc/core/architecture.md)** - Document new architectural patterns
+- [ ] **[doc/core/development-guidelines.md](mdc:doc/core/development-guidelines.md)** - Add coding standards and examples
+- [ ] **[CLAUDE.md](mdc:CLAUDE.md)** - Update development workflow if needed
+- [ ] **Project README** - Update feature list and overview
+
+### 🔧 When Changing Development Workflow/Commands:
+
+**Required Updates:**
+
+- [ ] **[CLAUDE.md](mdc:CLAUDE.md)** - Update command references and workflows
+- [ ] **[doc/features/environment/usage.md](mdc:doc/features/environment/usage.md)** - Update if environment-related
+- [ ] **[Makefile](mdc:Makefile)** and **[rps.yaml](mdc:rps.yaml)** - Ensure commands are consistent
+
+### 📝 When Modifying Code Standards/Linting:
+
+**Required Updates:**
+
+- [ ] **[analysis_options.yaml](mdc:analysis_options.yaml)** - Update linter configuration
+- [ ] **[coding-style.mdc](mdc:coding-style.mdc)** - Update coding style guidelines
+- [ ] **[doc/core/development-guidelines.md](mdc:doc/core/development-guidelines.md)** - Update development patterns
+
+### 🧪 When Adding New Testing Patterns:
+
+**Required Updates:**
+
+- [ ] **[doc/core/development-guidelines.md](mdc:doc/core/development-guidelines.md)** - Add testing patterns
+- [ ] **[CLAUDE.md](mdc:CLAUDE.md)** - Update testing commands if needed
+
+## 🎯 Documentation Update Checklist
+
+**Before completing ANY development task:**
+
+### 1. Identify Impact Areas
+
+- [ ] Does this change affect the tech stack? → Update **[doc/core/tech-stack.md](mdc:doc/core/tech-stack.md)**
+- [ ] Does this introduce new patterns? → Update **[doc/core/development-guidelines.md](mdc:doc/core/development-guidelines.md)**
+- [ ] Does this change commands/workflow? → Update **[CLAUDE.md](mdc:CLAUDE.md)**
+- [ ] Is this a user-facing feature? → Update **[README.md](mdc:README.md)**
+
+### 2. Specific File Checks
+
+- [ ] **[pubspec.yaml](mdc:pubspec.yaml)** changes → Update dependency lists in docs
+- [ ] New **models/state management** → Add patterns to guidelines
+- [ ] New **build commands** → Update CLAUDE.md command sections
+- [ ] **Environment changes** → Update environment documentation
+
+### 3. Consistency Validation
+
+- [ ] All code examples in docs use current patterns
+- [ ] Version numbers match across all documentation
+- [ ] Commands are tested and working
+- [ ] Examples follow current coding standards
+
+## 🚀 Auto-Update Protocol
+
+**When implementing changes:**
+
+1. **Make code changes first**
+2. **Immediately identify affected docs** using checklist above
+3. **Update documentation in same commit/PR**
+4. **Validate all examples and commands work**
+5. **Check for consistency across all docs**
+
+## 📋 Documentation Files Quick Reference
+
+| File                                                                             | Purpose              | Update When                        |
+| -------------------------------------------------------------------------------- | -------------------- | ---------------------------------- |
+| **[README.md](mdc:README.md)**                                                   | Project overview     | Major features, tech stack changes |
+| **[CLAUDE.md](mdc:CLAUDE.md)**                                                   | Development workflow | Commands, patterns, architecture   |
+| **[doc/core/tech-stack.md](mdc:doc/core/tech-stack.md)**                         | Technology details   | Dependencies, tools, versions      |
+| **[doc/core/development-guidelines.md](mdc:doc/core/development-guidelines.md)** | Coding standards     | Patterns, best practices, examples |
+| **[doc/core/architecture.md](mdc:doc/core/architecture.md)**                     | System design        | Architecture changes, new patterns |
+| **[coding-style.mdc](mdc:coding-style.mdc)**                                     | Style rules          | Linting rules, code standards      |
+
+## ⚠️ Common Outdated Documentation Anti-Patterns
+
+**Avoid these issues:**
+
+- ❌ Adding packages without updating tech-stack.md
+- ❌ Changing commands without updating CLAUDE.md
+- ❌ New patterns without examples in guidelines
+- ❌ Version mismatches between docs and code
+- ❌ Broken code examples in documentation
+- ❌ Missing workflow steps in development guides
+
+## 🎖️ Quality Standards
+
+**All documentation updates must:**
+
+- ✅ Include working code examples
+- ✅ Follow current coding standards from **[coding-style.mdc](mdc:coding-style.mdc)**
+- ✅ Use consistent terminology across all docs
+- ✅ Be written in English (as per project standards)
+- ✅ Include proper section organization
+- ✅ Validate all commands actually work
+
+**Remember: Documentation debt is technical debt. Keep them in sync!**

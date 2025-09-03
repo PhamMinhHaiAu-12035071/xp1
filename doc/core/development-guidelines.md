@@ -141,7 +141,9 @@ feature_name/
 │   ├── feature_cubit.dart
 │   └── feature_state.dart
 ├── models/
-│   └── feature_model.dart
+│   ├── feature_model.dart          # Freezed models
+│   ├── feature_model.freezed.dart  # Generated file
+│   └── feature_model.g.dart        # Generated JSON
 └── feature.dart  # Barrel export (optional)
 ```
 
@@ -282,6 +284,237 @@ class CounterView extends StatelessWidget {
           ),
         ],
       ),
+    );
+  }
+}
+```
+
+## 🏗️ Data Modeling with Freezed
+
+### Freezed Implementation Patterns
+
+#### Basic Data Models
+
+```dart
+// ✅ Good: Freezed data model with JSON support
+import 'package:freezed_annotation/freezed_annotation.dart';
+
+part 'user_model.freezed.dart';
+part 'user_model.g.dart';
+
+@freezed
+class UserModel with _$UserModel {
+  const factory UserModel({
+    required String id,
+    required String name,
+    required String email,
+    String? avatarUrl,
+    @Default(false) bool isActive,
+  }) = _UserModel;
+
+  factory UserModel.fromJson(Map<String, Object?> json) =>
+      _$UserModelFromJson(json);
+}
+```
+
+#### Union Types for State Management
+
+```dart
+// ✅ Good: Freezed unions for BLoC states
+@freezed
+class UserState with _$UserState {
+  const factory UserState.initial() = UserInitial;
+  const factory UserState.loading() = UserLoading;
+  const factory UserState.success(UserModel user) = UserSuccess;
+  const factory UserState.failure(String message) = UserFailure;
+}
+
+// Usage in BLoC
+class UserCubit extends Cubit<UserState> {
+  UserCubit() : super(const UserState.initial());
+
+  Future<void> fetchUser(String id) async {
+    emit(const UserState.loading());
+    try {
+      final user = await userRepository.getUser(id);
+      emit(UserState.success(user));
+    } catch (e) {
+      emit(UserState.failure(e.toString()));
+    }
+  }
+}
+```
+
+#### Advanced Freezed Patterns
+
+```dart
+// ✅ Good: Custom methods and getters
+@freezed
+class UserModel with _$UserModel {
+  const factory UserModel({
+    required String id,
+    required String firstName,
+    required String lastName,
+    String? email,
+  }) = _UserModel;
+
+  // Custom getters
+  const UserModel._();
+
+  String get fullName => '$firstName $lastName';
+  bool get hasEmail => email != null && email!.isNotEmpty;
+
+  factory UserModel.fromJson(Map<String, Object?> json) =>
+      _$UserModelFromJson(json);
+}
+```
+
+## 🔄 Functional Programming Patterns
+
+### Either Types for Error Handling
+
+```dart
+// ✅ Good: Using dartz Either for error handling
+import 'package:dartz/dartz.dart';
+
+abstract class UserRepository {
+  Future<Either<UserFailure, UserModel>> getUser(String id);
+  Future<Either<UserFailure, List<UserModel>>> getUsers();
+}
+
+class UserRepositoryImpl implements UserRepository {
+  @override
+  Future<Either<UserFailure, UserModel>> getUser(String id) async {
+    try {
+      final response = await apiClient.getUser(id);
+      final user = UserModel.fromJson(response.data);
+      return Right(user);
+    } on NetworkException catch (e) {
+      return Left(UserFailure.network(e.message));
+    } on ApiException catch (e) {
+      return Left(UserFailure.api(e.message, e.statusCode));
+    } catch (e) {
+      return Left(UserFailure.unknown(e.toString()));
+    }
+  }
+}
+```
+
+#### BLoC Integration with Either
+
+```dart
+// ✅ Good: BLoC with Either types
+class UserCubit extends Cubit<UserState> {
+  UserCubit({required UserRepository userRepository})
+      : _userRepository = userRepository,
+        super(const UserState.initial());
+
+  final UserRepository _userRepository;
+
+  Future<void> fetchUser(String id) async {
+    emit(const UserState.loading());
+
+    final result = await _userRepository.getUser(id);
+
+    result.fold(
+      (failure) => emit(UserState.failure(failure.message)),
+      (user) => emit(UserState.success(user)),
+    );
+  }
+}
+```
+
+### Option Types for Null Safety
+
+```dart
+// ✅ Good: Using Option for better null handling
+import 'package:dartz/dartz.dart';
+
+class UserService {
+  Option<UserModel> findUserByEmail(String email) {
+    final user = users.firstWhereOrNull((user) => user.email == email);
+    return optionOf(user);
+  }
+
+  String getUserDisplayName(String email) {
+    return findUserByEmail(email).fold(
+      () => 'Unknown User',
+      (user) => user.fullName,
+    );
+  }
+}
+```
+
+## 🏪 Advanced State Management
+
+### Hydrated BLoC Implementation
+
+```dart
+// ✅ Good: Hydrated BLoC for persistent state
+class SettingsCubit extends HydratedCubit<SettingsState> {
+  SettingsCubit() : super(const SettingsState.initial());
+
+  void updateTheme(ThemeMode theme) {
+    state.maybeWhen(
+      loaded: (settings) => emit(
+        SettingsState.loaded(settings.copyWith(themeMode: theme)),
+      ),
+      orElse: () {},
+    );
+  }
+
+  @override
+  SettingsState? fromJson(Map<String, dynamic> json) {
+    try {
+      return SettingsState.fromJson(json);
+    } catch (_) {
+      return null;
+    }
+  }
+
+  @override
+  Map<String, dynamic>? toJson(SettingsState state) {
+    return state.maybeWhen(
+      loaded: (settings) => settings.toJson(),
+      orElse: () => null,
+    );
+  }
+}
+```
+
+### Replay BLoC for Undo/Redo
+
+```dart
+// ✅ Good: Replay BLoC implementation
+class CounterCubit extends ReplayCubit<int> {
+  CounterCubit() : super(0);
+
+  void increment() => emit(state + 1);
+  void decrement() => emit(state - 1);
+}
+
+// Usage with undo/redo
+class CounterPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        actions: [
+          IconButton(
+            onPressed: context.read<CounterCubit>().canUndo
+                ? () => context.read<CounterCubit>().undo()
+                : null,
+            icon: const Icon(Icons.undo),
+          ),
+          IconButton(
+            onPressed: context.read<CounterCubit>().canRedo
+                ? () => context.read<CounterCubit>().redo()
+                : null,
+            icon: const Icon(Icons.redo),
+          ),
+        ],
+      ),
+      // ... rest of the widget
     );
   }
 }

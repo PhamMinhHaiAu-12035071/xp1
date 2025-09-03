@@ -13,3 +13,12 @@ ignore:
   - bloc_test
   - build_runner
   - flutter_bloc # False positive - transitive dependency from bloc_test
+  # State management packages (added for feat/#15_state-management)
+  - dartz # Functional programming utilities - planned for use
+  - equatable # Value equality - planned for use with immutable objects
+  - fpdart # Functional programming - planned for use
+  - freezed_annotation # Code generation annotations - used by freezed
+  - hydrated_bloc # Persistent BLoC state - planned for use
+  - json_annotation # JSON serialization annotations - used by json_serializable
+  - meta # Metadata annotations - used by framework (implicit)
+  - replay_bloc # Undo/Redo functionality - planned for use
