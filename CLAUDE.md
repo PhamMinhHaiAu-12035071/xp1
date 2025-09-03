@@ -24,14 +24,14 @@ make coverage-report        # Complete workflow: test + HTML
 make coverage-open          # Open coverage report in browser
 
 # Environment-specific commands
-dart run rps run-dev         # Development environment
-dart run rps run-staging     # Staging environment
-dart run rps run-prod        # Production environment
+make run-dev                 # Development environment
+make run-staging             # Staging environment
+make run-prod                # Production environment
 
 # Environment setup (required before first run)
-dart run rps generate-env-dev      # Generate development config
-dart run rps generate-env-staging  # Generate staging config
-dart run rps generate-env-prod     # Generate production config
+make generate-env-dev        # Generate development config
+make generate-env-staging    # Generate staging config
+make generate-env-prod       # Generate production config
 
 # Navigation & Auto Route commands
 dart run build_runner build        # Generate route files after route changes
@@ -47,9 +47,9 @@ flutter run --flavor staging --target lib/main_staging.dart
 flutter run --flavor production --target lib/main_production.dart
 
 # Build variants
-dart run rps build-dev       # Development build
-dart run rps build-staging   # Staging build
-dart run rps build-prod     # Production build
+make build-dev               # Development build
+make build-staging           # Staging build
+make build-prod              # Production build
 ```
 
 ### Quality Assurance
@@ -188,16 +188,16 @@ PageTestHelpers.testStandardPage<HomePage>(
 ```bash
 # Daily workflow
 make check && make test                    # Start of session
-dart run rps format && dart run rps analyze  # After each edit
-dart run rps pre-commit                    # Before commit
+make format && make analyze                # After each edit
+make pre-commit                            # Before commit
 
 # Environment switching
-dart run rps generate-env-dev && dart run rps run-dev
-dart run rps generate-env-staging && dart run rps run-staging
-dart run rps generate-env-prod && dart run rps run-prod
+make generate-env-dev && make run-dev
+make generate-env-staging && make run-staging
+make generate-env-prod && make run-prod
 
 # Emergency fixes
-flutter clean && flutter pub get && dart run rps generate-env-dev
+flutter clean && flutter pub get && make generate-env-dev
 
 # Navigation testing
 flutter test test/features/*/presentation/pages/   # Test all page implementations
@@ -209,7 +209,7 @@ flutter test test/helpers/                        # Test page helpers
 ### Initial Setup
 
 1. Run `make setup` for complete project initialization
-2. Generate environment config: `dart run rps generate-env-dev`
+2. Generate environment config: `make generate-env-dev`
 3. Install dependencies: `make deps`
 4. Verify setup: `make check`
 
@@ -219,13 +219,13 @@ Before running the app in a specific environment, generate the corresponding con
 
 ```bash
 # For development
-dart run rps generate-env-dev && dart run rps run-dev
+make generate-env-dev && make run-dev
 
 # For staging
-dart run rps generate-env-staging && dart run rps run-staging
+make generate-env-staging && make run-staging
 
 # For production
-dart run rps generate-env-prod && dart run rps run-prod
+make generate-env-prod && make run-prod
 ```
 
 ### Pre-Commit Requirements
@@ -272,9 +272,9 @@ This project enforces strict business-friendly license compliance:
 make check                     # Format + analyze (2-3 seconds)
 make test                      # Run all tests (10-15 seconds)
 
-# Alternative using RPS
-dart run rps check            # Format + analyze
-dart run rps test             # Run tests
+# Alternative commands
+make check                    # Format + analyze
+make test                     # Run tests
 ```
 
 **Why**: Ensures you start with a clean baseline and don't introduce errors into already-broken code.
@@ -285,8 +285,8 @@ dart run rps test             # Run tests
 
 ```bash
 # Quick validation loop (run after each file edit)
-dart run rps format           # Auto-fix formatting (1-2 seconds)
-dart run rps analyze          # Check for linting issues (2-3 seconds)
+make format                   # Auto-fix formatting (1-2 seconds)
+make analyze                  # Check for linting issues (2-3 seconds)
 
 # If tests are affected, also run:
 flutter test                  # Verify tests still pass (5-10 seconds)
@@ -294,7 +294,7 @@ flutter test                  # Verify tests still pass (5-10 seconds)
 
 **Integration with Code Changes:**
 
-- Edit file → Save → Run `dart run rps format` → Run `dart run rps analyze`
+- Edit file → Save → Run `make format` → Run `make analyze`
 - If tests affected → Run `flutter test`
 - Fix any errors before continuing
 
@@ -304,11 +304,11 @@ flutter test                  # Verify tests still pass (5-10 seconds)
 
 ```bash
 # Complete validation pipeline
-dart run rps pre-commit       # Format + analyze + test (full validation)
+make pre-commit               # Format + analyze + test (full validation)
 
 # Or step-by-step:
-dart run rps format           # 1. Fix formatting
-dart run rps analyze          # 2. Check linting
+make format                   # 1. Fix formatting
+make analyze                  # 2. Check linting
 flutter test                  # 3. Verify tests pass
 ```
 
@@ -331,14 +331,14 @@ make check                    # Ensure current codebase is healthy
 
 ```bash
 # After each significant change
-dart run rps format && dart run rps analyze
+make format && make analyze
 ```
 
 #### **Level 3: Final Validation**
 
 ```bash
 # Before responding to user
-dart run rps pre-commit       # Complete pipeline
+make pre-commit               # Complete pipeline
 ```
 
 ### 🚨 Command Reference for Claude Code
@@ -346,20 +346,20 @@ dart run rps pre-commit       # Complete pipeline
 | **When**            | **Commands**                                  | **Purpose**           | **Time** |
 | ------------------- | --------------------------------------------- | --------------------- | -------- |
 | **Start Session**   | `make check && make test`                     | Verify baseline       | 30s      |
-| **After Each Edit** | `dart run rps format && dart run rps analyze` | Continuous validation | 5s       |
-| **Before Response** | `dart run rps pre-commit`                     | Final validation      | 45s      |
-| **Emergency**       | `dart run rps format` + `flutter test`        | Minimum viable        | 10s      |
+| **After Each Edit** | `make format && make analyze`                 | Continuous validation | 5s       |
+| **Before Response** | `make pre-commit`                             | Final validation      | 45s      |
+| **Emergency**       | `make format` + `flutter test`                | Minimum viable        | 10s      |
 
 ### 🎨 Tool Usage Priority for Claude
 
-#### **1. RPS Scripts (Primary - Use These)**
+#### **1. Make Commands (Primary - Use These)**
 
 ```bash
-dart run rps format           # ⚡ Fastest formatting
-dart run rps analyze          # ⚡ Quick analysis
-dart run rps test             # ⚡ Test execution
-dart run rps check            # ⚡ Format + analyze combo
-dart run rps pre-commit       # 🏆 Complete validation
+make format                   # ⚡ Fastest formatting
+make analyze                  # ⚡ Quick analysis
+make test                     # ⚡ Test execution
+make check                    # ⚡ Format + analyze combo
+make pre-commit               # 🏆 Complete validation
 ```
 
 #### **2. Makefile (CI Equivalent)**
@@ -385,17 +385,17 @@ very_good test --coverage
 #### **When Linting Fails:**
 
 ```bash
-1. dart run rps format          # Fix formatting first
+1. make format                  # Fix formatting first
 2. dart analyze --fatal-infos   # See specific errors
 3. Fix errors manually
-4. dart run rps analyze         # Verify fixes
+4. make analyze                 # Verify fixes
 ```
 
 #### **When Tests Fail:**
 
 ```bash
 1. flutter clean && flutter pub get    # Reset environment
-2. dart run rps generate-env-dev       # Regenerate configs
+2. make generate-env-dev               # Regenerate configs
 3. flutter test --dart-define=ENVIRONMENT=development
 4. Fix failing tests
 5. flutter test                        # Verify all pass
@@ -404,7 +404,7 @@ very_good test --coverage
 #### **When Environment Issues:**
 
 ```bash
-1. dart run rps generate-env-dev       # Regenerate development
+1. make generate-env-dev               # Regenerate development
 2. flutter pub get                     # Refresh dependencies
 3. make check                          # Verify health
 4. make test                           # Verify tests
@@ -414,8 +414,8 @@ very_good test --coverage
 
 **Before providing ANY code response:**
 
-- [ ] ✅ `dart run rps format` - No formatting issues
-- [ ] ✅ `dart run rps analyze` - No linting errors/warnings
+- [ ] ✅ `make format` - No formatting issues
+- [ ] ✅ `make analyze` - No linting errors/warnings
 - [ ] ✅ `flutter test` - All tests pass
 - [ ] ✅ Code follows project patterns
 - [ ] ✅ Documentation is complete (if public APIs)
@@ -437,8 +437,8 @@ make check && make test
 
 # 2. For each code change iteration:
 # Edit code → Save → Execute:
-dart run rps format
-dart run rps analyze
+make format
+make analyze
 # Fix any issues → Repeat until clean
 
 # 3. If tests affected:
@@ -446,11 +446,11 @@ flutter test
 # Fix any failing tests
 
 # 4. Before final response:
-dart run rps pre-commit
+make pre-commit
 # Must pass before providing code to user
 
 # 5. For complex changes:
-make test-coverage          # Verify coverage maintained
+make coverage               # Verify coverage maintained
 ```
 
 ### 🔥 High-Speed Development Protocol
@@ -459,16 +459,16 @@ make test-coverage          # Verify coverage maintained
 
 ```bash
 # Continuous validation loop (use during active coding)
-dart run rps format && dart run rps analyze
+make format && make analyze
 
 # Parallel execution for speed
-dart run rps format & dart run rps analyze & wait
+make format & make analyze & wait
 
 # Quick test verification
 flutter test --dart-define=ENVIRONMENT=development
 
 # Final checkpoint
-dart run rps pre-commit
+make pre-commit
 ```
 
 ### 🏆 Advanced Claude Workflows
@@ -477,19 +477,18 @@ dart run rps pre-commit
 
 ```bash
 # When environment changes are involved
-dart run rps generate-env-dev && dart run rps test
-dart run rps generate-env-staging && dart run rps test
-dart run rps generate-env-prod && dart run rps test
+make generate-env-dev && make test
+make generate-env-staging && make test
+make generate-env-prod && make test
 ```
 
 #### **Coverage-Focused Development:**
 
 ```bash
 # When adding new features
-make test-coverage          # Generate coverage report
-make coverage-open          # Review coverage gaps
+make coverage               # Generate coverage report
 # Add tests for uncovered code
-make test-coverage          # Verify improved coverage
+make coverage               # Verify improved coverage
 ```
 
 #### **Performance Validation:**
@@ -497,7 +496,7 @@ make test-coverage          # Verify improved coverage
 ```bash
 # For performance-critical changes
 flutter test --coverage --dart-define=ENVIRONMENT=development
-make test-coverage
+make coverage
 # Review performance impact in coverage report
 ```
 
@@ -625,7 +624,7 @@ Our cspell configuration enforces English-only content:
 npx cspell doc/**/*.md --no-progress    # Verify English content
 
 # After adding comments or strings
-dart run rps analyze                    # Check for linting issues
+make analyze                            # Check for linting issues
 ```
 
 #### **Content Creation Guidelines:**
@@ -653,11 +652,11 @@ Add to your workflow:
 ```bash
 # Validate English content before commit
 npx cspell doc/**/*.md README.md --no-progress
-dart run rps analyze  # Includes comment validation
-dart run rps format   # Ensures consistent formatting
+make analyze          # Includes comment validation
+make format           # Ensures consistent formatting
 
 # Full validation
-dart run rps pre-commit  # Must pass for English compliance
+make pre-commit       # Must pass for English compliance
 ```
 
 ### 📚 **English Documentation Standards**

@@ -67,6 +67,9 @@ jobs:
           dart run build_runner clean
           dart run build_runner build --delete-conflicting-outputs
 
+      - name: 🎨 Format generated code
+        run: dart format lib test
+
       - name: 🔍 Validate dependencies
         run: dart run dependency_validator
 
@@ -99,6 +102,9 @@ jobs:
           dart run build_runner clean
           dart run build_runner build --delete-conflicting-outputs
 
+      - name: 🎨 Format generated code
+        run: dart format lib test
+
       - name: 🔐 Check license compliance
         run: make license-ci
 
@@ -128,6 +134,9 @@ jobs:
           dart run build_runner clean
           dart run build_runner build --delete-conflicting-outputs
 
+      - name: 🎨 Format generated code
+        run: dart format lib test
+
       - name: 🔍 Verify generated files
         run: |
           echo "Checking generated files..."
@@ -144,13 +153,25 @@ jobs:
       - name: 🕵️ Analyze
         run: flutter analyze lib test
 
-      # Enable Very Good CLI
+      # Enable Very Good CLI (for other commands)
       - name: Activate Very Good CLI
         run: dart pub global activate very_good_cli
 
-      # Run tests by Very Good CLI
+      # Install make (if not available) and setup scripts
+      - name: Setup build environment
+        run: |
+          # Install make if not available
+          if ! command -v make &> /dev/null; then
+            echo "Installing make..."
+            sudo apt-get update
+            sudo apt-get install -y make
+          fi
+          # Make scripts executable
+          chmod +x scripts/*.sh || true
+
+      # Run tests using Makefile
       - name: Run tests
-        run: very_good test --coverage
+        run: make test
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1

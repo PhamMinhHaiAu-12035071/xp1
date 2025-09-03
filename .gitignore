@@ -124,6 +124,9 @@ lib/l10n/gen/
 # Generated dependency injection files
 lib/core/di/injection_container.config.dart
 
+# BDD generated files (from bdd_widget_test)
+test/bdd/**/*_test.dart
+
 # Node.js/npm related
 node_modules/
 npm-debug.log*

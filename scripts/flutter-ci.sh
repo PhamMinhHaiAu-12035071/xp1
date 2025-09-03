@@ -13,7 +13,7 @@ echo "  🎨 Checking code format..."
 fvm dart format lib/ test/ --set-exit-if-changed --output=none
 
 echo "  🧪 Running tests..."
-fvm flutter test
+make test
 
 echo "  📋 Checking publish readiness..."
 fvm flutter pub publish --dry-run
