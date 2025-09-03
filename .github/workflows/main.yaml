@@ -169,9 +169,9 @@ jobs:
           # Make scripts executable
           chmod +x scripts/*.sh || true
 
-      # Run tests with coverage using Makefile
-      - name: Run tests with coverage
-        run: make coverage
+      # Run tests using Makefile
+      - name: Run tests
+        run: make test
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
