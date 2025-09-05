@@ -33,6 +33,14 @@ make generate-env-dev        # Generate development config
 make generate-env-staging    # Generate staging config
 make generate-env-prod       # Generate production config
 
+# Internationalization (i18n) commands using Slang
+make i18n-generate           # Generate slang translations from JSON files
+make i18n-watch              # Watch translation files and auto-generate
+make i18n-analyze            # Analyze translation coverage
+make i18n-validate           # Validate translation files
+make i18n-clean              # Clean generated slang files
+make i18n-help               # Show detailed i18n help
+
 # Code Generation commands (Freezed, JSON, Routes)
 dart run build_runner build --delete-conflicting-outputs  # Generate all code
 dart run build_runner watch --delete-conflicting-outputs   # Auto-generate on changes
@@ -579,6 +587,253 @@ make coverage
 - All environments must be considered for environment-related changes
 
 **Remember**: These commands are your quality assurance system. They prevent 95% of common issues and ensure professional-grade code delivery. Make them automatic and non-negotiable!
+
+## 🌐 Internationalization with Slang
+
+### Overview
+
+This project uses [Slang](https://pub.dev/packages/slang) for type-safe internationalization instead of the traditional ARB-based approach. Slang provides compile-time translation safety, better IDE support, and more maintainable i18n code.
+
+### File Structure
+
+```
+lib/l10n/
+├── i18n/                     # Translation source files
+│   ├── en.i18n.json          # English translations (base locale)
+│   └── vi.i18n.json          # Vietnamese translations
+└── gen/                      # Generated slang code
+    └── strings.g.dart        # Generated translation classes
+```
+
+### Configuration (slang.yaml)
+
+```yaml
+base_locale: en
+fallback_strategy: base_locale
+input_directory: lib/l10n/i18n
+input_file_pattern: .i18n.json
+output_directory: lib/l10n/gen
+output_file_name: strings.g.dart
+locale_handling: true
+flutter_integration: true
+translate_var: t
+enum_name: AppLocale
+class_name: Translations
+```
+
+### Essential Commands
+
+```bash
+# Development workflow
+make i18n-generate           # Generate translations after editing JSON files
+make i18n-watch              # Auto-generate during development (recommended)
+make i18n-analyze            # Check translation coverage and completeness
+make i18n-validate           # Validate translation files exist
+
+# Maintenance
+make i18n-clean              # Clean generated files when needed
+make i18n-help               # Show detailed help and file locations
+```
+
+### Translation File Format
+
+**English (en.i18n.json):**
+
+```json
+{
+  "hello": "Hello",
+  "welcome": "Welcome {name}",
+  "items": {
+    "one": "One item",
+    "other": "{count} items"
+  },
+  "pages": {
+    "home": {
+      "title": "Home",
+      "subtitle": "Welcome to the home page"
+    }
+  }
+}
+```
+
+**Vietnamese (vi.i18n.json):**
+
+```json
+{
+  "hello": "Xin chào",
+  "welcome": "Chào mừng {name}",
+  "items": {
+    "other": "{count} mục"
+  },
+  "pages": {
+    "home": {
+      "title": "Trang chủ",
+      "subtitle": "Chào mừng đến trang chủ"
+    }
+  }
+}
+```
+
+### Usage in Code
+
+```dart
+// Import generated translations
+import 'package:xp1/l10n/gen/strings.g.dart';
+
+// Basic usage
+Text(t.hello)                    // "Hello" / "Xin chào"
+Text(t.welcome(name: 'John'))    // "Welcome John" / "Chào mừng John"
+
+// Nested translations
+Text(t.pages.home.title)         // "Home" / "Trang chủ"
+
+// Pluralization
+Text(t.items(count: 1))          // "One item" / "1 mục"
+Text(t.items(count: 5))          // "5 items" / "5 mục"
+
+// Context extension (with slang_flutter)
+Widget build(BuildContext context) {
+  return Text(context.t.hello);
+}
+```
+
+### Locale Management
+
+The project includes a complete DDD-based locale management system:
+
+```dart
+// Switch locale programmatically
+await switchLocale(AppLocale.vi);
+
+// Get current locale
+final currentLocale = LocaleSettings.currentLocale;
+
+// Available locales
+final locales = AppLocaleUtils.supportedLocales;
+```
+
+### Development Workflow
+
+#### 1. Adding New Translations
+
+```bash
+# 1. Edit JSON files in lib/l10n/i18n/
+# Add new keys to en.i18n.json and vi.i18n.json
+
+# 2. Generate updated Dart classes
+make i18n-generate
+
+# 3. Use in code with full type safety
+Text(t.newKey)  # Auto-complete and type-safe!
+```
+
+#### 2. Live Development
+
+```bash
+# Start auto-generation (recommended during development)
+make i18n-watch
+
+# Edit translation files → Code regenerates automatically
+# IDE will immediately show new translations with auto-complete
+```
+
+#### 3. Translation Validation
+
+```bash
+# Check for missing translations and coverage
+make i18n-analyze
+
+# Validate files exist and are valid JSON
+make i18n-validate
+```
+
+### Git Hooks Integration
+
+The project automatically validates i18n files on commit:
+
+```yaml
+# lefthook.yml - automatically validates translation changes
+i18n-validation:
+  glob: "lib/l10n/i18n/*.json"
+  run: make i18n-validate
+```
+
+### Advanced Features
+
+#### Parameterized Translations
+
+```json
+{
+  "greeting": "Hello {name}, you have {count} messages",
+  "formatted": "Today is {date}"
+}
+```
+
+```dart
+Text(t.greeting(name: 'Alice', count: 3))
+Text(t.formatted(date: DateTime.now().toString()))
+```
+
+#### Rich Text Support
+
+```json
+{
+  "richText": "Visit our {website(tap here)} for more info"
+}
+```
+
+```dart
+RichText(
+  text: TextSpan(
+    children: t.richText.richTextSpan(
+      website: (text) => TextSpan(
+        text: text,
+        style: TextStyle(color: Colors.blue),
+        recognizer: TapGestureRecognizer()..onTap = () => launchUrl(),
+      ),
+    ),
+  ),
+)
+```
+
+### Migration from ARB Files
+
+If migrating from ARB-based i18n:
+
+1. Convert ARB files to JSON format
+2. Update imports from `AppLocalizations` to slang translations
+3. Replace `context.l10n.key` with `t.key` or `context.t.key`
+4. Run `make i18n-generate` to generate new classes
+5. Update all usage sites with type-safe alternatives
+
+### Troubleshooting
+
+#### Common Issues
+
+**1. Missing translations:**
+
+```bash
+make i18n-analyze  # Shows coverage report
+```
+
+**2. JSON syntax errors:**
+
+```bash
+make i18n-validate  # Validates JSON files
+```
+
+**3. Generated files out of sync:**
+
+```bash
+make i18n-clean && make i18n-generate  # Clean rebuild
+```
+
+**4. IDE not recognizing new translations:**
+
+```bash
+# Restart IDE after generation, or use:
+make i18n-watch  # For auto-generation during development
+```
 
 ## 🌐 Language Requirements - English Only Policy
 

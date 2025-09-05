@@ -6,7 +6,7 @@ Feature: Attendance Page
 
     Scenario: Attendance page displays correctly
         When I tap {Icons.access_time} icon
-        Then I see {'Hello World - Attendance'} text
+        Then I see {'Welcome to Attendance'} text
 
     Scenario: Attendance tab is accessible from navigation
         When I tap {Icons.access_time} icon

@@ -960,45 +960,499 @@ test/
     └── page_test_helpers.dart     # DRY testing utilities
 ```
 
-## 🌐 Internationalization Guidelines
+## 🌐 Internationalization Guidelines with Slang
 
-### Adding New Strings
+### Overview
 
-#### ARB File Structure
+This project uses [Slang](https://pub.dev/packages/slang) for type-safe internationalization. Slang provides compile-time translation safety, better IDE support, and more maintainable i18n code compared to traditional ARB-based approaches.
+
+### Translation File Structure
+
+#### JSON i18n Files
 
 ```json
-// ✅ Good: Proper ARB structure
+// ✅ Good: Proper JSON structure for en.i18n.json
 {
-  "@@locale": "en",
+  "hello": "Hello",
+  "welcome": "Welcome {name}",
   "counterAppBarTitle": "Counter",
-  "@counterAppBarTitle": {
-    "description": "Text shown in the AppBar of the Counter Page"
+  "items": {
+    "one": "One item",
+    "other": "{count} items"
   },
-  "newFeatureTitle": "New Feature",
-  "@newFeatureTitle": {
-    "description": "Title for the new feature page"
+  "pages": {
+    "home": {
+      "title": "Home",
+      "subtitle": "Welcome to the home page"
+    },
+    "profile": {
+      "title": "Profile",
+      "actions": {
+        "edit": "Edit Profile",
+        "save": "Save Changes"
+      }
+    }
+  },
+  "errors": {
+    "network": "Network connection failed",
+    "validation": {
+      "required": "This field is required",
+      "email": "Please enter a valid email"
+    }
   }
 }
 ```
 
-#### Usage in Code
+```json
+// ✅ Good: Corresponding vi.i18n.json
+{
+  "hello": "Xin chào",
+  "welcome": "Chào mừng {name}",
+  "counterAppBarTitle": "Bộ đếm",
+  "items": {
+    "other": "{count} mục"
+  },
+  "pages": {
+    "home": {
+      "title": "Trang chủ",
+      "subtitle": "Chào mừng đến trang chủ"
+    },
+    "profile": {
+      "title": "Hồ sơ",
+      "actions": {
+        "edit": "Chỉnh sửa hồ sơ",
+        "save": "Lưu thay đổi"
+      }
+    }
+  },
+  "errors": {
+    "network": "Kết nối mạng thất bại",
+    "validation": {
+      "required": "Trường này bắt buộc",
+      "email": "Vui lòng nhập email hợp lệ"
+    }
+  }
+}
+```
+
+### Usage in Code
+
+#### Basic Translation Usage
 
 ```dart
-// ✅ Good: Proper l10n usage
+// ✅ Good: Import generated translations
+import 'package:xp1/l10n/gen/strings.g.dart';
+
 class CounterPage extends StatelessWidget {
   const CounterPage({super.key});
 
   @override
   Widget build(BuildContext context) {
-    final l10n = context.l10n;
-
     return Scaffold(
       appBar: AppBar(
-        title: Text(l10n.counterAppBarTitle),
+        // Type-safe translations with auto-complete
+        title: Text(t.counterAppBarTitle),
       ),
-      // ...
+      body: Column(
+        children: [
+          Text(t.hello),                      // Basic translation
+          Text(t.welcome(name: 'John')),      // Parameterized translation
+          Text(t.pages.home.title),           // Nested translation
+          Text(t.items(count: 5)),           // Pluralization
+        ],
+      ),
     );
   }
+}
+
+// ❌ Avoid: Old ARB-based approach
+class BadCounterPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    final l10n = context.l10n;  // Old pattern
+    return Text(l10n.counterAppBarTitle);  // No type safety
+  }
+}
+```
+
+#### Context Extension Usage
+
+```dart
+// ✅ Good: Using context extension (requires slang_flutter)
+class ProfilePage extends StatelessWidget {
+  const ProfilePage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Scaffold(
+      appBar: AppBar(
+        title: Text(context.t.pages.profile.title),
+      ),
+      body: Column(
+        children: [
+          ElevatedButton(
+            onPressed: () {},
+            child: Text(context.t.pages.profile.actions.edit),
+          ),
+          ElevatedButton(
+            onPressed: () {},
+            child: Text(context.t.pages.profile.actions.save),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+### Advanced Translation Patterns
+
+#### Error Handling with Translations
+
+```dart
+// ✅ Good: Type-safe error messages
+class ApiService {
+  Future<Either<String, User>> getUser(String id) async {
+    try {
+      final user = await _client.getUser(id);
+      return Right(user);
+    } on NetworkException {
+      return Left(t.errors.network);
+    } on ValidationException {
+      return Left(t.errors.validation.required);
+    }
+  }
+}
+
+// ✅ Good: Error display in UI
+class UserWidget extends StatelessWidget {
+  final Either<String, User> userResult;
+
+  @override
+  Widget build(BuildContext context) {
+    return userResult.fold(
+      (error) => Text(
+        error,  // Already translated error message
+        style: TextStyle(color: Colors.red),
+      ),
+      (user) => UserCard(user: user),
+    );
+  }
+}
+```
+
+#### Form Validation with Translations
+
+```dart
+// ✅ Good: Form validation with slang
+class LoginForm extends StatefulWidget {
+  @override
+  State<LoginForm> createState() => _LoginFormState();
+}
+
+class _LoginFormState extends State<LoginForm> {
+  final _formKey = GlobalKey<FormState>();
+
+  @override
+  Widget build(BuildContext context) {
+    return Form(
+      key: _formKey,
+      child: Column(
+        children: [
+          TextFormField(
+            decoration: InputDecoration(
+              labelText: t.pages.login.email,
+              hintText: t.pages.login.emailHint,
+            ),
+            validator: (value) {
+              if (value?.isEmpty ?? true) {
+                return t.errors.validation.required;
+              }
+              if (!_isValidEmail(value!)) {
+                return t.errors.validation.email;
+              }
+              return null;
+            },
+          ),
+          ElevatedButton(
+            onPressed: _submit,
+            child: Text(t.pages.login.actions.signIn),
+          ),
+        ],
+      ),
+    );
+  }
+}
+```
+
+#### Rich Text and Complex Formatting
+
+```dart
+// ✅ Good: Rich text with translations
+class WelcomeText extends StatelessWidget {
+  final String username;
+
+  @override
+  Widget build(BuildContext context) {
+    return RichText(
+      text: TextSpan(
+        children: t.pages.welcome.richWelcome(
+          username: username,
+          linkToTerms: (text) => TextSpan(
+            text: text,
+            style: TextStyle(
+              color: Colors.blue,
+              decoration: TextDecoration.underline,
+            ),
+            recognizer: TapGestureRecognizer()
+              ..onTap = () => _openTerms(),
+          ),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Locale Management Architecture
+
+#### DDD-Based Locale Service
+
+```dart
+// ✅ Good: Domain service for locale management
+import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
+import 'package:xp1/features/locale/domain/services/locale_domain_service.dart';
+
+class LocaleService {
+  final LocaleDomainService _domainService;
+
+  LocaleService(this._domainService);
+
+  /// Switch application locale with persistence
+  Future<LocaleConfiguration> switchLocale(AppLocale locale) async {
+    final config = LocaleConfiguration(
+      languageCode: locale.languageCode,
+      countryCode: locale.countryCode,
+    );
+
+    await _domainService.saveLocaleConfiguration(config);
+    LocaleSettings.setLocale(locale);
+
+    return config;
+  }
+
+  /// Get current locale configuration
+  LocaleConfiguration getCurrentLocale() {
+    return LocaleConfiguration(
+      languageCode: LocaleSettings.currentLocale.languageCode,
+      countryCode: LocaleSettings.currentLocale.countryCode,
+    );
+  }
+}
+```
+
+#### BLoC Integration for Locale State
+
+```dart
+// ✅ Good: Locale cubit with persistence
+class LocaleCubit extends HydratedCubit<LocaleState> {
+  final LocaleService _localeService;
+
+  LocaleCubit(this._localeService) : super(LocaleState.initial());
+
+  Future<void> changeLocale(AppLocale locale) async {
+    emit(LocaleState.changing());
+
+    try {
+      final config = await _localeService.switchLocale(locale);
+      emit(LocaleState.changed(config));
+    } catch (e) {
+      emit(LocaleState.error(e.toString()));
+    }
+  }
+
+  @override
+  LocaleState? fromJson(Map<String, dynamic> json) {
+    try {
+      return LocaleState.fromJson(json);
+    } catch (_) {
+      return LocaleState.initial();
+    }
+  }
+
+  @override
+  Map<String, dynamic>? toJson(LocaleState state) {
+    return state.maybeWhen(
+      changed: (config) => config.toJson(),
+      orElse: () => null,
+    );
+  }
+}
+```
+
+### Development Workflow
+
+#### Adding New Translations
+
+```bash
+# 1. Edit JSON files in lib/l10n/i18n/
+# Add new keys to both en.i18n.json and vi.i18n.json
+
+# 2. Generate updated Dart classes
+make i18n-generate
+
+# 3. Use in code with full type safety and auto-complete
+Text(t.newTranslationKey)
+```
+
+#### Live Development
+
+```bash
+# Recommended: Auto-generation during development
+make i18n-watch
+
+# Edit translation files → Code regenerates automatically
+# IDE immediately shows new translations with auto-complete
+```
+
+#### Translation Validation
+
+```bash
+# Check for missing translations
+make i18n-analyze
+
+# Validate JSON files
+make i18n-validate
+
+# Clean and regenerate if needed
+make i18n-clean && make i18n-generate
+```
+
+### Best Practices
+
+#### Translation Organization
+
+```dart
+// ✅ Good: Hierarchical organization
+{
+  "pages": {
+    "login": {
+      "title": "Login",
+      "fields": {
+        "email": "Email",
+        "password": "Password"
+      },
+      "actions": {
+        "signIn": "Sign In",
+        "forgotPassword": "Forgot Password?"
+      }
+    }
+  },
+  "common": {
+    "actions": {
+      "save": "Save",
+      "cancel": "Cancel",
+      "delete": "Delete"
+    },
+    "status": {
+      "loading": "Loading...",
+      "error": "An error occurred",
+      "success": "Success!"
+    }
+  }
+}
+
+// ❌ Avoid: Flat structure
+{
+  "loginTitle": "Login",
+  "loginEmail": "Email",
+  "loginPassword": "Password",
+  "loginSignIn": "Sign In",
+  "commonSave": "Save",
+  "commonCancel": "Cancel"
+}
+```
+
+#### Consistent Naming Conventions
+
+```dart
+// ✅ Good: Consistent naming patterns
+t.pages.home.title              // Page titles
+t.pages.home.actions.edit       // Page actions
+t.common.actions.save           // Common actions
+t.errors.validation.required    // Error messages
+t.status.loading                // Status messages
+
+// ❌ Avoid: Inconsistent naming
+t.homePageTitle
+t.editAction
+t.saveBtn
+t.reqError
+```
+
+#### Parameterization
+
+```dart
+// ✅ Good: Proper parameterization
+{
+  "greeting": "Hello {name}!",
+  "itemCount": "You have {count} items",
+  "lastSeen": "Last seen {time} ago"
+}
+
+// Usage
+Text(t.greeting(name: user.name))
+Text(t.itemCount(count: items.length))
+Text(t.lastSeen(time: formatTime(user.lastSeen)))
+
+// ❌ Avoid: String concatenation
+Text('Hello ${user.name}!')  // Not translatable
+```
+
+### Testing Internationalization
+
+#### Translation Coverage Testing
+
+```dart
+// ✅ Good: Test translation coverage
+void main() {
+  group('Translation Coverage', () {
+    test('should have Vietnamese translations for all English keys', () {
+      final enKeys = _extractKeys(enTranslations);
+      final viKeys = _extractKeys(viTranslations);
+
+      final missingKeys = enKeys.where((key) => !viKeys.contains(key));
+
+      expect(
+        missingKeys,
+        isEmpty,
+        reason: 'Missing Vietnamese translations: ${missingKeys.join(', ')}',
+      );
+    });
+  });
+}
+```
+
+#### Widget Testing with Translations
+
+```dart
+// ✅ Good: Test widgets with different locales
+void main() {
+  group('LoginPage', () {
+    testWidgets('should display Vietnamese text when locale is vi', (tester) async {
+      LocaleSettings.setLocale(AppLocale.vi);
+
+      await tester.pumpWidget(
+        MaterialApp(
+          home: LoginPage(),
+          locale: AppLocale.vi.flutterLocale,
+        ),
+      );
+
+      expect(find.text('Đăng nhập'), findsOneWidget);
+      expect(find.text('Email'), findsOneWidget);
+    });
+  });
 }
 ```
 

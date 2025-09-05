@@ -1,0 +1,55 @@
+{
+  "app": {
+    "title": "XP1"
+  },
+  "navigation": {
+    "home": "Trang chủ",
+    "statistics": "Thống kê",
+    "attendance": "Chấm công", 
+    "features": "Tính năng",
+    "profile": "Hồ sơ"
+  },
+  "pages": {
+    "home": {
+      "title": "Trang chủ",
+      "welcomeMessage": "Chào mừng đến với {pageName}",
+      "todayStats": "Thống kê hôm nay",
+      "quickActions": "Hành động nhanh"
+    },
+    "login": {
+      "title": "Đăng nhập",
+      "welcomeMessage": "Chào mừng đến với {pageName}",
+      "instruction": "Vui lòng đăng nhập để tiếp tục",
+      "forgotPassword": "Quên mật khẩu?"
+    },
+    "attendance": {
+      "title": "Chấm công",
+      "welcomeMessage": "Chào mừng đến với {pageName}",
+      "currentStatus": "Trạng thái hiện tại: {status}",
+      "checkIn": "Vào ca",
+      "checkOut": "Ra ca"
+    },
+    "statistics": {
+      "title": "Thống kê",
+      "welcomeMessage": "Chào mừng đến với {pageName}",
+      "viewReport": "Xem báo cáo",
+      "exportData": "Xuất dữ liệu"
+    },
+    "features": {
+      "title": "Tính năng",
+      "welcomeMessage": "Chào mừng đến với {pageName}",
+      "availableFeatures": "Tính năng có sẵn",
+      "comingSoon": "Sắp ra mắt"
+    },
+    "profile": {
+      "title": "Hồ sơ",
+      "welcomeMessage": "Chào mừng đến với {pageName}",
+      "editProfile": "Chỉnh sửa hồ sơ",
+      "settings": "Cài đặt",
+      "preferences": "Tùy chọn"
+    }
+  },
+  "auth": {
+    "loginButton": "Đăng nhập"
+  }
+}

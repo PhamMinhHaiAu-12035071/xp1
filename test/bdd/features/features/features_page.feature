@@ -6,7 +6,7 @@ Feature: Features Page
 
     Scenario: Features page displays correctly
         When I tap {Icons.apps} icon
-        Then I see {'Hello World - Features'} text
+        Then I see {'Welcome to Features'} text
 
     Scenario: Features tab is accessible from navigation
         When I tap {Icons.apps} icon

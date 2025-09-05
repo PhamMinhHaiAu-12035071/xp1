@@ -97,7 +97,6 @@ test/tmp/
 packages/**/pubspec.lock
 
 # Web related
-lib/generated_plugin_registrant.dart
 
 # Symbolication related
 app.*.symbols
@@ -120,6 +119,9 @@ app.*.map.json
 
 # Generated l10n files
 lib/l10n/gen/
+
+# Slang generated translation files (generated from source i18n files)
+lib/l10n/i18n/*.g.dart
 
 # Generated dependency injection files
 lib/core/di/injection_container.config.dart

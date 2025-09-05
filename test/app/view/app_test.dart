@@ -20,7 +20,7 @@ void main() {
     testWidgets('should render login page', (tester) async {
       await tester.pumpWidget(App());
       await tester.pumpAndSettle();
-      expect(find.text('Hello World - Login'), findsOneWidget);
+      expect(find.text('Welcome to Login'), findsOneWidget);
     });
 
     testWidgets('should have MaterialApp with router', (tester) async {

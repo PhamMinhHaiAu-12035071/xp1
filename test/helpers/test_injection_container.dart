@@ -1,6 +1,6 @@
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
-
+import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
 import 'package:xp1/features/env/domain/env_config_repository.dart';
 
@@ -15,6 +15,9 @@ class TestDependencyContainer {
   static Future<void> setupTestDependencies() async {
     // Register fallback values for mocktail
     registerFallbackValue(LogLevel.info);
+
+    // Mock SharedPreferences for locale initialization
+    SharedPreferences.setMockInitialValues({});
 
     // Clear existing registrations
     await GetIt.instance.reset();

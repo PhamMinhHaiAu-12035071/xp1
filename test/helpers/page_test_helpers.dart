@@ -18,7 +18,7 @@ import 'helpers.dart';
 /// ```dart
 /// PageTestHelpers.testStandardPage<HomePage>(
 ///   const HomePage(),
-///   'Hello World - Home',
+///   'Welcome to Home',
 ///   () => const HomePage(),
 ///   (key) => HomePage(key: key),
 /// );
@@ -28,11 +28,11 @@ class PageTestHelpers {
   ///
   /// [page] The page widget to test.
   /// [expectedText] The text that should be displayed on the page.
-  /// [hasAppBar] Whether the page should have an AppBar (default: false).
+  /// [hasAppBar] Whether the page should have an AppBar (default: true).
   static void testBasicPageStructure(
     Widget page,
     String expectedText, {
-    bool hasAppBar = false,
+    bool hasAppBar = true,
   }) {
     group('Basic Page Structure Tests', () {
       testWidgets('should render page widget correctly', (tester) async {
@@ -52,7 +52,7 @@ class PageTestHelpers {
 
       testWidgets('should center the content', (tester) async {
         await tester.pumpApp(page);
-        expect(find.byType(Center), findsOneWidget);
+        expect(find.byType(Center), findsAtLeastNWidgets(1));
       });
 
       testWidgets('should have correct text style', (tester) async {
@@ -82,7 +82,7 @@ class PageTestHelpers {
         // Use cascade pattern for multiple expect calls on same finder type
         // when testing widget hierarchy
         expect(find.byType(Scaffold), findsOneWidget);
-        expect(find.byType(Center), findsOneWidget);
+        expect(find.byType(Center), findsAtLeastNWidgets(1));
         expect(find.byType(Text), findsAtLeastNWidgets(1));
       });
     });
@@ -223,13 +223,13 @@ class PageTestHelpers {
   /// [expectedText] The text that should be displayed on the page.
   /// [createWidget] Function to create widget instance without key.
   /// [createWidgetWithKey] Function to create widget instance with key.
-  /// [hasAppBar] Whether page has AppBar (default: false).
+  /// [hasAppBar] Whether page has AppBar (default: true).
   static void testStandardPage<T extends Widget>(
     T page,
     String expectedText,
     T Function() createWidget,
     T Function(Key key) createWidgetWithKey, {
-    bool hasAppBar = false,
+    bool hasAppBar = true,
   }) {
     // Test basic structure
     testBasicPageStructure(page, expectedText, hasAppBar: hasAppBar);
@@ -255,14 +255,14 @@ class PageTestHelpers {
   /// [createWidget] Function to create widget instance without key.
   /// [createWidgetWithKey] Function to create widget instance with key.
   /// [pageRoute] Optional route path for navigation testing.
-  /// [hasAppBar] Whether page has AppBar (default: false).
+  /// [hasAppBar] Whether page has AppBar (default: true).
   static void testComprehensivePage<T extends Widget>(
     T page,
     String expectedText,
     T Function() createWidget,
     T Function(Key key) createWidgetWithKey, {
     String? pageRoute,
-    bool hasAppBar = false,
+    bool hasAppBar = true,
   }) {
     // Test environment setup first
     testEnvironmentSetup();

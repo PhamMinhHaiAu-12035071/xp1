@@ -3,7 +3,7 @@ Feature: App Routing
     Scenario: App starts with login route
         Given the app is running
         Then I see {'Login'} text
-        And I see {'Hello World - Login'} text
+        And I see {'Welcome to Login'} text
         And I see {'Login'} button
 
     Scenario: Login navigates to main app wrapper
@@ -19,4 +19,4 @@ Feature: App Routing
     Scenario: Route replacement shows home page content
         Given the app is running
         When I tap {'Login'} button
-        Then I see {'Hello World - Home'} text
+        Then I see {'Welcome to Home'} text

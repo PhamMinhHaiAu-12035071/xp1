@@ -16,7 +16,7 @@ void main() {
     // Use helper function to eliminate code duplication
     PageTestHelpers.testStandardPage<FeaturesPage>(
       const FeaturesPage(),
-      'Hello World - Features',
+      'Welcome to Features',
       () => const FeaturesPage(),
       (key) => FeaturesPage(key: key),
     );

@@ -96,114 +96,107 @@ $ open coverage/index.html
 
 ## Working with Translations 🌐
 
-This project relies on [flutter_localizations][flutter_localizations_link] and follows the [official internationalization guide for Flutter][internationalization_link].
+This project uses [Slang](https://pub.dev/packages/slang) for type-safe internationalization with compile-time translation safety and better IDE support.
+
+### File Structure
+
+```
+lib/l10n/
+├── i18n/                     # Translation source files
+│   ├── en.i18n.json          # English translations (base locale)
+│   └── vi.i18n.json          # Vietnamese translations
+└── gen/                      # Generated slang code
+    └── strings.g.dart        # Generated translation classes
+```
 
 ### Adding Strings
 
-1. To add a new localizable string, open the `app_en.arb` file at `lib/l10n/arb/app_en.arb`.
+1. Edit the JSON translation files in `lib/l10n/i18n/`:
 
-```arb
+**English (`en.i18n.json`):**
+
+```json
 {
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
+  "hello": "Hello",
+  "welcome": "Welcome {name}",
+  "pages": {
+    "home": {
+      "title": "Home",
+      "subtitle": "Welcome to the home page"
     }
+  }
 }
 ```
 
-2. Then add a new key/value and description
+**Vietnamese (`vi.i18n.json`):**
 
-```arb
+```json
 {
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    },
-    "helloWorld": "Hello World",
-    "@helloWorld": {
-        "description": "Hello World Text"
+  "hello": "Xin chào",
+  "welcome": "Chào mừng {name}",
+  "pages": {
+    "home": {
+      "title": "Trang chủ",
+      "subtitle": "Chào mừng đến trang chủ"
     }
+  }
 }
 ```
 
-3. Use the new string
+2. Generate the updated Dart classes:
+
+```sh
+make i18n-generate
+# Or: dart run slang
+```
+
+3. Use the new translations with full type safety:
 
 ```dart
-import 'package:xp1/l10n/l10n.dart';
+import 'package:xp1/l10n/gen/strings.g.dart';
 
 @override
 Widget build(BuildContext context) {
-  final l10n = context.l10n;
-  return Text(l10n.helloWorld);
+  return Column(
+    children: [
+      Text(t.hello),                          // "Hello" / "Xin chào"
+      Text(t.welcome(name: 'John')),          // "Welcome John" / "Chào mừng John"
+      Text(t.pages.home.title),               // "Home" / "Trang chủ"
+
+      // Or use context extension
+      Text(context.t.hello),
+    ],
+  );
 }
 ```
 
-### Adding Supported Locales
-
-Update the `CFBundleLocalizations` array in the `Info.plist` at `ios/Runner/Info.plist` to include the new locale.
-
-```xml
-    ...
-
-    <key>CFBundleLocalizations</key>
-	<array>
-		<string>en</string>
-		<string>es</string>
-	</array>
-
-    ...
-```
-
-### Adding Translations
-
-1. For each supported locale, add a new ARB file in `lib/l10n/arb`.
-
-```
-├── l10n
-│   ├── arb
-│   │   ├── app_en.arb
-│   │   └── app_es.arb
-```
-
-2. Add the translated strings to each `.arb` file:
-
-`app_en.arb`
-
-```arb
-{
-    "@@locale": "en",
-    "counterAppBarTitle": "Counter",
-    "@counterAppBarTitle": {
-        "description": "Text shown in the AppBar of the Counter Page"
-    }
-}
-```
-
-`app_es.arb`
-
-```arb
-{
-    "@@locale": "es",
-    "counterAppBarTitle": "Contador",
-    "@counterAppBarTitle": {
-        "description": "Texto mostrado en la AppBar de la página del contador"
-    }
-}
-```
-
-### Generating Translations
-
-To use the latest translations changes, you will need to generate them:
-
-1. Generate localizations for the current project:
+### Translation Commands
 
 ```sh
-flutter gen-l10n --arb-dir="lib/l10n/arb"
+# Essential commands
+make i18n-generate           # Generate translations from JSON files
+make i18n-watch              # Auto-generate during development (recommended)
+make i18n-analyze            # Check translation coverage
+make i18n-validate           # Validate translation files
+
+# Maintenance
+make i18n-clean              # Clean generated files
+make i18n-help               # Show detailed help
 ```
 
-Alternatively, run `flutter run` and code generation will take place automatically.
+### Development Workflow
+
+1. **Live Development**: Use `make i18n-watch` for automatic code generation while editing translation files
+2. **Adding Translations**: Edit JSON files → Run `make i18n-generate` → Use with full type safety
+3. **Validation**: Use `make i18n-analyze` to check for missing translations
+
+### Advanced Features
+
+- **Parameterized strings**: `"greeting": "Hello {name}"`
+- **Pluralization**: Automatic plural forms based on count
+- **Nested translations**: Organize translations hierarchically
+- **Rich text support**: For complex formatted text
+- **Compile-time safety**: No more runtime translation errors!
 
 [coverage_badge]: coverage_badge.svg
 [flutter_localizations_link]: https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html

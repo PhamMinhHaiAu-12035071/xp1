@@ -41,6 +41,14 @@ pre-commit:
           echo "📦 pubspec.yaml changed, validating dependencies..."
           make validate-deps
         fi
+    # i18n validation when translation files change
+    i18n-validation:
+      glob: "lib/l10n/i18n/*.json"
+      run: |
+        if git diff --cached --name-only | grep -q "lib/l10n/i18n/.*\.json"; then
+          echo "🌐 Translation files changed, validating i18n..."
+          make i18n-validate
+        fi
     # Analyze staged files for linting and naming convention issues
     staged-analysis:
       glob: "*.dart"
