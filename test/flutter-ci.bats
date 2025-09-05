@@ -166,7 +166,10 @@ EOF
     assert_success
     assert_mock_called_with "fvm" "flutter pub get"
     assert_mock_called_with "fvm" "flutter analyze --fatal-infos"
-    assert_mock_called_with "fvm" "dart format lib/ test/ --set-exit-if-changed --output=none"
+    # Check that find command is called for excluding generated files
+    [[ "$output" =~ "find lib -name" ]]
+    # Check that test directory formatting is still called normally
+    assert_mock_called_with "fvm" "dart format test/ --set-exit-if-changed --output=none"
     assert_mock_called_with "make" "test"
     assert_mock_called_with "fvm" "flutter pub publish --dry-run"
 }
