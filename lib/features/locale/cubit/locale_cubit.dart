@@ -125,8 +125,9 @@ class LocaleCubit extends HydratedCubit<LocaleConfiguration> {
   LocaleConfiguration? fromJson(Map<String, dynamic> json) {
     try {
       return LocaleConfiguration.fromJson(json);
+    } on FormatException {
+      return null;
     } on Exception {
-      // Return null to trigger default state if deserialization fails
       return null;
     }
   }

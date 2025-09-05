@@ -27,7 +27,12 @@
       "welcomeMessage": "Chào mừng đến với {pageName}",
       "currentStatus": "Trạng thái hiện tại: {status}",
       "checkIn": "Vào ca",
-      "checkOut": "Ra ca"
+      "checkOut": "Ra ca",
+      "status": {
+        "notCheckedIn": "Chưa vào ca",
+        "checkedIn": "Đã vào ca",
+        "checkedOut": "Đã ra ca"
+      }
     },
     "statistics": {
       "title": "Thống kê",

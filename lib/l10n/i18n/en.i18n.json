@@ -27,7 +27,12 @@
       "welcomeMessage": "Welcome to {pageName}",
       "currentStatus": "Current Status: {status}",
       "checkIn": "Check In",
-      "checkOut": "Check Out"
+      "checkOut": "Check Out",
+      "status": {
+        "notCheckedIn": "Not checked in",
+        "checkedIn": "Checked in",
+        "checkedOut": "Checked out"
+      }
     },
     "statistics": {
       "title": "Statistics", 

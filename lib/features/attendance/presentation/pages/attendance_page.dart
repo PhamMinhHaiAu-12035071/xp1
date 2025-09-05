@@ -1,6 +1,5 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
-
 import 'package:xp1/l10n/gen/strings.g.dart';
 
 /// Attendance page for time tracking and check-in/out.
@@ -35,7 +34,7 @@ class AttendancePage extends StatelessWidget {
                     Text(
                       t.pages.attendance.currentStatus.replaceAll(
                         '{status}',
-                        'Not checked in',
+                        t.pages.attendance.status.notCheckedIn,
                       ),
                       style: Theme.of(context).textTheme.headlineSmall,
                     ),
