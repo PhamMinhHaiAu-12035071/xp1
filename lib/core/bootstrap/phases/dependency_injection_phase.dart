@@ -1,5 +1,7 @@
+import 'package:meta/meta.dart';
 import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
 import 'package:xp1/core/di/injection_container.dart';
+import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
 import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 
 /// Bootstrap phase responsible for dependency injection setup.
@@ -43,7 +45,7 @@ class DependencyInjectionPhase implements BootstrapPhase {
       await configureDependencies();
 
       // Validate critical dependencies are registered
-      _validateCriticalDependencies();
+      validateCriticalDependencies();
 
       _logger.info('✅ Dependency injection configured successfully');
 
@@ -74,9 +76,10 @@ class DependencyInjectionPhase implements BootstrapPhase {
   }
 
   /// Validates that critical dependencies are properly registered.
-  void _validateCriticalDependencies() {
+  @protected
+  void validateCriticalDependencies() {
     const criticalServices = <Type>[
-      LoggerService,
+      ILoggerService,
       // Add other critical services as they're registered
     ];
 

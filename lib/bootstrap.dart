@@ -2,10 +2,10 @@
 // This file is maintained for backward compatibility
 
 import 'package:xp1/core/di/injection_container.dart';
-import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 import 'package:xp1/features/locale/application/locale_application_service.dart';
 import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
-import 'package:xp1/features/locale/domain/services/locale_domain_service.dart';
+import 'package:xp1/features/locale/domain/services/locale_domain_service.dart'
+    show UnsupportedLocaleException;
 import 'package:xp1/l10n/gen/strings.g.dart';
 
 export 'package:xp1/core/bootstrap/app_bootstrap.dart' show bootstrap;
@@ -24,11 +24,8 @@ export 'package:xp1/l10n/gen/strings.g.dart' show AppLocale, LocaleSettings;
 /// Throws [UnsupportedLocaleException] if the locale is not supported.
 /// Throws [LocaleApplicationException] for infrastructure failures.
 Future<LocaleConfiguration> switchLocale(AppLocale locale) async {
-  // Use application service for proper DDD-compliant locale switching
-  final applicationService = LocaleApplicationService(
-    domainService: getIt<LocaleDomainService>(),
-    logger: getIt<LoggerService>(),
-  );
+  // Retrieve the singleton instance from GetIt for efficiency and consistency
+  final applicationService = getIt<LocaleApplicationService>();
 
   return applicationService.switchLocale(locale);
 }

@@ -1,3 +1,4 @@
+import 'package:injectable/injectable.dart';
 import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
 import 'package:xp1/features/locale/domain/repositories/locale_repository.dart';
 import 'package:xp1/features/locale/domain/services/platform_locale_provider.dart';
@@ -9,13 +10,9 @@ import 'package:xp1/l10n/gen/strings.g.dart';
 /// following DDD principles. It coordinates between repository, platform
 /// detection, and validation without depending on infrastructure concerns.
 ///
-/// **DEPRECATED**: This service has been replaced by LocaleCubit which
-/// provides the same business logic with automatic persistence via
-/// HydratedBloc. This class is kept for backward compatibility but
-/// should not be used in new code.
-///
 /// As Eric Evans explains: "Domain services encapsulate domain logic that
 /// doesn't naturally fit within an entity or value object."
+@injectable
 class LocaleDomainService {
   /// Creates locale domain service with required dependencies.
   const LocaleDomainService({

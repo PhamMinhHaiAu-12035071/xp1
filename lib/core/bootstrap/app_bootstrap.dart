@@ -6,6 +6,7 @@ import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
 import 'package:xp1/core/bootstrap/orchestrator/bootstrap_orchestrator.dart';
 import 'package:xp1/core/bootstrap/phases/dependency_injection_phase.dart';
 import 'package:xp1/core/bootstrap/phases/error_handling_phase.dart';
+import 'package:xp1/core/bootstrap/phases/locale_bootstrap_phase.dart';
 import 'package:xp1/core/infrastructure/bloc/app_bloc_observer.dart';
 import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 import 'package:xp1/features/env/infrastructure/env_config_factory.dart';
@@ -57,6 +58,9 @@ class AppBootstrap {
       // Log execution summary
       logger.info(orchestrator.getExecutionSummary(results));
 
+      // Extract locale configuration from locale phase result
+      final localeConfiguration = _extractLocaleConfiguration(results, logger);
+
       // Setup BLoC observer (kept here as it's Flutter-specific)
       _setupBlocObserver(logger);
 
@@ -65,12 +69,7 @@ class AppBootstrap {
 
       logger.info('🚀 Application bootstrap completed successfully');
 
-      // For now, return a default locale configuration
-      // In a real implementation, this would come from a locale phase
-      return const LocaleConfiguration(
-        languageCode: 'en',
-        source: LocaleSource.systemDetected,
-      );
+      return localeConfiguration;
     } on BootstrapException {
       logger.error('Application bootstrap failed');
       rethrow;
@@ -88,6 +87,7 @@ class AppBootstrap {
     return [
       DependencyInjectionPhase(logger: logger),
       ErrorHandlingPhase(logger: logger),
+      LocaleBootstrapPhase(logger: logger),
       // Add more phases as needed
     ];
   }
@@ -100,6 +100,37 @@ class AppBootstrap {
   void _setupBlocObserver(LoggerService logger) {
     Bloc.observer = AppBlocObserver();
     logger.info('🎯 BLoC observer configured');
+  }
+
+  /// Extracts locale configuration from bootstrap phase results.
+  ///
+  /// This method retrieves the locale configuration produced by the
+  /// LocaleBootstrapPhase and provides a fallback if the phase failed.
+  LocaleConfiguration _extractLocaleConfiguration(
+    Map<String, BootstrapResult> results,
+    LoggerService logger,
+  ) {
+    // Find the locale phase result
+    final localeResult = results['Locale System'];
+    if (localeResult != null &&
+        localeResult.success &&
+        localeResult.data.containsKey('locale_configuration')) {
+      final localeConfig = localeResult.getData<LocaleConfiguration>(
+        'locale_configuration',
+      );
+      if (localeConfig != null) {
+        return localeConfig;
+      }
+    }
+
+    // Fallback to default if locale phase failed or didn't run
+    logger.warning(
+      'Locale phase did not produce configuration, using fallback',
+    );
+    return const LocaleConfiguration(
+      languageCode: 'vi', // Project default
+      source: LocaleSource.defaultFallback,
+    );
   }
 
   /// Logs environment configuration for debugging and monitoring.

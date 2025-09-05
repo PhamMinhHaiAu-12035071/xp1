@@ -1,14 +1,13 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
-import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 import 'package:xp1/features/locale/application/locale_application_service.dart';
 import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
 import 'package:xp1/features/locale/domain/services/locale_domain_service.dart';
 import 'package:xp1/l10n/gen/strings.g.dart';
 
-/// Mock LoggerService for testing.
-class MockLoggerService extends Mock implements LoggerService {}
+/// Mock ILoggerService for testing.
+class MockILoggerService extends Mock implements ILoggerService {}
 
 /// Mock LocaleDomainService for testing LocaleApplicationService.
 class TestLocaleDomainService implements LocaleDomainService {
@@ -64,8 +63,8 @@ class TestLocaleDomainService implements LocaleDomainService {
   }
 }
 
-/// Test implementation of LoggerService for testing.
-class TestLoggerService implements LoggerService {
+/// Test implementation of ILoggerService for testing.
+class TestILoggerService implements ILoggerService {
   final List<String> logMessages = <String>[];
   final List<Object?> errorLogs = <Object?>[];
   final List<String> warningLogs = <String>[];
@@ -99,38 +98,6 @@ class TestLoggerService implements LoggerService {
     }
   }
 
-  @override
-  void info(String message, [Map<String, dynamic>? extra]) {
-    final extraInfo = extra != null ? ' | Extra: $extra' : '';
-    logMessages.add('INFO: $message$extraInfo');
-  }
-
-  @override
-  void error(String message, [Object? error, StackTrace? stackTrace]) {
-    errorLogs.add(error);
-    logMessages.add('ERROR: $message');
-  }
-
-  @override
-  void warning(String message, [Map<String, dynamic>? extra]) {
-    final extraInfo = extra != null ? ' | Extra: $extra' : '';
-    warningLogs.add(message);
-    logMessages.add('WARNING: $message$extraInfo');
-  }
-
-  @override
-  void debug(String message, [Map<String, dynamic>? extra]) {
-    final extraInfo = extra != null ? ' | Extra: $extra' : '';
-    debugLogs.add(message);
-    logMessages.add('DEBUG: $message$extraInfo');
-  }
-
-  @override
-  void fatal(String message, [Object? error, StackTrace? stackTrace]) {
-    errorLogs.add(error);
-    logMessages.add('FATAL: $message');
-  }
-
   void clearLogs() {
     logMessages.clear();
     errorLogs.clear();
@@ -140,12 +107,16 @@ class TestLoggerService implements LoggerService {
 }
 
 void main() {
-  late LoggerService logger;
+  late ILoggerService logger;
   late TestLocaleDomainService mockDomainService;
   late LocaleApplicationService applicationService;
 
+  setUpAll(() {
+    registerFallbackValue(LogLevel.info);
+  });
+
   setUp(() {
-    logger = LoggerService();
+    logger = TestILoggerService();
   });
 
   group('LocaleApplicationService', () {
@@ -214,8 +185,8 @@ void main() {
       test(
         'should cover logger.info at lines 52-53 by throwing exception',
         () async {
-          // Use MockLoggerService to control logger behavior
-          final mockLogger = MockLoggerService();
+          // Use MockILoggerService to control logger behavior
+          final mockLogger = MockILoggerService();
 
           mockDomainService = TestLocaleDomainService();
 
@@ -225,17 +196,15 @@ void main() {
           );
 
           // Setup default mock behaviors
-          when(() => mockLogger.info(any())).thenReturn(null);
-          when(() => mockLogger.warning(any())).thenReturn(null);
-          when(() => mockLogger.debug(any())).thenReturn(null);
-          when(
-            () => mockLogger.error(any(), any<dynamic>(), any<StackTrace?>()),
-          ).thenReturn(null);
+          when(() => mockLogger.log(any(), any())).thenReturn(null);
 
-          // Make logger.info throw exception when logging completion message
+          // Make logger.log throw exception when logging completion message
           // This forces the exception to occur after lines 52-53
           when(
-            () => mockLogger.info('Domain locale update completed: vi'),
+            () => mockLogger.log(
+              'Domain locale update completed: vi',
+              LogLevel.info,
+            ),
           ).thenThrow(Exception('stop'));
 
           // Act & Assert: should throw LocaleApplicationException
@@ -258,7 +227,10 @@ void main() {
 
           // Verify: the specific log at lines 52-53 was called
           verify(
-            () => mockLogger.info('Domain locale update completed: vi'),
+            () => mockLogger.log(
+              'Domain locale update completed: vi',
+              LogLevel.info,
+            ),
           ).called(1);
 
           // Verify: domain service was called
@@ -266,10 +238,11 @@ void main() {
 
           // Verify: error was logged due to exception
           verify(
-            () => mockLogger.error(
+            () => mockLogger.log(
               'Unexpected locale switch error',
-              any<dynamic>(),
-              any<StackTrace?>(),
+              LogLevel.error,
+              error: any<dynamic>(named: 'error'),
+              stackTrace: any<StackTrace?>(named: 'stackTrace'),
             ),
           ).called(1);
         },
@@ -278,8 +251,8 @@ void main() {
       test(
         'should handle error in _applyLocaleToSession gracefully',
         () async {
-          // Use MockLoggerService to simulate error in debug log
-          final mockLogger = MockLoggerService();
+          // Use MockILoggerService to simulate error in debug log
+          final mockLogger = MockILoggerService();
 
           mockDomainService = TestLocaleDomainService();
 
@@ -289,15 +262,14 @@ void main() {
           );
 
           // Setup default mock behaviors
-          when(() => mockLogger.info(any())).thenReturn(null);
-          when(() => mockLogger.warning(any())).thenReturn(null);
-          when(
-            () => mockLogger.error(any(), any<dynamic>(), any<StackTrace?>()),
-          ).thenReturn(null);
+          when(() => mockLogger.log(any(), any())).thenReturn(null);
 
           // Make debug log throw exception to simulate error in session update
           when(
-            () => mockLogger.debug('🔄 Applying locale to current session'),
+            () => mockLogger.log(
+              '🔄 Applying locale to current session',
+              LogLevel.debug,
+            ),
           ).thenThrow(Exception('session error'));
 
           // This should still succeed because _applyLocaleToSession catches
@@ -309,9 +281,10 @@ void main() {
 
           // Verify that error was logged
           verify(
-            () => mockLogger.error(
+            () => mockLogger.log(
               'Failed to apply locale to session',
-              any<dynamic>(),
+              LogLevel.error,
+              error: any<dynamic>(named: 'error'),
             ),
           ).called(1);
         },

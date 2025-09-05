@@ -1,4 +1,5 @@
-import 'package:xp1/core/infrastructure/logging/logger_service.dart';
+import 'package:injectable/injectable.dart';
+import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
 import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
 import 'package:xp1/features/locale/domain/services/locale_domain_service.dart';
 import 'package:xp1/l10n/gen/strings.g.dart';
@@ -14,16 +15,17 @@ import 'package:xp1/l10n/gen/strings.g.dart';
 /// - Handle transaction boundaries
 /// - Provide a clean API for UI operations
 /// - Manage cross-cutting concerns like logging
+@injectable
 class LocaleApplicationService {
   /// Creates locale application service with dependencies.
   const LocaleApplicationService({
     required LocaleDomainService domainService,
-    required LoggerService logger,
+    required ILoggerService logger,
   }) : _domainService = domainService,
        _logger = logger;
 
   final LocaleDomainService _domainService;
-  final LoggerService _logger;
+  final ILoggerService _logger;
 
   /// Switches user locale with proper validation and persistence.
   ///
@@ -42,30 +44,39 @@ class LocaleApplicationService {
   /// Throws [LocaleApplicationException] for unexpected errors.
   Future<LocaleConfiguration> switchLocale(AppLocale locale) async {
     try {
-      _logger.info('🌐 Switching locale to ${locale.languageCode}');
+      _logger.log(
+        '🌐 Switching locale to ${locale.languageCode}',
+        LogLevel.info,
+      );
 
       // Step 1: Use domain service for validation and persistence
       final configuration = await _domainService.updateUserLocale(
         locale.languageCode,
       );
 
-      _logger.info(
+      _logger.log(
         'Domain locale update completed: ${configuration.languageCode}',
+        LogLevel.info,
       );
 
       // Step 2: Apply to current session (infrastructure concern)
       // Note: This is handled separately to maintain clean architecture
       await _applyLocaleToSession(locale);
 
-      _logger.info('✅ Locale switch completed successfully');
+      _logger.log('✅ Locale switch completed successfully', LogLevel.info);
 
       return configuration;
     } on UnsupportedLocaleException catch (e) {
-      _logger.warning('Locale switch failed: ${e.message}');
+      _logger.log('Locale switch failed: ${e.message}', LogLevel.warning);
       // Re-throw domain exceptions as-is to preserve error semantics
       rethrow;
     } on Exception catch (e, stackTrace) {
-      _logger.error('Unexpected locale switch error', e, stackTrace);
+      _logger.log(
+        'Unexpected locale switch error',
+        LogLevel.error,
+        error: e,
+        stackTrace: stackTrace,
+      );
       // Wrap unexpected errors in application-specific exception
       throw LocaleApplicationException(
         'Failed to switch locale to ${locale.languageCode}',
@@ -80,21 +91,23 @@ class LocaleApplicationService {
   /// through the domain service, ensuring consistency with business rules.
   Future<LocaleConfiguration> getCurrentConfiguration() async {
     try {
-      _logger.debug('🔍 Retrieving current locale configuration');
+      _logger.log('🔍 Retrieving current locale configuration', LogLevel.debug);
 
       final configuration = await _domainService.resolveLocaleConfiguration();
 
-      _logger.debug(
+      _logger.log(
         'Current locale: ${configuration.languageCode} '
         '(source: ${configuration.source})',
+        LogLevel.debug,
       );
 
       return configuration;
     } on Exception catch (e, stackTrace) {
-      _logger.error(
+      _logger.log(
         'Failed to get current locale configuration',
-        e,
-        stackTrace,
+        LogLevel.error,
+        error: e,
+        stackTrace: stackTrace,
       );
       throw LocaleApplicationException(
         'Unable to retrieve current locale configuration',
@@ -110,7 +123,7 @@ class LocaleApplicationService {
   /// system settings.
   Future<LocaleConfiguration> initializeLocaleSystem() async {
     try {
-      _logger.info('🚀 Initializing locale system...');
+      _logger.log('🚀 Initializing locale system...', LogLevel.info);
 
       final configuration = await _domainService.resolveLocaleConfiguration();
 
@@ -122,13 +135,19 @@ class LocaleApplicationService {
         ),
       );
 
-      _logger.info(
+      _logger.log(
         '✅ Locale system initialized: ${configuration.languageCode}',
+        LogLevel.info,
       );
 
       return configuration;
     } on Exception catch (e, stackTrace) {
-      _logger.error('Locale system initialization failed', e, stackTrace);
+      _logger.log(
+        'Locale system initialization failed',
+        LogLevel.error,
+        error: e,
+        stackTrace: stackTrace,
+      );
       throw LocaleApplicationException(
         'Failed to initialize locale system',
         originalError: e,
@@ -143,14 +162,18 @@ class LocaleApplicationService {
   /// to maintain clean architecture.
   Future<void> _applyLocaleToSession(AppLocale locale) async {
     try {
-      _logger.debug('🔄 Applying locale to current session');
+      _logger.log('🔄 Applying locale to current session', LogLevel.debug);
 
       // Apply locale to current session
       await LocaleSettings.setLocale(locale);
 
-      _logger.debug('Session locale updated successfully');
+      _logger.log('Session locale updated successfully', LogLevel.debug);
     } on Exception catch (e) {
-      _logger.error('Failed to apply locale to session', e);
+      _logger.log(
+        'Failed to apply locale to session',
+        LogLevel.error,
+        error: e,
+      );
       // Don't throw here - session update is not critical for persistence
       // The domain layer has already been updated successfully
     }
@@ -162,7 +185,7 @@ class LocaleApplicationService {
   /// locale, useful for user preference reset scenarios.
   Future<LocaleConfiguration> resetToSystemDefault() async {
     try {
-      _logger.info('🔄 Resetting locale to system default');
+      _logger.log('🔄 Resetting locale to system default', LogLevel.info);
 
       final configuration = await _domainService.resetToSystemDefault();
 
@@ -173,11 +196,16 @@ class LocaleApplicationService {
         ),
       );
 
-      _logger.info('✅ Locale reset to system default');
+      _logger.log('✅ Locale reset to system default', LogLevel.info);
 
       return configuration;
     } on Exception catch (e, stackTrace) {
-      _logger.error('Failed to reset locale to system default', e, stackTrace);
+      _logger.log(
+        'Failed to reset locale to system default',
+        LogLevel.error,
+        error: e,
+        stackTrace: stackTrace,
+      );
       throw LocaleApplicationException(
         'Unable to reset locale to system default',
         originalError: e,
