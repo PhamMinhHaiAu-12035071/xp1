@@ -302,8 +302,24 @@ make generate-env-prod && make run-prod
 
 - **Format Check**: Code must be properly formatted
 - **Analysis**: No warnings or errors from `dart analyze --fatal-infos`
+- **i18n Generation**: Slang translation files must be generated (`dart run slang`)
 - **License Validation**: Only business-safe licenses allowed (blocks GPL/copyleft)
 - **Dependency Check**: No unused or missing dependencies
+
+### CI/CD Requirements
+
+The GitHub workflow automatically runs these steps in sequence:
+
+1. Setup environment and dependencies (`flutter pub get`)
+2. Generate environment config files
+3. Generate code via build_runner
+4. **Generate i18n files via slang** (`dart run slang`)
+5. Format check and analysis
+6. Run tests with coverage
+
+⚠️ **Critical**: The `dart run slang` step is essential for CI success as it generates
+`lib/l10n/gen/strings.g.dart` required by the analyze job. Without this step,
+you'll get 136+ "Target of URI hasn't been generated" errors.
 
 ## Special Considerations
 

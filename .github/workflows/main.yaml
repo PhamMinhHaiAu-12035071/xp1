@@ -174,6 +174,9 @@ jobs:
       - name: 🔍 Format check
         run: dart format --set-exit-if-changed lib test
 
+      - name: 🌐 Generate i18n files
+        run: dart run slang
+
       - name: 🕵️ Analyze
         run: flutter analyze lib test
 
