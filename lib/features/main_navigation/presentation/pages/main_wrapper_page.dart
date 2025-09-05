@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:xp1/core/routing/app_router.dart';
+import 'package:xp1/l10n/gen/strings.g.dart';
 
 /// Navigation tab configuration data structure.
 ///
@@ -34,44 +35,46 @@ class MainWrapperPage extends StatelessWidget {
   ///
   /// Eliminates code duplication between routes list and navigation items.
   /// Following Linus's data structure principle: worry about data first.
-  static const List<NavTabConfig> _navTabs = [
+  List<NavTabConfig> _buildNavTabs() => [
     NavTabConfig(
-      route: HomeRoute(),
+      route: const HomeRoute(),
       icon: Icons.home,
-      label: 'Home',
+      label: t.navigation.home,
     ),
     NavTabConfig(
-      route: StatisticsRoute(),
+      route: const StatisticsRoute(),
       icon: Icons.analytics,
-      label: 'Statistics',
+      label: t.navigation.statistics,
     ),
     NavTabConfig(
-      route: AttendanceRoute(),
+      route: const AttendanceRoute(),
       icon: Icons.access_time,
-      label: 'Attendance',
+      label: t.navigation.attendance,
     ),
     NavTabConfig(
-      route: FeaturesRoute(),
+      route: const FeaturesRoute(),
       icon: Icons.apps,
-      label: 'Features',
+      label: t.navigation.features,
     ),
     NavTabConfig(
-      route: ProfileRoute(),
+      route: const ProfileRoute(),
       icon: Icons.person,
-      label: 'Profile',
+      label: t.navigation.profile,
     ),
   ];
 
   @override
   Widget build(BuildContext context) {
+    final navTabs = _buildNavTabs();
+
     return AutoTabsScaffold(
-      routes: _navTabs.map((tab) => tab.route).toList(),
+      routes: navTabs.map((tab) => tab.route).toList(),
       bottomNavigationBuilder: (_, tabsRouter) {
         return BottomNavigationBar(
           currentIndex: tabsRouter.activeIndex,
           onTap: tabsRouter.setActiveIndex,
           type: BottomNavigationBarType.fixed,
-          items: _navTabs
+          items: navTabs
               .map(
                 (tab) => BottomNavigationBarItem(
                   icon: Icon(tab.icon),

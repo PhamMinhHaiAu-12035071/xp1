@@ -16,7 +16,7 @@ void main() {
     // Use helper function to eliminate code duplication
     PageTestHelpers.testStandardPage<StatisticsPage>(
       const StatisticsPage(),
-      'Hello World - Statistics',
+      'Welcome to Statistics',
       () => const StatisticsPage(),
       (key) => StatisticsPage(key: key),
     );

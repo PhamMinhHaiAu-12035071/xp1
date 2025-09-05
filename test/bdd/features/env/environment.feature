@@ -8,7 +8,7 @@ Feature: Environment Configuration
         # App should load with development configuration
 
     Scenario: Environment-specific configuration loads
-        Then I see {'Hello World - Login'} text
+        Then I see {'Welcome to Login'} text
         # Environment-specific strings and configs should be available
 
     Scenario: App initializes with proper environment

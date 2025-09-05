@@ -6,7 +6,7 @@ Feature: Statistics Page
 
     Scenario: Statistics page displays correctly
         When I tap {Icons.analytics} icon
-        Then I see {'Hello World - Statistics'} text
+        Then I see {'Welcome to Statistics'} text
 
     Scenario: Statistics tab is accessible from navigation
         When I tap {Icons.analytics} icon

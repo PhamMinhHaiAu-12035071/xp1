@@ -9,6 +9,8 @@ targets:
           testerType: WidgetTester
           # Step folder configuration - relative to test folder
           stepFolderName: step
+          # Hook folder for test setup/teardown - relative to test folder
+          hookFolderName: bdd_hooks
           # Use external steps from bdd_steps package - import individual files
           externalSteps:
             - package:bdd_steps/steps/the_app_is_running.dart

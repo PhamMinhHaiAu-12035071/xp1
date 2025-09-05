@@ -13,28 +13,28 @@ Feature: Bottom Navigation
 
     Scenario: Tap home navigation tab
         When I tap {Icons.home} icon
-        Then I see {'Hello World - Home'} text
+        Then I see {'Welcome to Home'} text
 
     Scenario: Tap statistics navigation tab
         When I tap {Icons.analytics} icon
-        Then I see {'Hello World - Statistics'} text
+        Then I see {'Welcome to Statistics'} text
 
     Scenario: Tap attendance navigation tab
         When I tap {Icons.access_time} icon
-        Then I see {'Hello World - Attendance'} text
+        Then I see {'Welcome to Attendance'} text
 
     Scenario: Tap features navigation tab
         When I tap {Icons.apps} icon
-        Then I see {'Hello World - Features'} text
+        Then I see {'Welcome to Features'} text
 
     Scenario: Tap profile navigation tab
         When I tap {Icons.person} icon
-        Then I see {'Hello World - Profile'} text
+        Then I see {'Welcome to Profile'} text
 
     Scenario: Navigation between tabs
         When I tap {Icons.analytics} icon
-        Then I see {'Hello World - Statistics'} text
+        Then I see {'Welcome to Statistics'} text
         When I tap {Icons.person} icon
-        Then I see {'Hello World - Profile'} text
+        Then I see {'Welcome to Profile'} text
         When I tap {Icons.home} icon
-        Then I see {'Hello World - Home'} text
+        Then I see {'Welcome to Home'} text

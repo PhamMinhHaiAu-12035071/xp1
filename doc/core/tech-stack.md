@@ -77,10 +77,20 @@
 
 ### Internationalization
 
-- **flutter_localizations**: SDK
-  - Built-in Flutter localization support
+- **slang**: ^4.8.1
+  - Type-safe i18n solution with code generation
+  - JSON-based translation files
+  - Compile-time translation safety
+- **slang_flutter**: ^4.8.0
+  - Flutter integration for slang
+  - Widget integration helpers
+  - Context extensions for translations
+- **shared_preferences**: ^2.3.3
+  - Locale persistence and user preference storage
+  - Cross-platform local storage
 - **intl**: ^0.20.2
   - Internationalization and localization formatting
+  - Date, number, and currency formatting support
 
 ### Development Tools
 
@@ -90,6 +100,10 @@
 - **build_runner**: ^2.7.0
   - Code generation for auto_route
   - Build system automation
+- **slang_build_runner**: ^4.8.0 (dev)
+  - Code generation for slang translations
+  - JSON to Dart code generation
+  - Build system integration for i18n
 
 ### Testing Framework
 
@@ -154,6 +168,11 @@ lib/
 │   │   └── app.dart              # Main app widget
 │   └── app.dart                  # Barrel export
 ├── l10n/                         # Internationalization
+│   ├── i18n/                     # Translation JSON files
+│   │   ├── en.i18n.json          # English translations
+│   │   └── vi.i18n.json          # Vietnamese translations
+│   └── gen/                      # Generated slang code
+│       └── strings.g.dart        # Generated translation classes
 ├── bootstrap.dart                # App initialization
 └── main_*.dart                   # Environment entry points
 ```
@@ -204,20 +223,27 @@ flutter test test/helpers/
 ### Code Generation
 
 ```bash
-# Generate localizations
-flutter gen-l10n --arb-dir="lib/l10n/arb"
+# Generate slang translations
+make i18n-generate
+# Or: dart run slang
+
+# Watch for translation changes during development
+make i18n-watch
+# Or: dart run slang watch
 
 # Generate routes and data classes
 dart run build_runner build --delete-conflicting-outputs
 
-# Watch for changes during development
+# Watch for code changes during development
 dart run build_runner watch
 
 # Clean generated files
 dart run build_runner clean
+make i18n-clean
 
-# Generate specific files (Freezed + JSON)
-dart run build_runner build --delete-conflicting-outputs
+# Analyze translation coverage
+make i18n-analyze
+# Or: dart run slang analyze
 ```
 
 ## Dependencies Management
@@ -234,7 +260,9 @@ dart run build_runner build --delete-conflicting-outputs
 
 - `fpdart`: Pure functional programming for Dart
 - `equatable`: Value equality for immutable objects
-- `flutter_localizations`: Localization support
+- `slang`: Type-safe i18n solution with code generation
+- `slang_flutter`: Flutter integration for slang
+- `shared_preferences`: Locale persistence and storage
 - `intl`: Internationalization utilities
 - `meta`: Metadata annotations for Dart
 
@@ -243,6 +271,7 @@ dart run build_runner build --delete-conflicting-outputs
 - `auto_route_generator`: Route code generation
 - `freezed`: Immutable data classes generation
 - `json_serializable`: JSON serialization code generation
+- `slang_build_runner`: Code generation for slang translations
 - `bloc_test`: BLoC testing utilities
 - `build_runner`: Code generation system
 - `flutter_test`: Flutter testing framework
@@ -258,8 +287,9 @@ dart run build_runner build --delete-conflicting-outputs
 
 ### Localization
 
-- `l10n.yaml`: Localization configuration
-- `lib/l10n/arb/`: ARB files for translations
+- `slang.yaml`: Slang i18n configuration
+- `lib/l10n/i18n/`: JSON translation files (en.i18n.json, vi.i18n.json)
+- `lib/l10n/gen/`: Generated slang translation classes
 
 ### Build Configuration
 
@@ -289,9 +319,11 @@ dart run build_runner build --delete-conflicting-outputs
 
 ### Internationalization
 
-- All user-facing strings in ARB files
-- Proper locale support configuration
-- Generated localization classes
+- All user-facing strings in JSON i18n files (lib/l10n/i18n/)
+- Type-safe translations with slang code generation
+- Compile-time translation validation
+- Locale persistence with shared_preferences
+- Generated translation classes in lib/l10n/gen/
 
 ## Performance Considerations
 

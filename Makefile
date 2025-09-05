@@ -1,7 +1,17 @@
 # Makefile for xp1 Flutter project
 # Provides easy commands for local CI equivalent to GitHub Actions
 
-.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report bdd-coverage build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
+# Detect FVM availability for CI compatibility
+FVM_EXISTS := $(shell command -v fvm 2> /dev/null)
+ifdef FVM_EXISTS
+  DART_CMD = fvm dart
+  FLUTTER_CMD = fvm flutter
+else
+  DART_CMD = dart
+  FLUTTER_CMD = flutter
+endif
+
+.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report bdd-coverage build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod i18n-generate i18n-watch i18n-analyze i18n-validate i18n-clean i18n-help deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
 
 # GitHub Actions equivalent commands
 semantic-check:
@@ -99,17 +109,29 @@ validate-deps:
 	@fvm dart run dependency_validator
 
 test:
-	@echo "🧪 Running tests via RPS..."
-	@very_good test --no-optimization --min-coverage 100
+	@echo "🧪 Running tests (excluding generated files from coverage)..."
+	@echo "⚡ Coverage excludes: *.g.dart, *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
+	@very_good test --no-optimization \
+		--exclude-coverage="**/*.g.dart" \
+		--exclude-coverage="**/*.freezed.dart" \
+		--exclude-coverage="**/*.config.dart" \
+		--exclude-coverage="**/env_*.dart" \
+		--exclude-coverage="**/strings*.g.dart"
 
 # Test coverage commands using flutter test (more reliable than very_good test --coverage)
 # NOTE: very_good test --coverage doesn't generate lcov.info file and fails with BDD tests
 coverage:
-	@echo "🧪📊 Running complete coverage workflow (all tests)..."
+	@echo "🧪📊 Running complete coverage workflow (excluding generated files)..."
 	@echo "1️⃣ Running all tests with coverage (including BDD tests)..."
+	@echo "⚡ Coverage excludes: *.g.dart, *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
 	@echo "⚠️  Note: Using flutter test --coverage for reliable coverage generation"
 	@echo "💡 very_good test --coverage doesn't work properly with BDD tests"
-	@very_good test --coverage --no-optimization --min-coverage 100
+	@very_good test --coverage --no-optimization \
+		--exclude-coverage="**/*.g.dart" \
+		--exclude-coverage="**/*.freezed.dart" \
+		--exclude-coverage="**/*.config.dart" \
+		--exclude-coverage="**/env_*.dart" \
+		--exclude-coverage="**/strings*.g.dart"
 	@echo "2️⃣ Generating HTML coverage report..."
 	@if command -v genhtml >/dev/null 2>&1; then \
 		genhtml coverage/lcov.info -o coverage/html --title "xp1 Test Coverage"; \
@@ -148,9 +170,15 @@ coverage-clean:
 
 # BDD-specific coverage (BDD tests only)
 bdd-coverage:
-	@echo "🎭 Running BDD tests with coverage..."
+	@echo "🎭 Running BDD tests with coverage (excluding generated files)..."
+	@echo "⚡ Coverage excludes: *.g.dart, *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
 	@echo "✅ BDD tests run in isolation - 100% reliable"
-	@very_good test --coverage test/bdd/
+	@very_good test --coverage test/bdd/ --min-coverage 100 \
+		--exclude-coverage="**/*.g.dart" \
+		--exclude-coverage="**/*.freezed.dart" \
+		--exclude-coverage="**/*.config.dart" \
+		--exclude-coverage="**/env_*.dart" \
+		--exclude-coverage="**/strings*.g.dart"
 	@echo "2️⃣ Generating HTML coverage report..."
 	@if command -v genhtml >/dev/null 2>&1; then \
 		genhtml coverage/lcov.info -o coverage/html --title "xp1 BDD Test Coverage"; \
@@ -222,6 +250,62 @@ generate-env-prod:
 	@echo "🏗️ Generating production environment..."
 	@fvm dart run build_runner clean
 	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+
+# Internationalization (i18n) commands using Slang
+i18n-generate:
+	@echo "🌐 Generating slang translations..."
+	@$(DART_CMD) run slang
+	@echo "✅ Slang translations generated successfully"
+
+i18n-watch:
+	@echo "👀 Watching translation files for changes..."
+	@echo "🔄 Auto-generating on file changes (Ctrl+C to stop)"
+	@$(DART_CMD) run slang watch
+
+i18n-analyze:
+	@echo "🔍 Analyzing translation coverage..."
+	@$(DART_CMD) run slang analyze
+	@echo "📊 Translation analysis completed"
+
+i18n-validate:
+	@echo "✅ Validating translation files..."
+	@if [ ! -f "lib/l10n/i18n/en.i18n.json" ]; then \
+		echo "❌ English translation file not found"; \
+		exit 1; \
+	fi
+	@if [ ! -f "lib/l10n/i18n/vi.i18n.json" ]; then \
+		echo "❌ Vietnamese translation file not found"; \
+		exit 1; \
+	fi
+	@$(DART_CMD) run slang
+	@echo "✅ Translation files validated successfully"
+
+i18n-clean:
+	@echo "🧹 Cleaning generated slang files..."
+	@rm -rf lib/l10n/gen/
+	@echo "✅ Slang generated files cleaned"
+
+i18n-help:
+	@echo "🌐 Internationalization (i18n) Commands using Slang:"
+	@echo ""
+	@echo "  i18n-generate  - Generate slang translation code from JSON files"
+	@echo "  i18n-watch     - Watch translation files and auto-generate on changes"
+	@echo "  i18n-analyze   - Analyze translation coverage and completeness"
+	@echo "  i18n-validate  - Validate translation files and regenerate"
+	@echo "  i18n-clean     - Clean all generated slang files"
+	@echo "  i18n-help      - Show this help"
+	@echo ""
+	@echo "📁 Translation files location:"
+	@echo "  lib/l10n/i18n/en.i18n.json - English translations"
+	@echo "  lib/l10n/i18n/vi.i18n.json - Vietnamese translations"
+	@echo ""
+	@echo "🏗️ Generated files location:"
+	@echo "  lib/l10n/gen/ - All generated slang code"
+	@echo ""
+	@echo "⚡ Quick workflow:"
+	@echo "  1. Edit JSON files in lib/l10n/i18n/"
+	@echo "  2. Run 'make i18n-generate' to update code"
+	@echo "  3. Use 'make i18n-watch' for live development"
 
 # Development commands
 deps:
@@ -490,7 +574,7 @@ help:
 	@echo "  make analyze-quick - Quick analysis"
 	@echo "  make analyze-strict - Strict analysis with warnings"
 	@echo "  make validate-deps - Validate dependencies"
-	@echo "  make test          - Run tests"
+	@echo "  make test          - Run tests (excludes generated files)"
 	@echo "  make deps          - Install dependencies"
 	@echo "  make pre-commit    - Run pre-commit checks"
 	@echo ""
@@ -507,10 +591,22 @@ help:
 	@echo "  make generate-env-staging - Generate staging environment"
 	@echo "  make generate-env-prod    - Generate production environment"
 	@echo ""
-	@echo "📊 Test Coverage (using very_good CLI + lcov):"
-	@echo "  make coverage       - Run ALL tests (may have 8 BDD test timing issues)"
-	@echo "  make bdd-coverage   - Run BDD tests only (100% reliable, isolated)"
+	@echo "🌐 Internationalization (i18n) with Slang:"
+	@echo "  make i18n-generate        - Generate slang translations from JSON files"
+	@echo "  make i18n-watch           - Watch translation files for changes"
+	@echo "  make i18n-analyze         - Analyze translation coverage"
+	@echo "  make i18n-validate        - Validate translation files"
+	@echo "  make i18n-clean           - Clean generated slang files"
+	@echo "  make i18n-help            - Show detailed i18n help"
+	@echo ""
+	@echo "📊 Test Coverage (using very_good CLI + lcov, excludes generated files):"
+	@echo "  make test           - Run all tests (excludes *.g.dart, *.freezed.dart, etc.)"
+	@echo "  make coverage       - Run ALL tests with coverage (excludes generated files)"
+	@echo "  make bdd-coverage   - Run BDD tests only with coverage (100% reliable, isolated)"
 	@echo "  make coverage-clean - Clean all coverage files"
+	@echo ""
+	@echo "⚡ Generated Files Excluded:"
+	@echo "  *.g.dart (json_serializable), *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
 	@echo ""
 	@echo "🎭 BDD Test Coverage:"
 	@echo "  make bdd-coverage     - Run BDD tests + generate HTML report + auto-open"

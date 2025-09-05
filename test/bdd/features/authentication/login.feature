@@ -5,7 +5,7 @@ Feature: Login
 
     Scenario: App starts with login page
         Then I see {'Login'} text
-        And I see {'Hello World - Login'} text
+        And I see {'Welcome to Login'} text
         And I see {'Login'} button
 
     Scenario: Login button navigates to main app

@@ -108,6 +108,30 @@ jobs:
       - name: 🔐 Check license compliance
         run: make license-ci
 
+  i18n-validation:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 📥 Checkout repository
+        uses: actions/checkout@v4
+
+      - name: 🔧 Setup Flutter
+        uses: subosito/flutter-action@v2
+        with:
+          flutter-version: ${{ env.FLUTTER_VERSION }}
+          cache: true
+
+      - name: 📦 Install dependencies
+        run: flutter pub get
+
+      - name: 🏗️ Setup environment files
+        run: |
+          cp lib/features/env/development.env.example lib/features/env/development.env
+          cp lib/features/env/staging.env.example lib/features/env/staging.env
+          cp lib/features/env/production.env.example lib/features/env/production.env
+
+      - name: 🌐 Validate i18n translations
+        run: make i18n-validate
+
   build:
     runs-on: ubuntu-latest
     steps:
@@ -149,6 +173,9 @@ jobs:
 
       - name: 🔍 Format check
         run: dart format --set-exit-if-changed lib test
+
+      - name: 🌐 Generate i18n files
+        run: dart run slang
 
       - name: 🕵️ Analyze
         run: flutter analyze lib test

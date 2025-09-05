@@ -5,7 +5,7 @@ Feature: Home Page
         And I am logged in
 
     Scenario: Home page displays by default after login
-        Then I see {'Hello World - Home'} text
+        Then I see {'Welcome to Home'} text
 
     Scenario: Home page is accessible via bottom navigation
         Then I see {'Home'} text

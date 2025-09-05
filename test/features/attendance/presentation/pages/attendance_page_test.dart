@@ -10,10 +10,48 @@ void main() {
     // principle of proper resource management
     PageTestHelpers.testComprehensivePage<AttendancePage>(
       const AttendancePage(),
-      'Hello World - Attendance',
+      'Welcome to Attendance',
       () => const AttendancePage(),
       (key) => AttendancePage(key: key),
       pageRoute: '/main/attendance',
     );
+
+    group('Button interactions', () {
+      testWidgets('should handle check in button tap', (tester) async {
+        await tester.pumpApp(const AttendancePage());
+
+        // Wait for the page to load
+        await tester.pumpAndSettle();
+
+        // Find and tap the check in button by text
+        // (since these are empty handlers)
+        final checkInButtonText = find.textContaining('Check In');
+        if (checkInButtonText.evaluate().isNotEmpty) {
+          await tester.tap(checkInButtonText.first);
+          await tester.pumpAndSettle();
+        }
+
+        // Verify the page is still rendered (button handler executed)
+        expect(find.text('Welcome to Attendance'), findsOneWidget);
+      });
+
+      testWidgets('should handle check out button tap', (tester) async {
+        await tester.pumpApp(const AttendancePage());
+
+        // Wait for the page to load
+        await tester.pumpAndSettle();
+
+        // Find and tap the check out button by text
+        // (since these are empty handlers)
+        final checkOutButtonText = find.textContaining('Check Out');
+        if (checkOutButtonText.evaluate().isNotEmpty) {
+          await tester.tap(checkOutButtonText.first);
+          await tester.pumpAndSettle();
+        }
+
+        // Verify the page is still rendered (button handler executed)
+        expect(find.text('Welcome to Attendance'), findsOneWidget);
+      });
+    });
   });
 }

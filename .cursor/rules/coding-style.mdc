@@ -10,11 +10,13 @@ description: Dart coding style guidelines to prevent linter errors and warnings
 > **ZERO TOLERANCE POLICY**: No linting errors, no warnings, no exceptions. Every issue must be resolved before commit.
 
 **Priority Order for Quick Fixes:**
+
 1. 🔥 **cascade_invocations** - Use `..` for instance methods, records `()` for static methods
-2. 🔥 **public_member_api_docs** - Add `/// documentation` to all public APIs  
+2. 🔥 **public_member_api_docs** - Add `/// documentation` to all public APIs
 3. 🔥 **lines_longer_than_80_chars** - Break long lines immediately
-4. 🔥 **prefer_const_constructors** - Add `const` wherever possible
-5. 🔥 **avoid_print** - Replace with `Console.info()` or proper logging
+4. 🔥 **avoid_catches_without_on_clauses** - Use `on` clause in catch blocks
+5. 🔥 **prefer_const_constructors** - Add `const` wherever possible
+6. 🔥 **avoid_print** - Replace with `Console.info()` or proper logging
 
 ### 1. Cascade Operators (`..`) - MANDATORY for Multiple Calls
 
@@ -216,6 +218,159 @@ expect(
 );
 ```
 
+#### **6.1. Comment Line Breaking - CRITICAL for Test Files**
+
+**THE GOLDEN RULE**: Comments must NEVER exceed 80 characters. Break them cleanly at logical points.
+
+```dart
+// ❌ LINT ERROR: Comment exceeds 80 characters
+// Initialize Flutter test bindings and mock platform storage before any DI work
+void main() {
+  // Call parent fromJson with data that will cause LocaleConfiguration.fromJson
+  // to throw an Exception (not Error)
+  final result = cubit.testMethod();
+}
+
+// ✅ CORRECT: Break comments at logical points
+// Initialize Flutter test bindings and mock platform storage before any
+// DI work
+void main() {
+  // Call parent fromJson with data that will cause
+  // LocaleConfiguration.fromJson
+  // to throw an Exception (not Error)
+  final result = cubit.testMethod();
+}
+```
+
+**Comment Breaking Patterns:**
+
+```dart
+// ❌ WRONG: Single line comment over 80 chars
+// Test through public API since private methods aren't directly accessible
+
+// ✅ CORRECT: Break at logical word boundaries
+// Test through public API since private methods aren't directly
+// accessible
+
+// ❌ WRONG: Breaking at arbitrary points
+// This will force a real Exception (not Error) in LocaleConfiguration.
+// fromJson
+
+// ✅ CORRECT: Break at class/method boundaries
+// This will force a real Exception (not Error) in
+// LocaleConfiguration.fromJson
+
+// ❌ WRONG: Method calls split awkwardly
+bool containsKey(Object? key) => true; // Return true so it gets to the operator[]
+
+// ✅ CORRECT: Break before inline comment or restructure
+bool containsKey(Object? key) =>
+    true; // Return true so it gets to the operator[]
+
+// ✅ ALTERNATIVE: Move comment above
+// Return true so it gets to the operator[]
+bool containsKey(Object? key) => true;
+```
+
+**💡 Comment Breaking Strategy Guide:**
+
+```dart
+// 🎯 STRATEGY 1: Break at natural word boundaries
+// ❌ Long: "This function handles complex user authentication and authorization processes"
+// ✅ Fixed: "This function handles complex user authentication and authorization
+//           processes"
+
+// 🎯 STRATEGY 2: Break at conjunctions (and, or, but, so, etc.)
+// ❌ Long: "This validates input data and returns proper error messages if validation fails"
+// ✅ Fixed: "This validates input data and returns proper error messages if
+//           validation fails"
+
+// 🎯 STRATEGY 3: Break at prepositions (in, on, at, for, with, etc.)
+// ❌ Long: "This step verifies that unsupported language attempts are handled gracefully"
+// ✅ Fixed: "This step verifies that unsupported language attempts are handled
+//           gracefully"
+
+// 🎯 STRATEGY 4: Break at technical terms/class names
+// ❌ Long: "For BDD testing, we verify that the state is properly configured for persistence"
+// ✅ Fixed: "For BDD testing, we verify that the state is properly configured for
+//           persistence"
+
+// 🎯 STRATEGY 5: Use parallel structure for multi-line comments
+// ✅ GOOD: Consistent indentation and parallel structure
+// This method accomplishes several important tasks:
+// - Validates user input according to business rules
+// - Transforms data into the required format
+// - Handles edge cases and error conditions gracefully
+```
+
+**Test File Comment Patterns:**
+
+```dart
+// ❌ COMMON MISTAKE: Long setup/teardown comments
+// Initialize Flutter test bindings and mock platform storage before any DI work
+
+// ✅ CORRECT: Break at logical boundaries
+// Initialize Flutter test bindings and mock platform storage before any
+// DI work
+
+// ❌ COMMON MISTAKE: Long test descriptions as inline comments
+test('should handle edge case', () {
+  // This test verifies that the system properly handles the edge case where user input is malformed
+});
+
+// ✅ CORRECT: Break long explanatory comments
+test('should handle edge case', () {
+  // This test verifies that the system properly handles the edge case
+  // where user input is malformed
+});
+
+// ✅ ALTERNATIVE: Use test description for clarity
+test(
+  'should handle edge case where user input is malformed',
+  () {
+    // Test implementation
+  },
+);
+```
+
+**BDD Test Step Comment Patterns:**
+
+```dart
+// ❌ BDD MISTAKE: Long explanation comments
+// This step verifies that unsupported language attempts are handled gracefully
+// For BDD testing, we verify that the state is properly configured for persistence
+
+// ✅ BDD CORRECT: Break at logical word boundaries
+// This step verifies that unsupported language attempts are handled
+// gracefully
+// For BDD testing, we verify that the state is properly configured for
+// persistence
+
+// ❌ BDD MISTAKE: Long verification explanations
+// The LocaleCubit should return errors for invalid locales, and the app should remain stable
+
+// ✅ BDD CORRECT: Break complex verification logic
+// The LocaleCubit should return errors for invalid locales, and the app
+// should remain stable
+
+// ✅ BDD PATTERN: Multi-step explanations
+// In a real app restart test, you would:
+// 1. Store the current state
+// 2. Restart the app (or create new widget tree)
+// 3. Verify the state is restored
+```
+
+**VS Code Line Length Helpers:**
+
+```json
+{
+  "editor.rulers": [80],
+  "editor.wordWrap": "bounded",
+  "editor.wordWrapColumn": 80,
+  "dart.lineLength": 80
+}
+```
+
 ### 7. Error Handling - Specific Exception Classes
 
 ```dart
@@ -233,6 +388,77 @@ class UserNotFoundException implements Exception {
 
 throw UserNotFoundException(userId);
 ```
+
+#### **7.1. Catch Clauses - MANDATORY Use of 'on' Clause**
+
+**THE GOLDEN RULE**: Always specify the exception type using `on` clause in catch blocks to avoid `avoid_catches_without_on_clauses` errors.
+
+```dart
+// ❌ LINT ERROR: avoid_catches_without_on_clauses
+try {
+  await someOperation();
+} catch (e) {
+  // Generic catch - linter error
+  handleError(e);
+}
+
+// ✅ CORRECT: Specific exception catching
+try {
+  await someOperation();
+} on BootstrapException catch (e) {
+  // Specific exception type
+  handleBootstrapError(e);
+} on Exception catch (e) {
+  // More general but still typed
+  handleGenericError(e);
+}
+
+// ✅ BEST PRACTICE: Multiple specific catches
+try {
+  await userService.updateUser(user);
+} on UserNotFoundException catch (e) {
+  showUserNotFoundError(e.userId);
+} on ValidationException catch (e) {
+  showValidationErrors(e.errors);
+} on NetworkException catch (e) {
+  showNetworkError(e.message);
+}
+```
+
+**Common Test Patterns:**
+
+```dart
+// ❌ WRONG: Generic catch in tests
+try {
+  await service.methodThatShouldThrow();
+  fail('Expected SomeException');
+} catch (e) {
+  expect(e, isA<SomeException>());
+  final exception = e as SomeException;
+}
+
+// ✅ CORRECT: Specific catch in tests
+try {
+  await service.methodThatShouldThrow();
+  fail('Expected SomeException');
+} on SomeException catch (e) {
+  expect(e, isA<SomeException>());
+  final exception = e; // No casting needed
+}
+
+// ✅ ALTERNATIVE: Use expectLater for cleaner tests
+expect(
+  () => service.methodThatShouldThrow(),
+  throwsA(isA<SomeException>()),
+);
+```
+
+**Exception Hierarchy Guidelines:**
+
+- **Specific first**: Catch most specific exceptions first
+- **General last**: Use `Exception` as fallback, not `Object` or generic catch
+- **Re-throw when needed**: Use `rethrow;` to preserve stack trace
+- **Document exceptions**: Always document what exceptions methods can throw
 
 ### 8. Widget Structure - Performance Optimized
 
@@ -325,6 +551,115 @@ String message = 'Hello';
 
 // ✅ Use final
 final message = 'Hello';
+```
+
+### unused_field → Remove or use declared fields
+
+```dart
+// ❌ unused_field
+class AppBootstrap {
+  AppBootstrap({PlatformLocaleProvider? platformProvider})
+    : _platformProvider = platformProvider;
+
+  final PlatformLocaleProvider? _platformProvider; // ❌ Never used
+
+  void bootstrap() {
+    // _platformProvider is never referenced
+  }
+}
+
+// ✅ OPTION 1: Remove unused field
+class AppBootstrap {
+  const AppBootstrap();
+
+  void bootstrap() {
+    // Clean implementation
+  }
+}
+
+// ✅ OPTION 2: Use the field
+class AppBootstrap {
+  AppBootstrap({PlatformLocaleProvider? platformProvider})
+    : _platformProvider = platformProvider;
+
+  final PlatformLocaleProvider? _platformProvider;
+
+  void bootstrap() {
+    final provider = _platformProvider ?? DefaultPlatformProvider();
+    // Use the provider
+  }
+}
+```
+
+### unnecessary_underscores → Use single underscore for unused parameters
+
+```dart
+// ❌ unnecessary_underscores
+return when(
+  success: (data, __) => 'Success',
+  error: (message, __) => 'Error: $message',
+  loading: (__, ___) => 'Loading...',
+);
+
+// ✅ Use single underscore
+return when(
+  success: (data, _) => 'Success',
+  error: (message, _) => 'Error: $message',
+  loading: (_, _) => 'Loading...',
+);
+```
+
+### unnecessary_statements → Avoid meaningless expressions
+
+```dart
+// ❌ unnecessary_statements
+final hasContent = checkForContent();
+// This line does nothing
+hasContent;
+
+// ✅ OPTION 1: Remove if truly unused
+final hasContent = checkForContent();
+// Don't reference it if not needed
+
+// ✅ OPTION 2: Assign to underscore if suppressing warnings
+final hasContent = checkForContent();
+// ignore: unused_local_variable
+final _ = hasContent;
+```
+
+### depend_on_referenced_packages → Declare all imported packages
+
+```dart
+// ❌ depend_on_referenced_packages
+// File: my_package/lib/example.dart
+import 'package:shared_preferences/shared_preferences.dart'; // ❌ Not in pubspec.yaml
+
+// ✅ Add to pubspec.yaml (alphabetically sorted)
+dependencies:
+  flutter:
+    sdk: flutter
+  shared_preferences: ^2.3.4  # ✅ Added dependency
+```
+
+### invalid_use_of_visible_for_testing_member → Proper testing member usage
+
+```dart
+// ❌ Using testing member outside test context
+void setup() {
+  SharedPreferences.setMockInitialValues({}); // ❌ Only for tests
+}
+
+// ✅ OPTION 1: Use in actual test files (test/ directory)
+// File: test/my_test.dart
+void setUp() {
+  SharedPreferences.setMockInitialValues({});
+}
+
+// ✅ OPTION 2: Suppress warning for BDD/integration tests
+void setupBddTest() {
+  // ignore: invalid_use_of_visible_for_testing_member
+  SharedPreferences.setMockInitialValues({});
+}
 ```
 
 ### unnecessary_lambdas → Use tear-offs
@@ -840,32 +1175,45 @@ These MUST be fixed immediately:
 1. **Missing documentation** on public APIs
 2. **cascade_invocations** warnings
 3. **lines_longer_than_80_chars** errors
-4. **avoid_print** in production code
-5. **Missing const** constructors
-6. **Unused imports**
-7. **Memory leaks** (undisposed resources)
-8. **Security vulnerabilities** (unvalidated input)
-9. **Performance anti-patterns** (unnecessary rebuilds)
-10. **Architecture violations** (direct environment access)
+4. **avoid_catches_without_on_clauses** - missing `on` clause in catch blocks
+5. **avoid_print** in production code
+6. **Missing const** constructors
+7. **Unused imports**
+8. **unused_field** warnings
+9. **unnecessary_underscores** in parameter names
+10. **unnecessary_statements** and dead code
+11. **depend_on_referenced_packages** - missing dependencies
+12. **Memory leaks** (undisposed resources)
+13. **Security vulnerabilities** (unvalidated input)
+14. **Performance anti-patterns** (unnecessary rebuilds)
+15. **Architecture violations** (direct environment access)
 
 ## 📋 Quick Reference: Error → Solution (Copy-Paste Ready)
 
-| **Linter Error**                 | **1-Second Fix**            | **Copy-Paste Solution**                                                               |
-| -------------------------------- | --------------------------- | ------------------------------------------------------------------------------------- |
-| `public_member_api_docs`         | Add doc comment             | `/// Implementation of [Repository].`                                                |
-| `cascade_invocations` (static)   | Group with records          | `final _ = (Factory.a, Factory.b, Factory.c);`                                       |
-| `cascade_invocations` (instance) | Use cascade                 | `logger..info('A')..info('B')..info('C');`                                           |
-| `lines_longer_than_80_chars`     | Break at comma/operator     | `group(`<br/>&nbsp;&nbsp;`'Long description',`<br/>&nbsp;&nbsp;`() {`                |
-| `omit_local_variable_types`      | Replace type with `var`     | `for (var i = 0; i < 10; i++)`                                                       |
-| `prefer_const_constructors`      | Add `const` keyword         | `const Text('Hello')`                                                                 |
-| `avoid_print`                    | Use Console abstraction     | `Console.info('message')`                                                             |
-| `unnecessary_lambdas`            | Use tear-off                | `items.map(Object.toString)`                                                          |
-| `prefer_final_locals`            | Change to `final`           | `final message = 'Hello';`                                                           |
+| **Linter Error**                            | **1-Second Fix**        | **Copy-Paste Solution**                                               |
+| ------------------------------------------- | ----------------------- | --------------------------------------------------------------------- |
+| `public_member_api_docs`                    | Add doc comment         | `/// Implementation of [Repository].`                                 |
+| `cascade_invocations` (static)              | Group with records      | `final _ = (Factory.a, Factory.b, Factory.c);`                        |
+| `cascade_invocations` (instance)            | Use cascade             | `logger..info('A')..info('B')..info('C');`                            |
+| `lines_longer_than_80_chars`                | Break at comma/operator | `group(`<br/>&nbsp;&nbsp;`'Long description',`<br/>&nbsp;&nbsp;`() {` |
+| `lines_longer_than_80_chars` (comments)     | Break comment lines     | `// Long comment text`<br/>`// continued here`                        |
+| `avoid_catches_without_on_clauses`          | Add `on` clause         | `} on SpecificException catch (e) {`                                  |
+| `omit_local_variable_types`                 | Replace type with `var` | `for (var i = 0; i < 10; i++)`                                        |
+| `prefer_const_constructors`                 | Add `const` keyword     | `const Text('Hello')`                                                 |
+| `avoid_print`                               | Use Console abstraction | `Console.info('message')`                                             |
+| `unnecessary_lambdas`                       | Use tear-off            | `items.map(Object.toString)`                                          |
+| `prefer_final_locals`                       | Change to `final`       | `final message = 'Hello';`                                            |
+| `unused_field`                              | Remove or use field     | Remove field or use in methods                                        |
+| `unnecessary_underscores`                   | Use single underscore   | `when(success: (_) => true, error: (_) => false)`                     |
+| `unnecessary_statements`                    | Assign to `_` variable  | `final _ = unusedVariable;`                                           |
+| `depend_on_referenced_packages`             | Add to pubspec.yaml     | Add missing package to dependencies                                   |
+| `invalid_use_of_visible_for_testing_member` | Add ignore comment      | `// ignore: invalid_use_of_visible_for_testing_member`                |
 
 **⚡ Speed Commands:**
+
 ```bash
 dart format lib/ test/ --set-exit-if-changed  # Fix formatting
-dart analyze --fatal-infos                    # See all errors  
+dart analyze --fatal-infos                    # See all errors
 dart fix --apply                              # Auto-fix some issues
 ```
 
@@ -892,13 +1240,14 @@ Following these guidelines ensures clean, maintainable code that passes all lint
 #### **🚫 What Must Be English**
 
 **1. Code Documentation & Comments:**
+
 ```dart
 // ❌ WRONG: Vietnamese documentation
 /// Quản lý trạng thái đếm số với các phương thức tăng giảm
 class CounterCubit extends Cubit<int> {
   /// Tạo instance với giá trị ban đầu là 0
   CounterCubit() : super(0);
-  
+
   /// Tăng giá trị lên 1 đơn vị
   void increment() => emit(state + 1); // Tăng số lên
 }
@@ -908,13 +1257,14 @@ class CounterCubit extends Cubit<int> {
 class CounterCubit extends Cubit<int> {
   /// Creates a CounterCubit with initial state of 0.
   CounterCubit() : super(0);
-  
+
   /// Increments the counter value by 1.
   void increment() => emit(state + 1); // Increment the value
 }
 ```
 
 **2. Error Messages & Exceptions:**
+
 ```dart
 // ❌ WRONG: Vietnamese error messages
 throw Exception('Lỗi khi tải cấu hình môi trường');
@@ -926,6 +1276,7 @@ throw ConfigException('Environment file .env not found');
 ```
 
 **3. Test Descriptions:**
+
 ```dart
 // ❌ WRONG: Vietnamese test descriptions
 test('nên trả về giá trị đúng khi gọi apiUrl', () {
@@ -947,6 +1298,7 @@ group('Repository implementation tests', () {
 ```
 
 **4. Variable & Method Names:**
+
 ```dart
 // ❌ WRONG: Vietnamese naming
 final tenUngDung = 'My App';
@@ -960,15 +1312,22 @@ class UserManager {}
 ```
 
 **5. Markdown Documentation:**
+
 ```markdown
 ❌ WRONG: Vietnamese markdown
+
 # Hướng Dẫn Cài Đặt
+
 ## Tổng Quan Dự Án
+
 Dự án này sử dụng Flutter để phát triển...
 
 ✅ CORRECT: English markdown
+
 # Installation Guide
+
 ## Project Overview
+
 This project uses Flutter to develop...
 ```
 
@@ -979,7 +1338,7 @@ Before any commit, verify:
 - [ ] **All class/method documentation** uses English `/// comments`
 - [ ] **All inline comments** are in English
 - [ ] **All variable names** use English terminology
-- [ ] **All method names** use English terminology  
+- [ ] **All method names** use English terminology
 - [ ] **All error messages** are in English
 - [ ] **All test descriptions** are in English
 - [ ] **All markdown files** are in English
@@ -998,26 +1357,27 @@ Our cspell configuration (`cspell.json`) enforces English-only:
 ```
 
 **When spell check fails:**
+
 1. ✅ Convert non-English content to proper English
 2. ✅ Add technical terms to `cspell.json` words array if needed
 3. ❌ NEVER suppress spell check with ignore directives
 
 #### **🎯 Common Vietnamese → English Translations**
 
-| Vietnamese Term | English Term | Usage Context |
-|-----------------|--------------|---------------|
-| `tạo` | `create` | Method names |
-| `cập nhật` | `update` | Method names |
-| `xóa` | `delete` | Method names |
-| `tìm kiếm` | `search` | Method names |
-| `lấy` | `get` | Method names |
-| `cấu hình` | `configuration` | Class/variable names |
-| `quản lý` | `manager` | Class names |
-| `dịch vụ` | `service` | Class names |
-| `kho lưu trữ` | `repository` | Class names |
-| `môi trường` | `environment` | General usage |
-| `ứng dụng` | `application` | General usage |
-| `người dùng` | `user` | General usage |
+| Vietnamese Term | English Term    | Usage Context        |
+| --------------- | --------------- | -------------------- |
+| `tạo`           | `create`        | Method names         |
+| `cập nhật`      | `update`        | Method names         |
+| `xóa`           | `delete`        | Method names         |
+| `tìm kiếm`      | `search`        | Method names         |
+| `lấy`           | `get`           | Method names         |
+| `cấu hình`      | `configuration` | Class/variable names |
+| `quản lý`       | `manager`       | Class names          |
+| `dịch vụ`       | `service`       | Class names          |
+| `kho lưu trữ`   | `repository`    | Class names          |
+| `môi trường`    | `environment`   | General usage        |
+| `ứng dụng`      | `application`   | General usage        |
+| `người dùng`    | `user`          | General usage        |
 
 #### **🚨 Pre-Commit English Validation**
 
@@ -1040,7 +1400,8 @@ dart run rps pre-commit  # Must pass for English compliance
 #### **📚 English Documentation Standards**
 
 **Class Documentation Template:**
-```dart
+
+````dart
 /// Brief description of what the class does.
 ///
 /// Longer description with more details about the class purpose,
@@ -1060,20 +1421,21 @@ class UserManager {
     // Implementation
   }
 }
-```
+````
 
 **Test Documentation Template:**
+
 ```dart
 group('UserManager', () {
   group('getUser', () {
     test('should return user when valid ID is provided', () {
       // Test implementation
     });
-    
+
     test('should throw UserNotFoundException when user does not exist', () {
       // Test implementation
     });
-    
+
     test('should handle network errors gracefully', () {
       // Test implementation
     });
@@ -1092,6 +1454,7 @@ group('UserManager', () {
 #### **🔧 Editor Configuration for English**
 
 **VS Code Settings (`.vscode/settings.json`):**
+
 ```json
 {
   "cSpell.language": "en",

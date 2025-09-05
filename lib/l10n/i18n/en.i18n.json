@@ -1,0 +1,60 @@
+{
+  "app": {
+    "title": "XP1"
+  },
+  "navigation": {
+    "home": "Home",
+    "statistics": "Statistics", 
+    "attendance": "Attendance",
+    "features": "Features",
+    "profile": "Profile"
+  },
+  "pages": {
+    "home": {
+      "title": "Home",
+      "welcomeMessage": "Welcome to {pageName}",
+      "todayStats": "Today's Statistics",
+      "quickActions": "Quick Actions"
+    },
+    "login": {
+      "title": "Login",
+      "welcomeMessage": "Welcome to {pageName}",
+      "instruction": "Please login to continue",
+      "forgotPassword": "Forgot Password?"
+    },
+    "attendance": {
+      "title": "Attendance",
+      "welcomeMessage": "Welcome to {pageName}",
+      "currentStatus": "Current Status: {status}",
+      "checkIn": "Check In",
+      "checkOut": "Check Out",
+      "status": {
+        "notCheckedIn": "Not checked in",
+        "checkedIn": "Checked in",
+        "checkedOut": "Checked out"
+      }
+    },
+    "statistics": {
+      "title": "Statistics", 
+      "welcomeMessage": "Welcome to {pageName}",
+      "viewReport": "View Report",
+      "exportData": "Export Data"
+    },
+    "features": {
+      "title": "Features",
+      "welcomeMessage": "Welcome to {pageName}",
+      "availableFeatures": "Available Features",
+      "comingSoon": "Coming Soon"
+    },
+    "profile": {
+      "title": "Profile",
+      "welcomeMessage": "Welcome to {pageName}",
+      "editProfile": "Edit Profile",
+      "settings": "Settings",
+      "preferences": "Preferences"
+    }
+  },
+  "auth": {
+    "loginButton": "Login"
+  }
+}

@@ -6,7 +6,7 @@ Feature: Profile Page
 
     Scenario: Profile page displays correctly
         When I tap {Icons.person} icon
-        Then I see {'Hello World - Profile'} text
+        Then I see {'Welcome to Profile'} text
 
     Scenario: Profile tab is accessible from navigation
         When I tap {Icons.person} icon
