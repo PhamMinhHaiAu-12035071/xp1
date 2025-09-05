@@ -879,6 +879,97 @@ void main() {
         },
       );
     });
+
+    group('unexpected exception coverage', () {
+      test(
+        'execute: unexpected exception after loop triggers lines 100-103',
+        () async {
+          // Create mock phases that will succeed
+          final mockPhase1 = MockBootstrapPhase();
+          final mockPhase2 = MockBootstrapPhase();
+          final mockLogger = MockLoggerService();
+
+          // Setup default mock behaviors
+          when(() => mockLogger.info(any())).thenReturn(null);
+          when(() => mockLogger.warning(any())).thenReturn(null);
+          when(() => mockLogger.debug(any())).thenReturn(null);
+          when(
+            () => mockLogger.error(any(), any<dynamic>(), any<StackTrace?>()),
+          ).thenReturn(null);
+
+          // Setup phase 1
+          when(() => mockPhase1.phaseName).thenReturn('Phase1');
+          when(() => mockPhase1.priority).thenReturn(1);
+          when(() => mockPhase1.canSkip).thenReturn(false);
+          when(mockPhase1.validatePreconditions).thenAnswer((_) async {});
+          when(mockPhase1.execute).thenAnswer(
+            (_) async => const BootstrapResult.success(
+              data: {'ok': true},
+              message: 'Phase1 completed',
+            ),
+          );
+          when(mockPhase1.rollback).thenAnswer((_) async {});
+
+          // Setup phase 2
+          when(() => mockPhase2.phaseName).thenReturn('Phase2');
+          when(() => mockPhase2.priority).thenReturn(2);
+          when(() => mockPhase2.canSkip).thenReturn(false);
+          when(mockPhase2.validatePreconditions).thenAnswer((_) async {});
+          when(mockPhase2.execute).thenAnswer(
+            (_) async => const BootstrapResult.success(
+              data: {'ok': true},
+              message: 'Phase2 completed',
+            ),
+          );
+          when(mockPhase2.rollback).thenAnswer((_) async {});
+
+          // Make logger.info throw exception when logging completion message
+          // This forces the exception to occur after all phases have completed
+          when(
+            () => mockLogger.info(
+              '🎉 Bootstrap orchestration completed successfully',
+            ),
+          ).thenThrow(Exception('boom'));
+
+          final orchestrator = BootstrapOrchestrator(
+            logger: mockLogger,
+            phases: [mockPhase2, mockPhase1], // Intentionally out of order
+          );
+
+          // Expect BootstrapException to be thrown from lines 100-103
+          await expectLater(
+            orchestrator.execute,
+            throwsA(
+              isA<BootstrapException>()
+                  .having(
+                    (e) => e.message,
+                    'message',
+                    'Bootstrap orchestration failed unexpectedly',
+                  )
+                  .having(
+                    (e) => e.originalError,
+                    'originalError',
+                    isA<Exception>(),
+                  ),
+            ),
+          );
+
+          // Verify that logger.error was called for unexpected failure
+          verify(
+            () => mockLogger.error(
+              'Unexpected bootstrap failure',
+              any<dynamic>(),
+              any<StackTrace?>(),
+            ),
+          ).called(1);
+
+          // Verify that rollback was called for both phases
+          // (they completed before error)
+          verify(mockPhase1.rollback).called(1);
+          verify(mockPhase2.rollback).called(1);
+        },
+      );
+    });
   });
 }
 

@@ -26,12 +26,7 @@ class ErrorHandlingPhase implements BootstrapPhase {
   @override
   Future<void> validatePreconditions() async {
     // Validate that logger is available for error handling
-    if (!identical(_logger, _logger)) {
-      throw BootstrapException(
-        'Logger service not available for error handling',
-        phase: phaseName,
-      );
-    }
+    // Logger is injected through constructor and always available
   }
 
   @override

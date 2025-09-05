@@ -1,10 +1,14 @@
 import 'package:flutter_test/flutter_test.dart';
+import 'package:mocktail/mocktail.dart';
 import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
 import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 import 'package:xp1/features/locale/application/locale_application_service.dart';
 import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
 import 'package:xp1/features/locale/domain/services/locale_domain_service.dart';
 import 'package:xp1/l10n/gen/strings.g.dart';
+
+/// Mock LoggerService for testing.
+class MockLoggerService extends Mock implements LoggerService {}
 
 /// Mock LocaleDomainService for testing LocaleApplicationService.
 class TestLocaleDomainService implements LocaleDomainService {
@@ -206,6 +210,112 @@ void main() {
           throwsA(isA<LocaleApplicationException>()),
         );
       });
+
+      test(
+        'should cover logger.info at lines 52-53 by throwing exception',
+        () async {
+          // Use MockLoggerService to control logger behavior
+          final mockLogger = MockLoggerService();
+
+          mockDomainService = TestLocaleDomainService();
+
+          applicationService = LocaleApplicationService(
+            domainService: mockDomainService,
+            logger: mockLogger,
+          );
+
+          // Setup default mock behaviors
+          when(() => mockLogger.info(any())).thenReturn(null);
+          when(() => mockLogger.warning(any())).thenReturn(null);
+          when(() => mockLogger.debug(any())).thenReturn(null);
+          when(
+            () => mockLogger.error(any(), any<dynamic>(), any<StackTrace?>()),
+          ).thenReturn(null);
+
+          // Make logger.info throw exception when logging completion message
+          // This forces the exception to occur after lines 52-53
+          when(
+            () => mockLogger.info('Domain locale update completed: vi'),
+          ).thenThrow(Exception('stop'));
+
+          // Act & Assert: should throw LocaleApplicationException
+          await expectLater(
+            () => applicationService.switchLocale(AppLocale.vi),
+            throwsA(
+              isA<LocaleApplicationException>()
+                  .having(
+                    (e) => e.message,
+                    'message',
+                    'Failed to switch locale to vi',
+                  )
+                  .having(
+                    (e) => e.originalError,
+                    'originalError',
+                    isA<Exception>(),
+                  ),
+            ),
+          );
+
+          // Verify: the specific log at lines 52-53 was called
+          verify(
+            () => mockLogger.info('Domain locale update completed: vi'),
+          ).called(1);
+
+          // Verify: domain service was called
+          expect(mockDomainService.updateUserLocaleCalled, isTrue);
+
+          // Verify: error was logged due to exception
+          verify(
+            () => mockLogger.error(
+              'Unexpected locale switch error',
+              any<dynamic>(),
+              any<StackTrace?>(),
+            ),
+          ).called(1);
+        },
+      );
+
+      test(
+        'should handle error in _applyLocaleToSession gracefully',
+        () async {
+          // Use MockLoggerService to simulate error in debug log
+          final mockLogger = MockLoggerService();
+
+          mockDomainService = TestLocaleDomainService();
+
+          applicationService = LocaleApplicationService(
+            domainService: mockDomainService,
+            logger: mockLogger,
+          );
+
+          // Setup default mock behaviors
+          when(() => mockLogger.info(any())).thenReturn(null);
+          when(() => mockLogger.warning(any())).thenReturn(null);
+          when(
+            () => mockLogger.error(any(), any<dynamic>(), any<StackTrace?>()),
+          ).thenReturn(null);
+
+          // Make debug log throw exception to simulate error in session update
+          when(
+            () => mockLogger.debug('🔄 Applying locale to current session'),
+          ).thenThrow(Exception('session error'));
+
+          // This should still succeed because _applyLocaleToSession catches
+          // exceptions
+          final result = await applicationService.switchLocale(AppLocale.en);
+
+          expect(result.languageCode, equals('en'));
+          expect(result.source, equals(LocaleSource.userSelected));
+
+          // Verify that error was logged
+          verify(
+            () => mockLogger.error(
+              'Failed to apply locale to session',
+              any<dynamic>(),
+            ),
+          ).called(1);
+        },
+      );
     });
 
     group('getCurrentConfiguration', () {

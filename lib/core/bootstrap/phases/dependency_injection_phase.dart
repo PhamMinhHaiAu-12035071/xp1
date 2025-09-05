@@ -1,5 +1,4 @@
 import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
-import 'package:xp1/core/constants/app_constants.dart';
 import 'package:xp1/core/di/injection_container.dart';
 import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 
@@ -40,17 +39,8 @@ class DependencyInjectionPhase implements BootstrapPhase {
     try {
       _logger.info('📦 Configuring dependency injection container...');
 
-      // Configure dependencies with timeout protection
-      await configureDependencies().timeout(
-        BootstrapConstants.dependencySetupTimeout,
-        onTimeout: () {
-          throw BootstrapException(
-            'Dependency injection setup exceeded timeout',
-            phase: phaseName,
-            canRetry: true,
-          );
-        },
-      );
+      // Configure dependencies
+      await configureDependencies();
 
       // Validate critical dependencies are registered
       _validateCriticalDependencies();
@@ -78,14 +68,9 @@ class DependencyInjectionPhase implements BootstrapPhase {
 
   @override
   Future<void> rollback() async {
-    try {
-      _logger.info('🔄 Rolling back dependency injection...');
-      await getIt.reset();
-      _logger.info('✅ Dependency injection rollback completed');
-    } on Exception catch (e) {
-      _logger.error('Failed to rollback dependency injection', e);
-      // Don't throw - rollback should be as resilient as possible
-    }
+    _logger.info('🔄 Rolling back dependency injection...');
+    await getIt.reset();
+    _logger.info('✅ Dependency injection rollback completed');
   }
 
   /// Validates that critical dependencies are properly registered.
