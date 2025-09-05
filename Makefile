@@ -1,6 +1,16 @@
 # Makefile for xp1 Flutter project
 # Provides easy commands for local CI equivalent to GitHub Actions
 
+# Detect FVM availability for CI compatibility
+FVM_EXISTS := $(shell command -v fvm 2> /dev/null)
+ifdef FVM_EXISTS
+  DART_CMD = fvm dart
+  FLUTTER_CMD = fvm flutter
+else
+  DART_CMD = dart
+  FLUTTER_CMD = flutter
+endif
+
 .PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report bdd-coverage build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod i18n-generate i18n-watch i18n-analyze i18n-validate i18n-clean i18n-help deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
 
 # GitHub Actions equivalent commands
@@ -244,17 +254,17 @@ generate-env-prod:
 # Internationalization (i18n) commands using Slang
 i18n-generate:
 	@echo "🌐 Generating slang translations..."
-	@fvm dart run slang
+	@$(DART_CMD) run slang
 	@echo "✅ Slang translations generated successfully"
 
 i18n-watch:
 	@echo "👀 Watching translation files for changes..."
 	@echo "🔄 Auto-generating on file changes (Ctrl+C to stop)"
-	@fvm dart run slang watch
+	@$(DART_CMD) run slang watch
 
 i18n-analyze:
 	@echo "🔍 Analyzing translation coverage..."
-	@fvm dart run slang analyze
+	@$(DART_CMD) run slang analyze
 	@echo "📊 Translation analysis completed"
 
 i18n-validate:
@@ -267,7 +277,7 @@ i18n-validate:
 		echo "❌ Vietnamese translation file not found"; \
 		exit 1; \
 	fi
-	@fvm dart run slang
+	@$(DART_CMD) run slang
 	@echo "✅ Translation files validated successfully"
 
 i18n-clean:
