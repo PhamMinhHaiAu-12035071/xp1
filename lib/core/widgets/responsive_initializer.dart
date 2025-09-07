@@ -58,15 +58,13 @@ class ResponsiveInitializer extends StatelessWidget {
         if (constraints.maxWidth != 0) {
           // Initialize ScreenUtil with the current constraints or provided
           // design size
-          ScreenUtil.init(
-            context,
+          return ScreenUtilInit(
             designSize: Size(
               designSize?.width ?? constraints.maxWidth,
               designSize?.height ?? constraints.maxHeight,
             ),
+            builder: (context, child) => builder(context),
           );
-
-          return builder(context);
         }
 
         // Return an empty container if constraints are not valid
