@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_localizations/flutter_localizations.dart';
 import 'package:xp1/core/routing/app_router.dart';
+import 'package:xp1/core/themes/app_theme.dart';
 import 'package:xp1/l10n/gen/strings.g.dart';
 import 'package:xp1/l10n/l10n.dart';
 
@@ -19,12 +20,8 @@ class App extends StatelessWidget {
           final locale = TranslationProvider.of(context).flutterLocale;
           return MaterialApp.router(
             title: t.app.title,
-            theme: ThemeData(
-              appBarTheme: AppBarTheme(
-                backgroundColor: Theme.of(context).colorScheme.inversePrimary,
-              ),
-              useMaterial3: true,
-            ),
+            theme: AppTheme.lightTheme(),
+            darkTheme: AppTheme.darkTheme(),
             locale: locale,
             supportedLocales: AppLocaleUtils.supportedLocales,
             localizationsDelegates: const [

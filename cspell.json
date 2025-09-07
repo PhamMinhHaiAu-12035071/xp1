@@ -116,7 +116,26 @@
 
     "Cupertino",
     "Riverpod",
-    "riverpod"
+    "riverpod",
+
+    "ARGB",
+    "RGBO",
+    "RRGGBB",
+    "lerp",
+    "lerped",
+    "WCAG",
+    "WCAGAA",
+    "WCAGAAA",
+    "screenutil",
+    "Widgetbook",
+    "widgetbook",
+    "colorpicker",
+    "tweens",
+    "Colorblinding",
+    "Liskov",
+    "microkernels",
+    "rhdj",
+    "amsn"
   ],
   "ignorePaths": [
     "build/**",

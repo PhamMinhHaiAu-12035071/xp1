@@ -2,6 +2,12 @@ import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
+import 'package:xp1/core/sizes/app_sizes.dart';
+import 'package:xp1/core/sizes/app_sizes_impl.dart';
+import 'package:xp1/core/styles/app_text_styles.dart';
+import 'package:xp1/core/styles/app_text_styles_impl.dart';
+import 'package:xp1/core/styles/colors/app_colors.dart';
+import 'package:xp1/core/styles/colors/app_colors_impl.dart';
 import 'package:xp1/features/env/domain/env_config_repository.dart';
 
 /// Mock services for testing.
@@ -25,7 +31,11 @@ class TestDependencyContainer {
     // Register mock services
     GetIt.instance
       ..registerLazySingleton<ILoggerService>(MockLoggerService.new)
-      ..registerLazySingleton<EnvConfigRepository>(MockEnvConfigRepository.new);
+      ..registerLazySingleton<EnvConfigRepository>(MockEnvConfigRepository.new)
+      // Register theme services required by AppTheme
+      ..registerLazySingleton<AppColors>(() => const AppColorsImpl())
+      ..registerLazySingleton<AppSizes>(() => const AppSizesImpl())
+      ..registerLazySingleton<AppTextStyles>(() => const AppTextStylesImpl());
 
     // Setup default mock behaviors
     final mockEnvConfig =

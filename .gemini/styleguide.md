@@ -1,4 +1,4 @@
-`# Flutter Coding Standards - Very Good Analysis
+# Flutter Coding Standards - Very Good Analysis
 
 ## Introduction
 
@@ -8,12 +8,14 @@ This guide ensures consistency, maintainability, and high-quality code across al
 
 ## Key Principles
 
-* **Very Good Ventures Standards**: Tuân thủ nghiêm ngặt các quy tắc của `very_good_analysis`
-* **Optimized for Readability**: Code phải dễ đọc và hiểu ngay cả với người lần đầu đọc
-* **Comprehensive Documentation**: Viết documentation chi tiết cho tất cả public APIs (bắt buộc với very_good_analysis)
-* **Maintainability**: Code dễ bảo trì, mở rộng và debug
-* **Performance First**: Tối ưu hiệu suất từ khi thiết kế với const usage bắt buộc
-* **Consistency**: Tuân thủ nhất quán trong toàn bộ codebase
+* **Very Good Ventures Standards**: Strict adherence to `very_good_analysis` rules
+* **Optimized for Readability**: Code must be readable and understandable for first-time readers
+* **Comprehensive Documentation**: Write detailed documentation for all public APIs (required by very_good_analysis)
+* **Maintainability**: Code that is easy to maintain, extend, and debug
+* **Performance First**: Optimize performance from design phase with mandatory const usage
+* **Consistency**: Consistent adherence throughout the entire codebase
+* **Modern Dart 3+ Syntax**: Use latest language features for type safety and expressiveness
+* **Flutter 3.27+ Compatibility**: Follow latest framework updates and deprecation guidelines
 
 ## Very Good Analysis Configuration
 
@@ -35,12 +37,12 @@ analyzer:
     strict-inference: true
     strict-raw-types: true
 
-# Very Good Analysis đã include hầu hết rules tốt nhất
-# Chỉ override khi thực sự cần thiết
+# Very Good Analysis includes most best-practice rules
+# Only override when absolutely necessary
 linter:
   rules:
-    # Override rules nếu cần (không khuyến khích)
-    # lines_longer_than_80_chars: false  # Nếu cần dòng dài hơn
+    # Override rules if needed (not recommended)
+    # lines_longer_than_80_chars: false  # If longer lines needed
 ```
 
 ## Deviations from Official Flutter/Dart Standards
@@ -59,9 +61,173 @@ linter:
 * **Use relative imports** for files within the same package for better maintainability.
 
 ### Documentation Style
-* **Use triple slash (`///`) for documentation comments** (bắt buộc với very_good_analysis).
+* **Use triple slash (`///`) for documentation comments** (required by very_good_analysis).
 * **Include usage examples** in documentation for complex widgets and methods.
-* **Document all public APIs** with detailed parameter descriptions (bắt buộc).
+* **Document all public APIs** with detailed parameter descriptions (mandatory).
+* **English only**: All documentation must be written in English for international collaboration.
+
+## 🚨 CRITICAL: Flutter 3.27+ Color Deprecation Guidelines
+
+**IMPORTANT**: Flutter 3.27.0+ introduced breaking changes for Color API to support wide-gamut color spaces.
+
+### ✅ CORRECT: Use withValues() (Flutter 3.27+)
+
+```dart
+// ✅ CORRECT: New withValues() method (prevents precision loss)
+BoxShadow(
+  color: Colors.black.withValues(alpha: 0.04),
+  blurRadius: 8,
+)
+
+// ✅ CORRECT: Access alpha component
+final alphaValue = color.a; // Direct floating-point access
+
+// ✅ CORRECT: Convert to ARGB for integer operations
+final colorValue = color.toARGB32();
+expect(color.toARGB32(), equals(0xFF2196F3));
+```
+
+### ❌ DEPRECATED: Avoid these methods (Flutter 3.27+)
+
+```dart
+// ❌ DEPRECATED: withOpacity() causes precision loss
+BoxShadow(
+  color: Colors.black.withOpacity(0.04), // DEPRECATED
+  blurRadius: 8,
+)
+
+// ❌ DEPRECATED: Old component accessors
+final alphaValue = color.alpha;  // DEPRECATED
+final colorValue = color.value;  // DEPRECATED
+final opacity = color.opacity;   // DEPRECATED
+```
+
+### Migration Guide
+
+| **Deprecated (Old)**          | **Recommended (New)**                    | **Reason**                  |
+|-------------------------------|------------------------------------------|-----------------------------|
+| `color.withOpacity(0.5)`     | `color.withValues(alpha: 0.5)`          | Prevents precision loss     |
+| `color.opacity`               | `color.a`                                | Direct floating-point value |
+| `color.alpha`                 | `(color.a * 255.0).round() & 0xff`      | Explicit integer conversion |
+| `color.value`                 | `color.toARGB32()`                       | Explicit ARGB conversion    |
+
+**Why this change?**
+Flutter now supports wide-gamut color spaces (Display P3) beyond sRGB. The new methods provide better precision and avoid data loss when working with modern color spaces.
+
+## 🚀 DART 3+ MODERN SYNTAX - HIGHEST PRIORITY
+
+> **MANDATORY**: Always prioritize Dart 3+ features and syntax over legacy patterns. Use the latest language constructs for better type safety, expressiveness, and performance.
+
+### Pattern Matching & Switch Expressions (Dart 3.0+)
+
+```dart
+// ❌ OLD: Switch statement with manual handling
+String getStatusMessage(ApiState state) {
+  switch (state.runtimeType) {
+    case LoadingState:
+      return 'Loading...';
+    case SuccessState:
+      final successState = state as SuccessState;
+      return 'Success: ${successState.data}';
+    case ErrorState:
+      final errorState = state as ErrorState;
+      return 'Error: ${errorState.message}';
+    default:
+      return 'Unknown state';
+  }
+}
+
+// ✅ DART 3+: Switch expression with pattern matching
+String getStatusMessage(ApiState state) => switch (state) {
+  LoadingState() => 'Loading...',
+  SuccessState(:final data) => 'Success: $data',
+  ErrorState(:final message) => 'Error: $message',
+};
+```
+
+### Sealed Classes for Type Safety (Dart 3.0+)
+
+```dart
+// ✅ CORRECT: Sealed class for exhaustive pattern matching
+sealed class ApiState {}
+
+final class LoadingState extends ApiState {}
+
+final class SuccessState extends ApiState {
+  const SuccessState(this.data);
+  final String data;
+}
+
+final class ErrorState extends ApiState {
+  const ErrorState(this.message);
+  final String message;
+}
+
+// ✅ USAGE: Compiler ensures exhaustive handling
+Widget buildStateWidget(ApiState state) => switch (state) {
+  LoadingState() => const CircularProgressIndicator(),
+  SuccessState(:final data) => Text(data),
+  ErrorState(:final message) => ErrorWidget(message),
+  // No default needed - compiler enforces completeness!
+};
+```
+
+### Records for Multiple Return Values (Dart 3.0+)
+
+```dart
+// ❌ OLD: Creating classes for simple data
+class ValidationResult {
+  const ValidationResult(this.isValid, this.error);
+  final bool isValid;
+  final String? error;
+}
+
+ValidationResult validateEmail(String email) {
+  if (email.isEmpty) return ValidationResult(false, 'Email required');
+  if (!email.contains('@')) return ValidationResult(false, 'Invalid format');
+  return ValidationResult(true, null);
+}
+
+// ✅ DART 3+: Records for lightweight data
+(bool isValid, String? error) validateEmail(String email) {
+  if (email.isEmpty) return (false, 'Email required');
+  if (!email.contains('@')) return (false, 'Invalid format');
+  return (true, null);
+}
+
+// ✅ USAGE: Destructuring assignment
+final (isValid, error) = validateEmail(userEmail);
+if (!isValid) {
+  showError(error!);
+}
+```
+
+### Extension Types for Zero-Cost Wrappers (Dart 3.3+)
+
+```dart
+// ❌ OLD: Runtime overhead with wrapper classes
+class UserId {
+  const UserId(this.value);
+  final String value;
+  
+  bool get isValid => value.isNotEmpty && value.length > 3;
+}
+
+// ✅ DART 3.3+: Zero-cost extension type
+extension type UserId(String value) {
+  UserId.fromString(String str) : value = str;
+  
+  bool get isValid => value.isNotEmpty && value.length > 3;
+  String get displayName => 'User($value)';
+}
+
+// Usage: No runtime cost, full type safety
+void processUser(UserId id) {
+  if (id.isValid) {
+    print(id.displayName);
+  }
+}
+```
 
 #### Documentation Templates for Common Patterns
 
@@ -135,62 +301,62 @@ final class Development extends Environment {
 
 ### Classes, Enums, Typedefs, Extensions
 ```dart
-// ✅ Tốt - UpperCamelCase
+// ✅ CORRECT - UpperCamelCase
 class UserRepository extends Repository<User> {}
 class PaymentBloc extends Bloc<PaymentEvent, PaymentState> {}
 enum ConnectionState { connected, disconnected }
 typedef UserCallback = void Function(User user);
 extension StringExtensions on String {}
 
-// ❌ Tránh
+// ❌ AVOID
 class userProfileScreen {} // lowercase
 class User_Profile_Screen {} // snake_case
 ```
 
 ### Variables, Methods, Parameters
 ```dart
-// ✅ Tốt - lowerCamelCase
+// ✅ CORRECT - lowerCamelCase
 final String userName = 'john_doe';
 int itemCount = 0;
 void fetchUserData() {}
 void calculateTotalAmount({required double basePrice}) {}
 
-// ❌ Tránh  
+// ❌ AVOID
 final String user_name = 'john_doe'; // snake_case
 final String UserName = 'john_doe'; // UpperCamelCase
 ```
 
-### Files và Directories
+### Files and Directories
 ```dart
-// ✅ Tốt - snake_case
+// ✅ CORRECT - snake_case
 user_repository.dart
 payment_bloc.dart
 home_page.dart
 lib/features/authentication/
 
-// ❌ Tránh
+// ❌ AVOID
 UserRepository.dart // UpperCamelCase
 user-repository.dart // kebab-case
 ```
 
 ### Constants (Very Good Analysis Update)
 ```dart
-// ✅ Tốt - lowerCamelCase cho const (không phải SCREAMING_SNAKE_CASE)
+// ✅ CORRECT - lowerCamelCase for const (not SCREAMING_SNAKE_CASE)
 const double defaultPadding = 16.0;
 const Color primaryColor = Colors.blue;
 
-// ✅ Tốt - lowerCamelCase cho static const
+// ✅ CORRECT - lowerCamelCase for static const
 static const String apiBaseUrl = 'https://api.example.com';
 static const int maxRetryCount = 3;
 
-// ❌ Tránh - SCREAMING_SNAKE_CASE không được khuyến khích
+// ❌ AVOID - SCREAMING_SNAKE_CASE is not recommended
 static const String API_BASE_URL = 'https://api.example.com';
 static const int MAX_RETRY_COUNT = 3;
 ```
 
 ### Private Members
 ```dart
-// ✅ Tốt - underscore prefix cho private members
+// ✅ CORRECT - underscore prefix for private members
 class _HomePageState extends State<HomePage> {}
 final String _privateField = 'private';
 void _privateMethod() {}
@@ -198,9 +364,9 @@ void _privateMethod() {}
 
 ## Code Formatting & Structure
 
-### Indentation và Line Length
+### Indentation and Line Length
 ```dart
-// ✅ Sử dụng 2 spaces cho indentation (Very Good standard)
+// ✅ CORRECT - Use 2 spaces for indentation (Very Good standard)
 class ExampleWidget extends StatelessWidget {
   const ExampleWidget({super.key});
 
@@ -221,7 +387,7 @@ class ExampleWidget extends StatelessWidget {
 
 ### Trailing Commas
 ```dart
-// ✅ Tốt - Sử dụng trailing comma để format tốt hơn
+// ✅ CORRECT - Use trailing comma for better formatting
 Widget build(BuildContext context) {
   return Column(
     children: [
@@ -231,13 +397,13 @@ Widget build(BuildContext context) {
   );
 }
 
-// ✅ Tốt - Không cần trailing comma với single parameter
+// ✅ CORRECT - No trailing comma needed with single parameter
 const Text('Simple text')
 ```
 
 ### Import Organization
 ```dart
-// ✅ Tốt - Nhóm imports theo thứ tự
+// ✅ CORRECT - Group imports by category
 // 1. Dart core libraries
 import 'dart:async';
 import 'dart:convert';
@@ -251,7 +417,7 @@ import 'package:bloc/bloc.dart';
 import 'package:equatable/equatable.dart';
 import 'package:http/http.dart' as http;
 
-// 4. Internal packages (relative imports cho files trong lib/)
+// 4. Internal packages (relative imports for files in lib/)
 import '../models/user.dart';
 import '../repositories/user_repository.dart';
 import 'widgets/user_card.dart';
@@ -261,10 +427,10 @@ import 'widgets/user_card.dart';
 
 ### StatelessWidget Template
 ```dart
-/// Widget hiển thị thông tin người dùng với avatar và tên.
+/// Widget displaying user information with avatar and name.
 /// 
-/// Widget này tự động load avatar từ URL và hiển thị placeholder
-/// nếu load thất bại. Hỗ trợ callback khi user tap vào.
+/// This widget automatically loads avatar from URL and displays placeholder
+/// if loading fails. Supports callback when user taps.
 /// 
 /// ## Usage
 /// 
@@ -280,11 +446,11 @@ import 'widgets/user_card.dart';
 /// )
 /// ```
 class UserInfoCard extends StatelessWidget {
-  /// Tạo [UserInfoCard].
+  /// Creates a [UserInfoCard].
   /// 
-  /// [user] là required và không được null.
-  /// [onTap] là optional callback khi user tap.
-  /// [showAvatar] mặc định là true.
+  /// [user] is required and cannot be null.
+  /// [onTap] is optional callback when user taps.
+  /// [showAvatar] defaults to true.
   const UserInfoCard({
     required this.user,
     this.onTap,
@@ -292,13 +458,13 @@ class UserInfoCard extends StatelessWidget {
     super.key,
   });
 
-  /// User data để hiển thị.
+  /// User data to display.
   final User user;
   
-  /// Callback được gọi khi user tap vào card.
+  /// Callback called when user taps the card.
   final VoidCallback? onTap;
   
-  /// Có hiển thị avatar hay không.
+  /// Whether to show avatar or not.
   final bool showAvatar;
 
   @override
@@ -339,24 +505,24 @@ class UserInfoCard extends StatelessWidget {
 
 ### StatefulWidget Template
 ```dart
-/// Widget counter với state management.
+/// Counter widget with state management.
 /// 
-/// Hỗ trợ initial value và callback khi giá trị thay đổi.
+/// Supports initial value and callback when value changes.
 class CounterWidget extends StatefulWidget {
-  /// Tạo [CounterWidget].
+  /// Creates a [CounterWidget].
   /// 
-  /// [initialValue] mặc định là 0.
-  /// [onChanged] là optional callback khi giá trị thay đổi.
+  /// [initialValue] defaults to 0.
+  /// [onChanged] is optional callback when value changes.
   const CounterWidget({
     this.initialValue = 0,
     this.onChanged,
     super.key,
   });
 
-  /// Giá trị ban đầu của counter.
+  /// Initial value of the counter.
   final int initialValue;
   
-  /// Callback được gọi khi giá trị thay đổi.
+  /// Callback called when value changes.
   final ValueChanged<int>? onChanged;
 
   @override
@@ -396,21 +562,21 @@ class _CounterWidgetState extends State<CounterWidget> {
 
 ## Performance Optimization (Very Good Analysis Requirements)
 
-### Const Usage (Bắt buộc)
+### Const Usage (Mandatory)
 ```dart
-// ✅ Bắt buộc - const constructors
+// ✅ MANDATORY - const constructors
 const Text('Static text')
 const SizedBox(height: 16.0)
 const Icon(Icons.home)
 
-// ✅ Const collections
+// ✅ CORRECT - Const collections
 const <String>['item1', 'item2']
 const {
   'key1': 'value1',
   'key2': 'value2',
 }
 
-// ✅ Const constructor
+// ✅ CORRECT - Const constructor
 class AppColors {
   static const Color primary = Color(0xFF2196F3);
   static const Color secondary = Color(0xFF03DAC6);
@@ -419,7 +585,7 @@ class AppColors {
 
 ### Widget Extraction
 ```dart
-// ✅ Tốt - Extract widgets để tránh rebuilds không cần thiết
+// ✅ CORRECT - Extract widgets to avoid unnecessary rebuilds
 class HomePage extends StatelessWidget {
   const HomePage({super.key});
 
@@ -429,7 +595,7 @@ class HomePage extends StatelessWidget {
       appBar: AppBar(title: const Text('Home')),
       body: const Column(
         children: [
-          _Header(), // Extract thành widget riêng
+          _Header(), // Extract as separate widget
           Expanded(child: _Content()),
         ],
       ),
@@ -455,20 +621,20 @@ class _Header extends StatelessWidget {
 
 ### ListView Optimization
 ```dart
-// ✅ Tốt - Sử dụng ListView.builder cho long lists
+// ✅ CORRECT - Use ListView.builder for long lists
 ListView.builder(
   itemCount: items.length,
   itemBuilder: (context, index) {
     final item = items[index];
     return ListTile(
-      key: ValueKey(item.id), // Key cho dynamic content
+      key: ValueKey(item.id), // Key for dynamic content
       title: Text(item.title),
       subtitle: Text(item.description),
     );
   },
 )
 
-// ✅ Tốt - Sử dụng ListView.separated cho dividers
+// ✅ CORRECT - Use ListView.separated for dividers
 ListView.separated(
   itemCount: items.length,
   itemBuilder: (context, index) => ItemCard(item: items[index]),
@@ -480,24 +646,24 @@ ListView.separated(
 
 ### Safe Navigation
 ```dart
-// ✅ Tốt - Null-aware operators
+// ✅ CORRECT - Null-aware operators
 final userName = user?.name ?? 'Unknown';
 final userEmail = user?.profile?.email;
 final itemCount = items?.length ?? 0;
 
-// ✅ Tốt - Safe method calls
+// ✅ CORRECT - Safe method calls
 user?.updateProfile();
 items?.forEach((item) => print(item));
 
-// ❌ Tránh - Unsafe casting
-final user = data as User; // Có thể throw exception
-// Thay vào đó:
+// ❌ AVOID - Unsafe casting
+final user = data as User; // May throw exception
+// Instead use:
 final user = data is User ? data : null;
 ```
 
 ### Exception Handling (Very Good Pattern)
 ```dart
-// ✅ Very Good pattern - specific exceptions
+// ✅ VERY GOOD PATTERN - specific exceptions
 class UserNotFoundException implements Exception {
   const UserNotFoundException(this.userId);
   final String userId;
@@ -515,7 +681,7 @@ class ApiException implements Exception {
   String toString() => 'ApiException: $message (Status: $statusCode)';
 }
 
-// ✅ Repository implementation
+// ✅ REPOSITORY IMPLEMENTATION
 class UserRepositoryImpl implements UserRepository {
   @override
   Future<User> getUser(String id) async {
@@ -641,10 +807,10 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 
 ### Class Documentation
 ```dart
-/// Repository để quản lý user data.
+/// Repository for managing user data.
 /// 
-/// Cung cấp methods để CRUD operations với user entities
-/// thông qua local database và remote API.
+/// Provides methods for CRUD operations with user entities
+/// through local database and remote API.
 /// 
 /// ## Usage
 /// 
@@ -655,16 +821,16 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 /// 
 /// ## See also
 /// 
-/// * [User], model class cho user data
-/// * [UserBloc], BLoC để quản lý user state
+/// * [User], model class for user data
+/// * [UserBloc], BLoC for managing user state
 abstract class UserRepository {
-  /// Lấy user by ID.
+  /// Gets user by ID.
   /// 
-  /// Throws [UserNotFoundException] nếu không tìm thấy.
+  /// Throws [UserNotFoundException] if not found.
   /// 
   /// ## Parameters
   /// 
-  /// * [id] - User ID cần lấy
+  /// * [id] - User ID to retrieve
   /// 
   /// ## Returns
   /// 
@@ -672,23 +838,23 @@ abstract class UserRepository {
   /// 
   /// ## Throws
   /// 
-  /// * [UserNotFoundException] - Khi user không tồn tại
-  /// * [ApiException] - Khi API call thất bại
+  /// * [UserNotFoundException] - When user doesn't exist
+  /// * [ApiException] - When API call fails
   Future<User> getUser(String id);
   
-  /// Lưu hoặc update user.
+  /// Saves or updates user.
   /// 
   /// ## Parameters
   /// 
-  /// * [user] - User data cần lưu
+  /// * [user] - User data to save
   /// 
   /// ## Returns
   /// 
-  /// Future<void> - Hoàn thành khi lưu thành công
+  /// Future<void> - Completes when save succeeds
   /// 
   /// ## Throws
   /// 
-  /// * [ApiException] - Khi API call thất bại
+  /// * [ApiException] - When API call fails
   Future<void> saveUser(User user);
 }
 ```
@@ -978,25 +1144,25 @@ ignore_patterns:
 
 ### Navigation
 ```dart
-// ✅ Tốt - Sử dụng named routes
+// ✅ CORRECT - Use named routes
 Navigator.pushNamed(context, '/user-detail', arguments: userId);
 
-// ✅ Tốt - Sử dụng GoRouter cho complex navigation
+// ✅ CORRECT - Use GoRouter for complex navigation
 GoRouter.of(context).push('/user/$userId');
 ```
 
 ### Localization
 ```dart
-// ✅ Tốt - Sử dụng AppLocalizations
+// ✅ CORRECT - Use AppLocalizations
 Text(AppLocalizations.of(context)!.welcomeMessage)
 
-// ✅ Tốt - Sử dụng context extension
+// ✅ CORRECT - Use context extension
 Text(context.l10n.welcomeMessage)
 ```
 
 ### Theme Usage
 ```dart
-// ✅ Tốt - Sử dụng Theme.of(context)
+// ✅ CORRECT - Use Theme.of(context)
 Container(
   color: Theme.of(context).colorScheme.primary,
   child: Text(
@@ -1008,7 +1174,7 @@ Container(
 
 ### Responsive Design
 ```dart
-// ✅ Tốt - Sử dụng MediaQuery và LayoutBuilder
+// ✅ CORRECT - Use MediaQuery and LayoutBuilder
 LayoutBuilder(
   builder: (context, constraints) {
     if (constraints.maxWidth > 600) {
@@ -1024,7 +1190,7 @@ LayoutBuilder(
 
 ### Input Validation
 ```dart
-// ✅ Tốt - Validate user input
+// ✅ CORRECT - Validate user input
 class UserInputValidator {
   /// Validates email address format.
   /// 
@@ -1043,7 +1209,7 @@ class UserInputValidator {
 
 ### Secure Storage
 ```dart
-// ✅ Tốt - Sử dụng flutter_secure_storage cho sensitive data
+// ✅ CORRECT - Use flutter_secure_storage for sensitive data
 final storage = FlutterSecureStorage();
 await storage.write(key: 'auth_token', value: token);
 ```
@@ -1052,7 +1218,7 @@ await storage.write(key: 'auth_token', value: token);
 
 ### Semantic Labels
 ```dart
-// ✅ Tốt - Thêm semantic labels cho accessibility
+// ✅ CORRECT - Add semantic labels for accessibility
 IconButton(
   onPressed: () {},
   icon: const Icon(Icons.close),
@@ -1063,7 +1229,7 @@ IconButton(
 
 ### Color Contrast
 ```dart
-// ✅ Tốt - Đảm bảo contrast ratio đủ cao
+// ✅ CORRECT - Ensure sufficient contrast ratio
 Text(
   'Important text',
   style: TextStyle(

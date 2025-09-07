@@ -29,6 +29,16 @@
       "type": "dart",
       "program": "lib/main_production.dart",
       "args": ["--flavor", "production", "--target", "lib/main_production.dart"]
+    },
+    {
+      "name": "Launch Widgetbook",
+      "request": "launch",
+      "type": "dart",
+      "program": "widgetbook/main.dart",
+      "args": [
+        "--target",
+        "widgetbook/main.dart"
+      ]
     }
   ]
 }

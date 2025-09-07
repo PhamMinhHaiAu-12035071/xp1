@@ -161,6 +161,97 @@ This project also implements environment management using sealed classes and fac
 - **Sealed Classes**: Used for type-safe environment switching
 - **Repository Pattern**: Clean architecture with domain/infrastructure separation
 
+### Flutter 3.27+ Color Deprecation Guidelines - MANDATORY
+
+**CRITICAL**: Flutter 3.27.0+ deprecated `Color.value` and `Color.alpha` for wide gamut color support.
+
+#### **Replace Color.value with toARGB32()**
+
+```dart
+// ❌ DEPRECATED: Color.value (Flutter 3.27+)
+int colorValue = myColor.value;
+expect(color.value, equals(0xFF2196F3));
+
+// ✅ CORRECT: Use toARGB32() for explicit conversion
+int colorValue = myColor.toARGB32();
+expect(color.toARGB32(), equals(0xFF2196F3));
+```
+
+#### **Replace Color.alpha with Component Accessors**
+
+```dart
+// ❌ DEPRECATED: Color.alpha (Flutter 3.27+)
+int alphaValue = color.alpha;
+expect(color.alpha, equals(255));
+
+// ✅ CORRECT: Use component accessor with conversion
+int alphaValue = (color.a * 255.0).round() & 0xff;
+expect((color.a * 255.0).round() & 0xff, equals(255));
+```
+
+#### **Use Component Accessors for Color Values**
+
+```dart
+// ❌ DEPRECATED: Color.red, Color.green, Color.blue (Flutter 3.27+)
+int redValue = color.red;
+int greenValue = color.green;
+int blueValue = color.blue;
+
+// ✅ CORRECT: Use floating-point component accessors
+double redComponent = color.r;      // 0.0-1.0 range
+double greenComponent = color.g;    // 0.0-1.0 range
+double blueComponent = color.b;     // 0.0-1.0 range
+double alphaComponent = color.a;    // 0.0-1.0 range
+
+// Convert to integer if needed
+int redInt = (color.r * 255.0).round() & 0xff;
+int greenInt = (color.g * 255.0).round() & 0xff;
+int blueInt = (color.b * 255.0).round() & 0xff;
+```
+
+#### **MaterialColor Creation with toARGB32()**
+
+```dart
+// ❌ DEPRECATED: Using Color.value in MaterialColor
+MaterialColor primary = MaterialColor(color.value, swatch);
+
+// ✅ CORRECT: Use toARGB32() for MaterialColor
+MaterialColor primary = MaterialColor(color.toARGB32(), swatch);
+```
+
+#### **Testing Color Comparisons**
+
+```dart
+// ❌ DEPRECATED: Color.value in tests
+expect(color.value, equals(0xFF2196F3));
+expect(color.alpha, equals(255));
+
+// ✅ CORRECT: Use toARGB32() and component accessors
+expect(color.toARGB32(), equals(0xFF2196F3));
+expect((color.a * 255.0).round() & 0xff, equals(255));
+
+// For lerp tests with closeTo matcher
+expect(
+  lerpedColor.toARGB32(),
+  closeTo(expectedColor.toARGB32(), 0x010101),
+);
+```
+
+#### **Migration Checklist**
+
+- [ ] Replace all `Color.value` with `Color.toARGB32()`
+- [ ] Replace all `Color.alpha` with `(color.a * 255.0).round() & 0xff`
+- [ ] Replace `Color.red/green/blue` with `Color.r/g/b` (floating-point)
+- [ ] Update MaterialColor constructors to use `toARGB32()`
+- [ ] Update test expectations to use new methods
+- [ ] Verify color precision in critical applications
+
+#### **Why This Change?**
+
+Flutter deprecated these properties to support **wide gamut color spaces** and improve color accuracy. The new methods provide explicit conversion with awareness of precision loss when converting from floating-point to 32-bit integer representation.
+
+**Note**: `toARGB32()` may not produce identical results to `value` due to floating-point precision differences, but this is intentional for better color space support.
+
 ### Environment Usage Patterns
 
 **Navigation Usage (Most Common):**
@@ -514,6 +605,7 @@ very_good test --coverage
 - ❌ No formatting inconsistencies
 - ❌ No missing documentation on public APIs
 - ❌ No license compliance violations
+- ❌ No deprecated Color.value or Color.alpha usage (Flutter 3.27+)
 
 ### 📋 Claude Code Workflow Template
 
