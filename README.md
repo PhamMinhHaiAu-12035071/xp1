@@ -261,6 +261,157 @@ make i18n-help               # Show detailed help
 - **Rich text support**: For complex formatted text
 - **Compile-time safety**: No more runtime translation errors!
 
+---
+
+## Image Asset Management 🖼️
+
+### Pure Flutter Image System
+
+This project implements a **zero-dependency** image asset management system using pure Flutter capabilities:
+
+- **🚀 Pure Flutter Approach**: No external image libraries - uses built-in `Image.asset()` + `ImageCache`
+- **📱 Responsive Sizing**: Automatic integration with `flutter_screenutil` for responsive design
+- **🛡️ Error Handling**: Built-in error fallbacks with `Icon(Icons.broken_image)`
+- **⏳ Loading States**: Automatic loading indicators with `CircularProgressIndicator`
+- **🏗️ Architecture**: Clean DI pattern following existing codebase standards
+- **✅ Test Coverage**: 100% test coverage with TDD approach
+
+### Quick Usage
+
+```dart
+// Inject the service
+final assetService = GetIt.instance<AssetImageService>();
+final appImages = GetIt.instance<AppImages>();
+
+// Display responsive image with automatic error handling
+Widget buildProfileImage() {
+  return assetService.assetImage(
+    appImages.employeeAvatar,
+    width: 96,  // Automatically becomes 96.w (responsive)
+    height: 96, // Automatically becomes 96.h (responsive)
+    fit: BoxFit.cover,
+  );
+}
+
+// Use predefined image sizes
+final iconSize = appImages.imageSizes.medium; // 96.0
+```
+
+### Asset Organization
+
+```
+assets/images/
+├── common/           # Shared images
+├── splash/           # Splash screen assets
+├── login/            # Login screen assets
+├── employee/         # Employee-related assets
+└── placeholders/     # Placeholder images
+```
+
+### Key Benefits
+
+- **Performance**: Built-in `ImageCache` handles caching automatically
+- **Reliability**: Error states never fail - always shows fallback icon
+- **Maintainability**: Centralized asset path management
+- **Type Safety**: No magic strings - all paths are typed constants
+- **Responsive**: Automatic responsive sizing across all screen sizes
+
+---
+
+## Design System & Styling 🎨
+
+### Comprehensive Design System
+
+This project implements a **complete design system** with colors, typography, spacing, and theming following established architectural patterns:
+
+- **🎨 Color System**: Complete color palettes with light/normal/dark/hover/active variants
+- **✍️ Typography Scale**: 8-level typography system with Public Sans font family
+- **📏 Responsive Sizing**: Comprehensive sizing system with responsive variants (r/v/h)
+- **🌙 Theme Support**: Full light/dark mode with custom theme extensions
+- **🏗️ Architecture**: Clean DI pattern with abstract + implementation
+- **📱 Material 3**: Full Material Design 3 integration with custom extensions
+
+### Quick Usage
+
+```dart
+// Inject design system services
+final appColors = GetIt.instance<AppColors>();
+final appTextStyles = GetIt.instance<AppTextStyles>();
+final appSizes = GetIt.instance<AppSizes>();
+
+// Use comprehensive color system
+Widget buildBrandButton() {
+  return ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: appColors.amberNormal,  // Main brand color
+      foregroundColor: appColors.charcoal,    // Primary text
+    ),
+    onPressed: () {},
+    child: Text(
+      'Brand Button',
+      style: appTextStyles.bodyLarge(),       // Typography system
+    ),
+  );
+}
+
+// Responsive layout with consistent spacing
+Widget buildResponsiveCard() {
+  return Container(
+    width: appSizes.r120,                     // 120px responsive
+    padding: EdgeInsets.all(appSizes.r16),   // 16px responsive padding
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(appSizes.borderRadiusMd),
+      color: appColors.lightGray,
+    ),
+    child: Text(
+      'Responsive Card',
+      style: appTextStyles.headingMedium(color: appColors.charcoal),
+    ),
+  );
+}
+```
+
+### Color System
+
+Complete color palettes with semantic naming and interaction states:
+
+- **Brand Colors**: Amber palette (light, normal, dark, hover, active)
+- **Neutral Colors**: Grey palette with comprehensive variations
+- **Semantic Colors**: Blue (info), Green (success), Red (error), Pink, Orange
+- **Theme Colors**: Automatic light/dark mode support
+- **Interactive States**: Hover and active states for all colors
+
+### Typography System
+
+8-level typography scale based on Public Sans:
+
+- **Display Large** (36px) - Hero text, main titles
+- **Display Medium** (32px) - Section headings
+- **Heading Large** (24px) - Page titles  
+- **Heading Medium** (20px) - Subsection headers
+- **Body Large** (16px) - Primary body text
+- **Body Medium** (14px) - Secondary text
+- **Body Small** (12px) - Metadata
+- **Caption** (10px) - Fine print
+
+### Responsive Sizing
+
+Three variants for every dimension:
+
+- **r** (responsive) - Both width and height
+- **v** (vertical) - Height only  
+- **h** (horizontal) - Width only
+
+Comprehensive scale: 2px → 680px with specialized sizes for common use cases.
+
+### Key Benefits
+
+- **Consistency**: Type-safe design tokens prevent inconsistent styling
+- **Performance**: Centralized styling with dependency injection
+- **Maintainability**: Single source of truth for all design decisions  
+- **Accessibility**: Semantic color naming and proper contrast ratios
+- **Developer Experience**: IntelliSense support with comprehensive documentation
+
 [coverage_badge]: coverage_badge.svg
 [flutter_localizations_link]: https://api.flutter.dev/flutter/flutter_localizations/flutter_localizations-library.html
 [internationalization_link]: https://flutter.dev/docs/development/accessibility-and-localization/internationalization

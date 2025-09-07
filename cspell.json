@@ -136,7 +136,9 @@
     "microkernels",
     "rhdj",
     "amsn",
-    "vsync"
+    "vsync",
+    "octo",
+    "precache"
   ],
   "ignorePaths": [
     "build/**",

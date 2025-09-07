@@ -93,3 +93,20 @@ dev_dependencies:
 flutter:
   generate: true # Enable code generation
   uses-material-design: true # Use Material Design icons
+
+  # Enhanced organized asset structure for image management
+  assets:
+    # Common shared images
+    - assets/images/common/
+
+    # Feature-specific directories  
+    - assets/images/splash/
+    - assets/images/login/
+    - assets/images/employee/
+
+    # Error handling and placeholders
+    - assets/images/placeholders/
+    - assets/images/icons/
+
+    # Keep existing structure if any
+    - assets/icons/

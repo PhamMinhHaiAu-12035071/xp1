@@ -3072,6 +3072,525 @@ make coverage-open          # View HTML report
 - ✅ Git hooks pass automatically
 - ✅ CI pipeline ready (make local-ci passes)
 
+---
+
+## 🖼️ Image Asset Management - Pure Flutter Approach
+
+**THE GOLDEN RULE:** Use the established Image Asset service with dependency injection for consistent, responsive, and error-safe image handling.
+
+### Service Injection Pattern - MANDATORY
+
+```dart
+// ❌ WRONG: Direct widget usage without service layer
+Widget buildImage() {
+  return Image.asset(
+    'assets/images/logo.png',
+    width: 100,
+    height: 100,
+  );
+}
+
+// ✅ CORRECT: Use AssetImageService with dependency injection
+class ProfileWidget extends StatelessWidget {
+  const ProfileWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final assetService = GetIt.instance<AssetImageService>();
+    final appImages = GetIt.instance<AppImages>();
+    
+    return assetService.assetImage(
+      appImages.employeeAvatar,
+      width: 96,  // Automatically becomes 96.w (responsive)
+      height: 96, // Automatically becomes 96.h (responsive)
+      fit: BoxFit.cover,
+    );
+  }
+}
+```
+
+### Asset Path Management - CENTRALIZED
+
+```dart
+// ❌ WRONG: Magic strings scattered throughout code
+Widget buildSplashLogo() {
+  return Image.asset('assets/images/splash/logo.png');
+}
+
+Widget buildLoginLogo() {
+  return Image.asset('assets/images/login/logo.png');
+}
+
+// ✅ CORRECT: Use AppImages constants for type safety
+class SplashPage extends StatelessWidget {
+  const SplashPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final assetService = GetIt.instance<AssetImageService>();
+    final appImages = GetIt.instance<AppImages>();
+    
+    return assetService.assetImage(
+      appImages.splashLogo,  // Type-safe, centralized path
+      width: appImages.imageSizes.large,  // Consistent sizing
+    );
+  }
+}
+```
+
+### Error Handling - DEFENSIVE PROGRAMMING
+
+```dart
+// ❌ WRONG: No error handling, might crash on missing assets
+Widget buildUserAvatar() {
+  return Image.asset(
+    userAvatarPath,
+    width: 50,
+    height: 50,
+  );
+}
+
+// ✅ CORRECT: Built-in error handling with graceful fallbacks
+Widget buildUserAvatar() {
+  final assetService = GetIt.instance<AssetImageService>();
+  
+  return assetService.assetImage(
+    userAvatarPath,
+    width: 50,  // Auto-responsive with .w
+    height: 50, // Auto-responsive with .h
+    // Automatic error handling: shows Icons.broken_image if asset fails
+    // Automatic loading states: shows CircularProgressIndicator while loading
+  );
+}
+
+// For custom error states
+Widget buildCriticalImage() {
+  return assetService.assetImage(
+    criticalImagePath,
+    width: 100,
+    height: 100,
+    errorWidget: const Icon(Icons.error_outline, color: Colors.red),
+    placeholder: const ShimmerPlaceholder(),
+  );
+}
+```
+
+### Responsive Sizing - AUTOMATIC
+
+```dart
+// ❌ WRONG: Fixed pixel values, not responsive
+Widget buildIcon() {
+  return Image.asset(
+    'assets/icon.png',
+    width: 24,    // Fixed pixels - bad for different screen sizes
+    height: 24,
+  );
+}
+
+// ✅ CORRECT: Let service handle responsive sizing automatically
+Widget buildIcon() {
+  final assetService = GetIt.instance<AssetImageService>();
+  final appImages = GetIt.instance<AppImages>();
+  
+  return assetService.assetImage(
+    appImages.commonIcon,
+    width: 24,    // Automatically becomes 24.w (responsive)
+    height: 24,   // Automatically becomes 24.h (responsive)
+  );
+}
+
+// Use predefined sizes for consistency
+Widget buildStandardSizes() {
+  final appImages = GetIt.instance<AppImages>();
+  
+  return Column(
+    children: [
+      // Small: 48.0
+      assetService.assetImage(icon, width: appImages.imageSizes.small),
+      // Medium: 96.0  
+      assetService.assetImage(icon, width: appImages.imageSizes.medium),
+      // Large: 144.0
+      assetService.assetImage(icon, width: appImages.imageSizes.large),
+      // Extra Large: 192.0
+      assetService.assetImage(icon, width: appImages.imageSizes.xLarge),
+    ],
+  );
+}
+```
+
+### Performance Optimization - BUILT-IN CACHING
+
+```dart
+// ❌ WRONG: Manual cache management
+Widget buildOptimizedImage() {
+  return Image.asset(
+    imagePath,
+    cacheWidth: 100,
+    cacheHeight: 100,
+  );
+}
+
+// ✅ CORRECT: Service handles caching automatically
+Widget buildOptimizedImage() {
+  final assetService = GetIt.instance<AssetImageService>();
+  
+  return assetService.assetImage(
+    imagePath,
+    width: 100,   // Service automatically sets cacheWidth: 100
+    height: 100,  // Service automatically sets cacheHeight: 100
+    // Built-in ImageCache optimization included
+  );
+}
+```
+
+### Testing Pattern - 100% COVERAGE
+
+```dart
+// Test the service behavior, not just widget rendering
+testWidgets('should handle error states with default fallback', (
+  tester,
+) async {
+  final service = const AssetImageServiceImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          ScreenUtil.init(context, designSize: const Size(375, 812));
+          return service.assetImage('assets/images/nonexistent.png');
+        },
+      ),
+    ),
+  );
+
+  await tester.pumpAndSettle();
+  
+  // Verify error fallback appears
+  expect(find.byIcon(Icons.broken_image), findsOneWidget);
+  
+  // Verify default size is applied
+  final iconWidget = tester.widget<Icon>(find.byIcon(Icons.broken_image));
+  expect(iconWidget.size, equals(24.w));
+});
+```
+
+---
+
+## 🎨 Design System & Styling - Comprehensive Approach
+
+**THE GOLDEN RULE:** Use the established Design System services with dependency injection for consistent, maintainable, and type-safe styling across the application.
+
+### Color System Usage - MANDATORY PATTERNS
+
+```dart
+// ❌ WRONG: Hard-coded colors scattered throughout code
+Widget buildButton() {
+  return ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: Color(0xFFFF6B35), // Magic number - unmaintainable
+      foregroundColor: Colors.white,      // Generic color - inconsistent
+    ),
+    onPressed: () {},
+    child: Text('Button'),
+  );
+}
+
+// ✅ CORRECT: Use AppColors service with semantic naming
+class BrandButton extends StatelessWidget {
+  const BrandButton({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = GetIt.instance<AppColors>();
+    
+    return ElevatedButton(
+      style: ElevatedButton.styleFrom(
+        backgroundColor: appColors.amberNormal,    // Semantic brand color
+        foregroundColor: appColors.charcoal,      // Consistent text color
+      ),
+      onPressed: () {},
+      child: Text('Brand Button'),
+    );
+  }
+}
+```
+
+### Interactive State Management - REQUIRED PATTERN
+
+```dart
+// ❌ WRONG: No interaction states, poor UX
+Widget buildInteractiveCard() {
+  return Container(
+    color: Colors.grey[200], // Static color - no interaction feedback
+    child: Text('Card'),
+  );
+}
+
+// ✅ CORRECT: Proper interaction states with design system
+class InteractiveCard extends StatefulWidget {
+  const InteractiveCard({super.key});
+
+  @override
+  State<InteractiveCard> createState() => _InteractiveCardState();
+}
+
+class _InteractiveCardState extends State<InteractiveCard> {
+  bool _isHovered = false;
+  bool _isPressed = false;
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = GetIt.instance<AppColors>();
+    
+    // Use design system hover/active states
+    final cardColor = switch ((_isPressed, _isHovered)) {
+      (true, _) => appColors.amberLightActive,    // Active state
+      (false, true) => appColors.amberLightHover, // Hover state
+      (false, false) => appColors.amberLight,     // Default state
+    };
+    
+    return MouseRegion(
+      onEnter: (_) => setState(() => _isHovered = true),
+      onExit: (_) => setState(() => _isHovered = false),
+      child: GestureDetector(
+        onTapDown: (_) => setState(() => _isPressed = true),
+        onTapUp: (_) => setState(() => _isPressed = false),
+        onTapCancel: () => setState(() => _isPressed = false),
+        child: Container(
+          color: cardColor,
+          child: Text('Interactive Card'),
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Typography System - TYPE-SAFE APPROACH
+
+```dart
+// ❌ WRONG: Inconsistent text styles scattered everywhere
+Widget buildTextContent() {
+  return Column(
+    children: [
+      Text('Title', style: TextStyle(fontSize: 24, fontWeight: FontWeight.bold)),
+      Text('Body', style: TextStyle(fontSize: 16)),
+      Text('Caption', style: TextStyle(fontSize: 12, color: Colors.grey)),
+    ],
+  );
+}
+
+// ✅ CORRECT: Use AppTextStyles service for consistency
+class TextContent extends StatelessWidget {
+  const TextContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appTextStyles = GetIt.instance<AppTextStyles>();
+    final appColors = GetIt.instance<AppColors>();
+    
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text('Main Title', style: appTextStyles.displayLarge()),
+        Text('Section Header', style: appTextStyles.headingLarge()),
+        Text('Primary content goes here', style: appTextStyles.bodyLarge()),
+        Text('Secondary information', style: appTextStyles.bodyMedium()),
+        Text(
+          'Fine print details', 
+          style: appTextStyles.caption(color: appColors.greyNormal),
+        ),
+      ],
+    );
+  }
+}
+```
+
+### Responsive Sizing - AUTOMATIC SCALING
+
+```dart
+// ❌ WRONG: Fixed pixel values, not responsive
+Widget buildLayout() {
+  return Container(
+    width: 120,        // Fixed pixels - bad for different screen sizes
+    height: 80,        // Fixed pixels - poor responsive design
+    padding: EdgeInsets.all(16),
+    margin: EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+  );
+}
+
+// ✅ CORRECT: Use AppSizes service for responsive design
+class ResponsiveLayout extends StatelessWidget {
+  const ResponsiveLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appSizes = GetIt.instance<AppSizes>();
+    
+    return Container(
+      width: appSizes.r120,     // Responsive both dimensions
+      height: appSizes.v80,     // Responsive height only
+      padding: EdgeInsets.all(appSizes.r16),  // Responsive padding
+      margin: EdgeInsets.symmetric(
+        horizontal: appSizes.h20,  // Responsive horizontal margin
+        vertical: appSizes.v12,    // Responsive vertical margin
+      ),
+      decoration: BoxDecoration(
+        borderRadius: BorderRadius.circular(appSizes.borderRadiusMd),
+      ),
+    );
+  }
+}
+```
+
+### Theme Integration - LIGHT/DARK MODE SUPPORT
+
+```dart
+// ❌ WRONG: Hard-coded theme colors, no dark mode support
+Widget buildThemedContent() {
+  return Container(
+    color: Colors.white,        // Fixed color - no theme support
+    child: Text(
+      'Content',
+      style: TextStyle(color: Colors.black),  // Fixed text color
+    ),
+  );
+}
+
+// ✅ CORRECT: Use theme extensions for automatic theme switching
+class ThemedContent extends StatelessWidget {
+  const ThemedContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appTextStyles = GetIt.instance<AppTextStyles>();
+    final colorExtension = context.theme.extension<AppColorExtension>()!;
+    
+    return Container(
+      color: colorExtension.primary,      // Automatically switches with theme
+      child: Text(
+        'Themed Content',
+        style: appTextStyles.bodyLarge(
+          color: colorExtension.textPrimary,  // Theme-aware text color
+        ),
+      ),
+    );
+  }
+}
+```
+
+### Complete Color Palette Usage - SEMANTIC APPROACH
+
+```dart
+// ❌ WRONG: Generic color choices without semantic meaning
+Widget buildStatusIndicators() {
+  return Row(
+    children: [
+      Container(color: Colors.green, width: 20, height: 20),    // Generic
+      Container(color: Colors.red, width: 20, height: 20),      // Generic  
+      Container(color: Colors.blue, width: 20, height: 20),     // Generic
+    ],
+  );
+}
+
+// ✅ CORRECT: Semantic color usage with design system
+class StatusIndicators extends StatelessWidget {
+  const StatusIndicators({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final appColors = GetIt.instance<AppColors>();
+    final appSizes = GetIt.instance<AppSizes>();
+    
+    return Row(
+      children: [
+        // Success state - semantic color choice
+        Container(
+          color: appColors.greenNormal,
+          width: appSizes.r20,
+          height: appSizes.r20,
+        ),
+        SizedBox(width: appSizes.h8),
+        
+        // Error state - semantic color choice
+        Container(
+          color: appColors.redNormal,
+          width: appSizes.r20,
+          height: appSizes.r20,
+        ),
+        SizedBox(width: appSizes.h8),
+        
+        // Information state - semantic color choice
+        Container(
+          color: appColors.blueNormal,
+          width: appSizes.r20,
+          height: appSizes.r20,
+        ),
+      ],
+    );
+  }
+}
+```
+
+### Testing Pattern - DESIGN SYSTEM VALIDATION
+
+```dart
+// Test design system consistency and integration
+testWidgets('should use design system colors consistently', (tester) async {
+  final appColors = const AppColorsImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Scaffold(
+        body: ElevatedButton(
+          style: ElevatedButton.styleFrom(
+            backgroundColor: appColors.amberNormal,
+          ),
+          onPressed: () {},
+          child: Text('Test Button'),
+        ),
+      ),
+    ),
+  );
+
+  expect(find.byType(ElevatedButton), findsOneWidget);
+  
+  final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+  final buttonStyle = button.style!;
+  
+  // Verify design system color is applied correctly
+  expect(
+    buttonStyle.backgroundColor!.resolve({}),
+    equals(appColors.amberNormal),
+  );
+});
+
+// Test responsive sizing integration
+testWidgets('should apply responsive sizing correctly', (tester) async {
+  final appSizes = AppSizesImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          ScreenUtil.init(context, designSize: const Size(375, 812));
+          return Container(
+            width: appSizes.r100,   // Should be 100.w
+            height: appSizes.v80,   // Should be 80.h
+            child: Text('Responsive Container'),
+          );
+        },
+      ),
+    ),
+  );
+
+  expect(find.byType(Container), findsOneWidget);
+  expect(find.text('Responsive Container'), findsOneWidget);
+});
+```
+
+---
+
 ### 📋 Daily Workflow Template
 
 ```bash
