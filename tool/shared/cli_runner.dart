@@ -6,16 +6,16 @@ import 'validator_interface.dart';
 
 /// CLI runner utility following Single Responsibility Principle.
 /// Handles common command-line interface patterns for validation tools.
-/// 
+///
 /// Eliminates code duplication between different CLI validation tools
 /// while providing consistent error handling and user experience.
 class CliRunner {
-
   /// Creates a CLI runner with the specified validator and tool name.
   const CliRunner({
     required this.validator,
     required this.toolName,
   });
+
   /// The validator instance to use for validation.
   final IValidator<String> validator;
 
@@ -23,11 +23,11 @@ class CliRunner {
   final String toolName;
 
   /// Runs the CLI validation tool with the provided arguments.
-  /// 
+  ///
   /// [args] Command line arguments
   /// [getInputFromArgs] Function to extract input from arguments
   /// [getInputFromFile] Optional function to get input from file
-  /// 
+  ///
   /// Returns exit code (0 for success, 1 for failure)
   int run(
     List<String> args, {
@@ -37,14 +37,14 @@ class CliRunner {
     try {
       // Get input string to validate
       final input = _getInput(args, getInputFromArgs, getInputFromFile);
-      
+
       if (input == null) {
         return 1; // Error already logged
       }
 
       // Perform validation
       final result = validator.validate(input);
-      
+
       // Handle validation result
       return _handleValidationResult(result);
     } on Exception catch (e) {
@@ -69,7 +69,7 @@ class CliRunner {
 
     // Try to get input from arguments first
     var input = getInputFromArgs(args);
-    
+
     // If getInputFromFile is provided and first arg looks like a file
     if (getInputFromFile != null && args.length == 1) {
       final possibleFile = File(args[0]);
@@ -97,18 +97,18 @@ class CliRunner {
     if (result.isValid) {
       // Show success message
       CliLogger.info(result.message);
-      
+
       // Show validation details
       _showValidationDetails(result);
-      
+
       return 0;
     } else {
       // Show error message
       CliLogger.error(result.message);
-      
+
       // Show specific errors
       _showValidationErrors(result);
-      
+
       return 1;
     }
   }
@@ -116,19 +116,19 @@ class CliRunner {
   /// Shows validation details for successful validation.
   void _showValidationDetails(ValidationResult result) {
     final details = result.details;
-    
+
     if (details['type'] != null) {
       CliLogger.info('   Type: ${details['type']}');
     }
-    
+
     if (details['scope'] != null) {
       CliLogger.info('   Scope: ${details['scope']}');
     }
-    
+
     if (details['description'] != null) {
       CliLogger.info('   Description: ${details['description']}');
     }
-    
+
     if (details['isBreakingChange'] == true) {
       CliLogger.warning('⚠️  BREAKING CHANGE detected!');
       if (details['breakingChangeDescription'] != null) {
@@ -137,11 +137,11 @@ class CliRunner {
         );
       }
     }
-    
+
     if (details['hasBody'] == true) {
       CliLogger.info('   Has body: Yes');
     }
-    
+
     final footerCount = details['footerCount'] as int?;
     if (footerCount != null && footerCount > 0) {
       CliLogger.info('   Footers: $footerCount');
@@ -168,7 +168,7 @@ class CliRunner {
 /// File input helper for reading validation input from files.
 class FileInputHelper {
   /// Reads content from a file and returns it as a string.
-  /// 
+  ///
   /// [filePath] Path to the file to read
   /// Returns file content as trimmed string
   /// Throws exception if file cannot be read
@@ -177,7 +177,7 @@ class FileInputHelper {
     if (!file.existsSync()) {
       throw Exception('File not found: $filePath');
     }
-    
+
     return file.readAsStringSync().trim();
   }
 }

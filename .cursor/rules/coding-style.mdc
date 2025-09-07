@@ -5,6 +5,1184 @@ description: Dart coding style guidelines to prevent linter errors and warnings
 
 # Dart Coding Style Guidelines
 
+## 🚀 DART 3+ MODERN SYNTAX - HIGHEST PRIORITY
+
+> **MANDATORY**: Always prioritize Dart 3+ features and syntax over legacy patterns. Use the latest language constructs for better type safety, expressiveness, and performance.
+
+### 1. Pattern Matching & Switch Expressions (Dart 3.0+) - ESSENTIAL
+
+**THE GOLDEN RULE:** Use pattern matching and switch expressions for type-safe, exhaustive handling of data.
+
+#### **1.1. Switch Expressions - PREFER Over Switch Statements**
+
+```dart
+// ❌ OLD STYLE: Switch statement
+String getMessage(Status status) {
+  switch (status) {
+    case Status.loading:
+      return 'Loading...';
+    case Status.success:
+      return 'Success!';
+    case Status.error:
+      return 'Error occurred';
+    default:
+      return 'Unknown';
+  }
+}
+
+// ✅ DART 3+: Switch expression (more concise, exhaustive)
+String getMessage(Status status) => switch (status) {
+  Status.loading => 'Loading...',
+  Status.success => 'Success!',
+  Status.error => 'Error occurred',
+};
+```
+
+#### **1.2. Pattern Matching with if-case - MODERN VALIDATION**
+
+```dart
+// ❌ OLD STYLE: Manual type checking and casting
+void processUser(Object data) {
+  if (data is Map<String, dynamic>) {
+    final map = data as Map<String, dynamic>;
+    if (map.containsKey('name') && map.containsKey('age')) {
+      final name = map['name'];
+      final age = map['age'];
+      if (name is String && age is int) {
+        print('User: $name, Age: $age');
+      }
+    }
+  }
+}
+
+// ✅ DART 3+: Pattern matching with if-case
+void processUser(Object data) {
+  if (data case {'name': String name, 'age': int age}) {
+    print('User: $name, Age: $age');
+  }
+}
+```
+
+#### **1.3. Destructuring Patterns - MANDATORY for Complex Data**
+
+```dart
+// ❌ OLD STYLE: Manual destructuring
+final coordinates = [10.0, 20.0, 30.0];
+final x = coordinates[0];
+final y = coordinates[1];
+final z = coordinates[2];
+
+// ✅ DART 3+: Destructuring assignment
+final coordinates = [10.0, 20.0, 30.0];
+final [x, y, z] = coordinates;
+
+// ✅ DART 3+: Advanced destructuring with rest elements
+final numbers = [1, 2, 3, 4, 5];
+final [first, second, ...rest] = numbers;
+```
+
+### 2. Records & Tuple Types (Dart 3.0+) - ESSENTIAL
+
+**THE GOLDEN RULE:** Use records for multiple return values and lightweight data structures instead of creating classes.
+
+#### **2.1. Multiple Return Values - PREFER Records**
+
+```dart
+// ❌ OLD STYLE: Creating class for simple data
+class UserResult {
+  const UserResult(this.user, this.error);
+  final User? user;
+  final String? error;
+}
+
+Future<UserResult> getUser(String id) async {
+  // implementation
+  return UserResult(user, null);
+}
+
+// ✅ DART 3+: Records for multiple returns
+Future<(User?, String?)> getUser(String id) async {
+  // implementation
+  return (user, null);
+}
+
+// ✅ DART 3+: Named records for clarity
+Future<({User? user, String? error})> getUser(String id) async {
+  // implementation
+  return (user: user, error: null);
+}
+```
+
+#### **2.2. Record Destructuring - MANDATORY Pattern**
+
+```dart
+// ✅ DART 3+: Record destructuring in method calls
+final result = await getUser('123');
+final (user, error) = result;
+
+// ✅ DART 3+: Direct destructuring in variable declaration
+final (user, error) = await getUser('123');
+
+// ✅ DART 3+: Named record destructuring
+final result = await getUserDetailed('123');
+final (user: userData, error: errorMessage, timestamp: time) = result;
+```
+
+#### **2.3. Records in Collections - MODERN DATA STRUCTURES**
+
+```dart
+// ✅ DART 3+: Records in lists for coordinate data
+final points = [
+  (10.0, 20.0),
+  (30.0, 40.0),
+  (50.0, 60.0),
+];
+
+for (final (x, y) in points) {
+  print('Point: ($x, $y)');
+}
+
+// ✅ DART 3+: Named records for complex data
+final users = [
+  (name: 'Alice', age: 30, email: 'alice@example.com'),
+  (name: 'Bob', age: 25, email: 'bob@example.com'),
+];
+
+for (final (name: userName, age: userAge, :email) in users) {
+  print('$userName ($userAge): $email');
+}
+```
+
+### 3. Sealed Classes & Class Modifiers (Dart 3.0+) - CRITICAL
+
+**THE GOLDEN RULE:** Use sealed classes for algebraic data types and enforce exhaustive pattern matching.
+
+#### **3.1. Sealed Classes - MANDATORY for State/Result Types**
+
+```dart
+// ✅ DART 3+: Sealed class for API states (exhaustive matching)
+sealed class ApiState {}
+
+final class LoadingState extends ApiState {}
+
+final class SuccessState extends ApiState {
+  const SuccessState(this.data);
+  final String data;
+}
+
+final class ErrorState extends ApiState {
+  const ErrorState(this.message);
+  final String message;
+}
+
+// ✅ DART 3+: Exhaustive pattern matching (compiler enforced)
+String handleState(ApiState state) => switch (state) {
+  LoadingState() => 'Loading...',
+  SuccessState(:final data) => 'Success: $data',
+  ErrorState(:final message) => 'Error: $message',
+  // No default needed - compiler ensures exhaustiveness!
+};
+```
+
+#### **3.2. Class Modifiers - ENFORCE Design Intent**
+
+```dart
+// ✅ DART 3+: Base class (can be extended but not implemented)
+base class Vehicle {
+  void startEngine() => print('Engine started');
+}
+
+// ✅ DART 3+: Interface class (can be implemented but not extended)
+interface class Drawable {
+  void draw();
+}
+
+// ✅ DART 3+: Final class (cannot be extended or implemented)
+final class DatabaseConnection {
+  void connect() => print('Connected to database');
+}
+
+// ✅ DART 3+: Mixin class (explicit mixin declaration)
+mixin class Loggable {
+  void log(String message) => print('Log: $message');
+}
+```
+
+### 4. Extension Types (Dart 3.3+) - ZERO-COST WRAPPERS
+
+**THE GOLDEN RULE:** Use extension types for zero-cost type safety without runtime overhead.
+
+#### **4.1. Type-Safe Wrappers - PREFER Extension Types**
+
+```dart
+// ❌ OLD STYLE: Runtime overhead with wrapper classes
+class UserId {
+  const UserId(this.value);
+  final String value;
+}
+
+// ✅ DART 3.3+: Zero-cost extension type
+extension type UserId(String value) {
+  UserId.fromString(String str) : value = str;
+
+  bool get isValid => value.isNotEmpty && value.length > 3;
+
+  String get displayName => 'User($value)';
+}
+
+// Usage: No runtime cost, full type safety
+void processUser(UserId id) {
+  if (id.isValid) {
+    print(id.displayName);
+  }
+}
+```
+
+#### **4.2. Extension Types for API Responses - MODERN PATTERN**
+
+```dart
+// ✅ DART 3.3+: Extension types for API data
+extension type ApiResponse(Map<String, dynamic> json) {
+  ApiResponse.fromJson(Map<String, dynamic> data) : json = data;
+
+  String get status => json['status'] as String;
+  T? getData<T>(String key) => json['data']?[key] as T?;
+  bool get isSuccess => status == 'success';
+}
+
+// Usage: Type-safe API handling
+void handleResponse(ApiResponse response) {
+  if (response.isSuccess) {
+    final name = response.getData<String>('name');
+    print('Success: $name');
+  }
+}
+```
+
+### 5. Null-Aware Elements (Dart 3.8+) - COLLECTION SAFETY
+
+**THE GOLDEN RULE:** Use null-aware elements to conditionally insert collection elements safely.
+
+#### **5.1. Conditional Collection Elements - MODERN SYNTAX**
+
+```dart
+// ❌ OLD STYLE: Manual null checking
+List<String> buildItems(String? optionalItem) {
+  final items = <String>['item1', 'item2'];
+  if (optionalItem != null) {
+    items.add(optionalItem);
+  }
+  return items;
+}
+
+// ✅ DART 3.8+: Null-aware collection elements
+List<String> buildItems(String? optionalItem) => [
+  'item1',
+  'item2',
+  if (optionalItem != null) optionalItem,  // Traditional if
+  ...?optionalItem != null ? [optionalItem] : null,  // Null-aware spread
+];
+
+// ✅ DART 3.8+: Advanced null-aware elements
+Widget buildColumn(List<Widget>? additionalWidgets) {
+  return Column(
+    children: [
+      const Text('Header'),
+      const Spacer(),
+      ...?additionalWidgets,  // Only spreads if not null
+      const Text('Footer'),
+    ],
+  );
+}
+```
+
+#### **5.2. Map Null-Aware Elements - SAFE MAP BUILDING**
+
+```dart
+// ✅ DART 3.8+: Null-aware map elements
+Map<String, String> buildConfig(String? apiKey, String? secretKey) => {
+  'app_name': 'MyApp',
+  'version': '1.0.0',
+  if (apiKey != null) 'api_key': apiKey,
+  ...?secretKey != null ? {'secret_key': secretKey} : null,
+};
+```
+
+### 6. Wildcard Variables (Dart 3.7+) - IGNORE UNUSED VALUES
+
+**THE GOLDEN RULE:** Use wildcard variables `_` to explicitly ignore values in pattern matching.
+
+#### **6.1. Pattern Matching with Wildcards - CLEAN SYNTAX**
+
+```dart
+// ✅ DART 3.7+: Multiple wildcards (no collision)
+void processRecord(Record record) {
+  switch (record) {
+    case (int value, _, String name):  // Ignore middle value
+      print('Got int $value and string $name');
+    case (_, double value, _):  // Only care about middle value
+      print('Got double $value');
+  }
+}
+
+// ✅ DART 3.7+: Wildcards in destructuring
+final coordinates = [10.0, 20.0, 30.0, 40.0];
+final [x, _, z, _] = coordinates;  // Only use x and z
+```
+
+#### **6.2. Function Parameters Wildcards - CALLBACK SIGNATURES**
+
+```dart
+// ✅ DART 3.7+: Wildcard parameters in callbacks
+void setupListener() {
+  stream.listen(
+    (data) => processData(data),
+    onError: (_) => print('Error occurred'),  // Don't need error details
+    onDone: () => print('Stream completed'),
+  );
+}
+```
+
+### 7. Enhanced Enums (Dart 3.0+) - POWERFUL ENUM FEATURES
+
+**THE GOLDEN RULE:** Use enhanced enums with methods, constructors, and mixins instead of static classes.
+
+#### **7.1. Enums with Methods and Fields - MODERN APPROACH**
+
+```dart
+// ✅ DART 3.0+: Enhanced enums with behavior
+enum HttpStatus {
+  ok(200, 'OK'),
+  notFound(404, 'Not Found'),
+  internalError(500, 'Internal Server Error');
+
+  const HttpStatus(this.code, this.message);
+
+  final int code;
+  final String message;
+
+  bool get isSuccess => code >= 200 && code < 300;
+  bool get isError => code >= 400;
+
+  static HttpStatus fromCode(int code) {
+    return values.firstWhere(
+      (status) => status.code == code,
+      orElse: () => internalError,
+    );
+  }
+}
+
+// Usage: Rich enum behavior
+void handleResponse(int statusCode) {
+  final status = HttpStatus.fromCode(statusCode);
+  if (status.isError) {
+    print('Error: ${status.message}');
+  }
+}
+```
+
+#### **7.2. Enums with Mixins - EXTEND FUNCTIONALITY**
+
+```dart
+// ✅ DART 3.0+: Enums with mixins
+mixin JsonSerializable {
+  Map<String, dynamic> toJson();
+}
+
+enum Priority with JsonSerializable {
+  low(1, 'Low Priority'),
+  medium(2, 'Medium Priority'),
+  high(3, 'High Priority');
+
+  const Priority(this.value, this.description);
+
+  final int value;
+  final String description;
+
+  @override
+  Map<String, dynamic> toJson() => {
+    'priority': name,
+    'value': value,
+    'description': description,
+  };
+}
+```
+
+### 8. Advanced Pattern Matching Examples - REAL-WORLD USAGE
+
+#### **8.1. JSON Validation & Processing - MODERN API HANDLING**
+
+```dart
+// ✅ DART 3+: Comprehensive JSON pattern matching
+void processApiResponse(Object? response) {
+  switch (response) {
+    case {
+      'status': 'success',
+      'data': {
+        'user': {
+          'name': String name,
+          'age': int age,
+          'email': String email,
+        }
+      }
+    }:
+      print('User: $name ($age) - $email');
+
+    case {'status': 'error', 'message': String message}:
+      throw ApiException(message);
+
+    case {'status': 'loading'}:
+      showLoadingIndicator();
+
+    case null:
+      throw ApiException('No response received');
+
+    default:
+      throw ApiException('Invalid response format');
+  }
+}
+```
+
+#### **8.2. State Machine Implementation - SEALED CLASSES + PATTERNS**
+
+```dart
+// ✅ DART 3+: Type-safe state machine
+sealed class ConnectionState {}
+
+final class Disconnected extends ConnectionState {}
+
+final class Connecting extends ConnectionState {
+  const Connecting(this.attempt);
+  final int attempt;
+}
+
+final class Connected extends ConnectionState {
+  const Connected(this.sessionId);
+  final String sessionId;
+}
+
+final class Failed extends ConnectionState {
+  const Failed(this.error, this.retryable);
+  final String error;
+  final bool retryable;
+}
+
+// ✅ DART 3+: Exhaustive state handling
+String getStatusMessage(ConnectionState state) => switch (state) {
+  Disconnected() => 'Not connected',
+  Connecting(:final attempt) => 'Connecting... (attempt $attempt)',
+  Connected(:final sessionId) => 'Connected (session: $sessionId)',
+  Failed(:final error, retryable: true) => 'Failed: $error (retrying...)',
+  Failed(:final error, retryable: false) => 'Failed permanently: $error',
+};
+```
+
+### 9. Modern BLoC/Cubit Patterns with Dart 3+ - FLUTTER INTEGRATION
+
+#### **9.1. Sealed State Classes - TYPE-SAFE STATE MANAGEMENT**
+
+```dart
+// ✅ DART 3+: Sealed state with exhaustive matching
+sealed class UserState {}
+
+final class UserInitial extends UserState {}
+
+final class UserLoading extends UserState {}
+
+final class UserSuccess extends UserState {
+  const UserSuccess(this.user);
+  final User user;
+}
+
+final class UserError extends UserState {
+  const UserError(this.message);
+  final String message;
+}
+
+// ✅ DART 3+: Pattern matching in BlocBuilder
+class UserPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<UserCubit, UserState>(
+      builder: (context, state) => switch (state) {
+        UserInitial() => const Text('Press button to load user'),
+        UserLoading() => const CircularProgressIndicator(),
+        UserSuccess(:final user) => UserWidget(user),
+        UserError(:final message) => ErrorWidget(message),
+      },
+    );
+  }
+}
+```
+
+### 10. Type Safety Best Practices - DART 3+ PATTERNS
+
+#### **10.1. Result Type with Sealed Classes - ERROR HANDLING**
+
+```dart
+// ✅ DART 3+: Type-safe result handling
+sealed class Result<T, E> {}
+
+final class Success<T, E> extends Result<T, E> {
+  const Success(this.value);
+  final T value;
+}
+
+final class Failure<T, E> extends Result<T, E> {
+  const Failure(this.error);
+  final E error;
+}
+
+// ✅ DART 3+: Pattern matching for result handling
+Future<Result<User, String>> fetchUser(String id) async {
+  try {
+    final user = await userService.getUser(id);
+    return Success(user);
+  } catch (e) {
+    return Failure(e.toString());
+  }
+}
+
+// Usage with exhaustive matching
+void handleUserFetch(String userId) async {
+  final result = await fetchUser(userId);
+
+  switch (result) {
+    case Success(:final value):
+      displayUser(value);
+    case Failure(:final error):
+      showError(error);
+  }
+}
+```
+
+## 📦 SMART PACKAGE USAGE - MAXIMIZE DEVELOPMENT VELOCITY
+
+> **GOLDEN RULE**: Always leverage existing packages intelligently over manual implementation. Use the ecosystem to accelerate development and reduce bugs.
+
+### 1. State Management with BLoC Ecosystem - COMPREHENSIVE SOLUTION
+
+**THE PRINCIPLE:** Use the complete BLoC ecosystem for predictable, testable state management instead of manual state handling.
+
+#### **1.1. BLoC + Flutter BLoC - MODERN STATE MANAGEMENT**
+
+```dart
+// ❌ MANUAL STATE: Custom notifier implementation
+class CounterNotifier extends ChangeNotifier {
+  int _count = 0;
+  int get count => _count;
+
+  void increment() {
+    _count++;
+    notifyListeners();
+  }
+}
+
+// ✅ BLOC PACKAGE: Type-safe, testable state management
+@injectable
+class CounterCubit extends Cubit<int> {
+  CounterCubit() : super(0);
+
+  void increment() => emit(state + 1);
+}
+
+// ✅ FLUTTER_BLOC: Declarative UI updates
+class CounterPage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return BlocBuilder<CounterCubit, int>(
+      builder: (context, count) => Text('$count'),
+    );
+  }
+}
+```
+
+#### **1.2. HydratedBloc - AUTOMATIC PERSISTENCE**
+
+```dart
+// ❌ MANUAL PERSISTENCE: Custom SharedPreferences handling
+class CounterCubit extends Cubit<int> {
+  CounterCubit() : super(0) {
+    _loadFromPrefs();
+  }
+
+  void _loadFromPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    final saved = prefs.getInt('counter') ?? 0;
+    emit(saved);
+  }
+
+  void increment() {
+    emit(state + 1);
+    _saveToPrefs();
+  }
+
+  void _saveToPrefs() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setInt('counter', state);
+  }
+}
+
+// ✅ HYDRATED_BLOC: Automatic state persistence
+class CounterCubit extends HydratedCubit<int> {
+  CounterCubit() : super(0);
+
+  void increment() => emit(state + 1);
+
+  @override
+  int? fromJson(Map<String, dynamic> json) => json['value'] as int?;
+
+  @override
+  Map<String, dynamic>? toJson(int state) => {'value': state};
+}
+```
+
+#### **1.3. BlocTest - COMPREHENSIVE TESTING**
+
+```dart
+// ❌ MANUAL TESTING: Complex async testing
+test('should increment counter', () async {
+  final cubit = CounterCubit();
+  final states = <int>[];
+
+  final subscription = cubit.stream.listen(states.add);
+
+  cubit.increment();
+  await Future.delayed(Duration.zero); // Wait for emission
+
+  expect(states, [1]);
+  await subscription.cancel();
+  await cubit.close();
+});
+
+// ✅ BLOC_TEST: Declarative, powerful testing
+blocTest<CounterCubit, int>(
+  'emits [1] when increment is called',
+  build: () => CounterCubit(),
+  act: (cubit) => cubit.increment(),
+  expect: () => [1],
+);
+```
+
+### 2. Code Generation - ELIMINATE BOILERPLATE
+
+**THE PRINCIPLE:** Use code generation packages to eliminate repetitive code and ensure consistency.
+
+#### **2.1. Freezed - IMMUTABLE DATA CLASSES**
+
+```dart
+// ❌ MANUAL DATA CLASS: Lots of boilerplate
+class User {
+  const User({
+    required this.id,
+    required this.name,
+    this.email,
+  });
+
+  final String id;
+  final String name;
+  final String? email;
+
+  User copyWith({
+    String? id,
+    String? name,
+    String? email,
+  }) {
+    return User(
+      id: id ?? this.id,
+      name: name ?? this.name,
+      email: email ?? this.email,
+    );
+  }
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is User &&
+        other.id == id &&
+        other.name == name &&
+        other.email == email;
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name, email);
+}
+
+// ✅ FREEZED: Zero boilerplate, maximum features
+@freezed
+class User with _$User {
+  const factory User({
+    required String id,
+    required String name,
+    String? email,
+  }) = _User;
+
+  factory User.fromJson(Map<String, Object?> json) => _$UserFromJson(json);
+}
+```
+
+#### **2.2. Injectable + GetIt - DEPENDENCY INJECTION**
+
+```dart
+// ❌ MANUAL DI: Error-prone service registration
+class ServiceLocator {
+  static final GetIt _getIt = GetIt.instance;
+
+  static void setup() {
+    _getIt.registerFactory<UserRepository>(() => UserRepositoryImpl());
+    _getIt.registerLazySingleton<ApiClient>(() => ApiClientImpl());
+    _getIt.registerSingleton<Logger>(Logger());
+    // Risk of typos, missing dependencies, wrong lifecycle
+  }
+}
+
+// ✅ INJECTABLE: Automatic dependency injection
+@module
+abstract class AppModule {
+  @factoryMethod
+  UserRepository get userRepository => UserRepositoryImpl();
+
+  @lazySingleton
+  ApiClient get apiClient => ApiClientImpl();
+
+  @singleton
+  Logger get logger => Logger();
+}
+
+@injectableInit
+void configureDependencies() => getIt.init();
+```
+
+#### **2.3. Auto Route - TYPE-SAFE NAVIGATION**
+
+```dart
+// ❌ MANUAL ROUTING: String-based, error-prone
+class AppRouter {
+  static const String home = '/';
+  static const String user = '/user';
+
+  static Route<dynamic> generateRoute(RouteSettings settings) {
+    switch (settings.name) {
+      case home:
+        return MaterialPageRoute(builder: (_) => HomePage());
+      case user:
+        final userId = settings.arguments as String;
+        return MaterialPageRoute(builder: (_) => UserPage(userId: userId));
+      default:
+        return MaterialPageRoute(builder: (_) => NotFoundPage());
+    }
+  }
+}
+
+// ✅ AUTO_ROUTE: Type-safe, declarative routing
+@AutoRouterConfig()
+class AppRouter extends _$AppRouter {
+  @override
+  List<AutoRoute> get routes => [
+    AutoRoute(page: HomeRoute.page, path: '/'),
+    AutoRoute(page: UserRoute.page, path: '/user/:userId'),
+  ];
+}
+
+// Usage: Type-safe navigation
+context.router.push(UserRoute(userId: '123'));
+```
+
+### 3. Functional Programming with FpDart - BULLETPROOF ERROR HANDLING
+
+**THE PRINCIPLE:** Use functional programming patterns for safer, more predictable code.
+
+#### **3.1. Either Type for Error Handling**
+
+```dart
+// ❌ MANUAL ERROR HANDLING: Exception-based, unpredictable
+Future<User> getUser(String id) async {
+  try {
+    final response = await apiClient.get('/user/$id');
+    return User.fromJson(response.data);
+  } catch (e) {
+    throw UserException('Failed to get user: $e');
+  }
+}
+
+// Caller must remember to handle exceptions
+try {
+  final user = await getUser('123');
+  print(user.name);
+} catch (e) {
+  print('Error: $e');
+}
+
+// ✅ FPDART: Explicit, type-safe error handling
+Future<Either<UserFailure, User>> getUser(String id) async {
+  try {
+    final response = await apiClient.get('/user/$id');
+    final user = User.fromJson(response.data);
+    return Right(user);
+  } catch (e) {
+    return Left(UserFailure.network(e.toString()));
+  }
+}
+
+// Caller forced to handle both success and failure cases
+final result = await getUser('123');
+result.fold(
+  (failure) => print('Error: ${failure.message}'),
+  (user) => print('Success: ${user.name}'),
+);
+```
+
+#### **3.2. Option Type for Nullable Values**
+
+```dart
+// ❌ MANUAL NULL HANDLING: Verbose null checks
+String? getUserName(String? id) {
+  if (id == null) return null;
+  final user = users[id];
+  if (user == null) return null;
+  return user.name.isEmpty ? null : user.name;
+}
+
+// ✅ FPDART: Elegant option chaining
+Option<String> getUserName(String? id) {
+  return Option.fromNullable(id)
+      .flatMap((id) => Option.fromNullable(users[id]))
+      .map((user) => user.name)
+      .filter((name) => name.isNotEmpty);
+}
+
+// Usage with pattern matching
+getUserName('123').match(
+  () => print('No user name found'),
+  (name) => print('User name: $name'),
+);
+```
+
+### 4. Internationalization with Slang - TYPE-SAFE I18N
+
+**THE PRINCIPLE:** Use type-safe internationalization instead of string-based approaches.
+
+#### **4.1. Type-Safe Translations**
+
+```dart
+// ❌ MANUAL I18N: String-based, error-prone
+class AppLocalizations {
+  static String welcome(String name) => 'Welcome, $name!';
+  static String itemCount(int count) =>
+      count == 1 ? '1 item' : '$count items';
+}
+
+// ✅ SLANG: Type-safe, compile-time checked
+// translations.i18n.json:
+// {
+//   "welcome": "Welcome, {name}!",
+//   "itemCount": {
+//     "one": "1 item",
+//     "other": "{count} items"
+//   }
+// }
+
+// Generated code provides type safety:
+Text(t.welcome(name: user.name))
+Text(t.itemCount(count: items.length))
+```
+
+### 5. Environment Management with Envied - SECURE CONFIG
+
+**THE PRINCIPLE:** Use compile-time environment variable management instead of runtime loading.
+
+#### **5.1. Type-Safe Environment Variables**
+
+```dart
+// ❌ MANUAL ENV: Runtime loading, insecure
+class Config {
+  static String get apiUrl {
+    const url = String.fromEnvironment('API_URL');
+    if (url.isEmpty) throw StateError('API_URL not found');
+    return url;
+  }
+}
+
+// ✅ ENVIED: Compile-time, obfuscated, type-safe
+@Envied(path: '.env')
+abstract class Env {
+  @EnviedField(varName: 'API_URL', obfuscate: true)
+  static const String apiUrl = _Env.apiUrl;
+
+  @EnviedField(varName: 'DEBUG_MODE')
+  static const bool debugMode = _Env.debugMode;
+}
+```
+
+### 6. Testing with Smart Mocking - COMPREHENSIVE TESTING
+
+**THE PRINCIPLE:** Use modern mocking and testing tools for reliable, maintainable tests.
+
+#### **6.1. Mocktail for Modern Mocking**
+
+```dart
+// ❌ MANUAL MOCKING: Boilerplate-heavy
+class MockUserRepository implements UserRepository {
+  User? _mockUser;
+  Exception? _mockError;
+
+  void setMockUser(User user) => _mockUser = user;
+  void setMockError(Exception error) => _mockError = error;
+
+  @override
+  Future<User> getUser(String id) async {
+    if (_mockError != null) throw _mockError!;
+    return _mockUser ?? throw StateError('No mock user set');
+  }
+}
+
+// ✅ MOCKTAIL: Clean, powerful mocking
+class MockUserRepository extends Mock implements UserRepository {}
+
+test('should return user when repository succeeds', () async {
+  final mockRepo = MockUserRepository();
+  final user = User(id: '1', name: 'John');
+
+  when(() => mockRepo.getUser('1')).thenAnswer((_) async => user);
+
+  final cubit = UserCubit(mockRepo);
+  cubit.loadUser('1');
+
+  verify(() => mockRepo.getUser('1')).called(1);
+});
+```
+
+#### **6.2. BDD Widget Test for Behavioral Testing**
+
+```dart
+// ❌ MANUAL BEHAVIOR TESTING: Verbose, unclear intent
+testWidgets('should show loading then user data', (tester) async {
+  final mockCubit = MockUserCubit();
+
+  when(() => mockCubit.state).thenReturn(UserLoading());
+
+  await tester.pumpWidget(UserPage(cubit: mockCubit));
+
+  expect(find.byType(CircularProgressIndicator), findsOneWidget);
+
+  when(() => mockCubit.state).thenReturn(UserSuccess(user));
+  mockCubit.emit(UserSuccess(user));
+
+  await tester.pump();
+
+  expect(find.text(user.name), findsOneWidget);
+});
+
+// ✅ BDD_WIDGET_TEST: Natural language, clear scenarios
+void main() {
+  group('User Page', () {
+    bddWidgetTest(
+      'User sees loading indicator then user data',
+      (WidgetTester tester) async {
+        given('user page is displayed');
+        when('user data is loading');
+        then('loading indicator should be visible');
+        and('when user data loads successfully');
+        then('user name should be displayed');
+      },
+    );
+  });
+}
+```
+
+### 7. UI Development with Smart Packages - RESPONSIVE & CONSISTENT
+
+#### **7.1. Flutter ScreenUtil for Responsive Design**
+
+```dart
+// ❌ MANUAL RESPONSIVE: Device-specific calculations
+class ResponsiveHelper {
+  static double getResponsiveWidth(BuildContext context, double width) {
+    final screenWidth = MediaQuery.of(context).size.width;
+    final devicePixelRatio = MediaQuery.of(context).devicePixelRatio;
+    return width * screenWidth / 375.0; // Assuming 375 base width
+  }
+}
+
+// ✅ FLUTTER_SCREENUTIL: Automatic responsive calculations
+// Initialize once in main()
+ScreenUtil.init(
+  context,
+  designSize: Size(375, 812),
+  minTextAdapt: true,
+);
+
+// Usage: Automatic scaling
+Container(
+  width: 200.w,        // Responsive width
+  height: 100.h,       // Responsive height
+  margin: EdgeInsets.all(16.r),  // Responsive margin
+  child: Text(
+    'Hello',
+    style: TextStyle(fontSize: 18.sp),  // Responsive font size
+  ),
+)
+```
+
+#### **7.2. Google Fonts for Typography**
+
+```dart
+// ❌ MANUAL FONTS: Asset management, platform variations
+class AppFonts {
+  static const TextStyle bodyText = TextStyle(
+    fontFamily: 'Roboto',  // Must manage font files
+    fontSize: 16,
+    fontWeight: FontWeight.normal,
+  );
+}
+
+// ✅ GOOGLE_FONTS: Automatic font management
+Text(
+  'Beautiful Typography',
+  style: GoogleFonts.roboto(  // Automatic font loading
+    fontSize: 16.sp,
+    fontWeight: FontWeight.w400,
+  ),
+)
+
+// Theme integration
+ThemeData(
+  textTheme: GoogleFonts.robotoTextTheme(),
+  primaryTextTheme: GoogleFonts.openSansTextTheme(),
+)
+```
+
+### 8. Component Development with Widgetbook - ISOLATED TESTING
+
+**THE PRINCIPLE:** Use Widgetbook for component-driven development and visual testing.
+
+#### **8.1. Widgetbook for Component Showcase**
+
+```dart
+// ❌ MANUAL COMPONENT TESTING: Full app required
+void main() {
+  runApp(MaterialApp(
+    home: Scaffold(
+      body: Column(
+        children: [
+          CustomButton(text: 'Primary'),
+          CustomButton(text: 'Secondary', variant: ButtonVariant.secondary),
+          // Hard to test all variations
+        ],
+      ),
+    ),
+  ));
+}
+
+// ✅ WIDGETBOOK: Isolated component development
+@UseCase(name: 'Default', type: CustomButton)
+Widget defaultButton(BuildContext context) {
+  return CustomButton(
+    text: context.knobs.string(label: 'Text', initialValue: 'Click me'),
+    variant: context.knobs.list(
+      label: 'Variant',
+      options: ButtonVariant.values,
+    ),
+    isEnabled: context.knobs.boolean(label: 'Enabled', initialValue: true),
+  );
+}
+
+// Automatic component catalog with live knobs
+class WidgetbookApp extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Widgetbook.material(
+      directories: [
+        WidgetbookFolder(
+          name: 'Buttons',
+          children: [
+            WidgetbookComponent(
+              name: 'CustomButton',
+              useCases: [
+                WidgetbookUseCase(
+                  name: 'Default',
+                  builder: defaultButton,
+                ),
+              ],
+            ),
+          ],
+        ),
+      ],
+    );
+  }
+}
+```
+
+### 9. Performance Optimization with Smart Package Usage
+
+#### **9.1. Equatable for Efficient Comparisons**
+
+```dart
+// ❌ MANUAL EQUALITY: Error-prone, performance issues
+class User {
+  const User({required this.id, required this.name});
+
+  final String id;
+  final String name;
+
+  @override
+  bool operator ==(Object other) {
+    if (identical(this, other)) return true;
+    return other is User && other.id == id && other.name == name;
+    // Easy to forget fields or make mistakes
+  }
+
+  @override
+  int get hashCode => Object.hash(id, name);
+}
+
+// ✅ EQUATABLE: Automatic, efficient equality
+class User extends Equatable {
+  const User({required this.id, required this.name});
+
+  final String id;
+  final String name;
+
+  @override
+  List<Object?> get props => [id, name];  // Automatic equality
+}
+```
+
+### 10. Development Workflow Acceleration
+
+#### **10.1. Build Runner Commands - SMART GENERATION**
+
+```bash
+# ❌ MANUAL: Running individual generators
+flutter pub run freezed
+flutter pub run json_serializable
+flutter pub run auto_route_generator
+flutter pub run injectable_generator
+
+# ✅ BUILD_RUNNER: Unified code generation
+dart run build_runner build --delete-conflicting-outputs
+dart run build_runner watch  # Continuous generation during development
+```
+
+#### **10.2. Smart Build Configuration**
+
+```yaml
+# build.yaml - Optimize generation performance
+targets:
+  $default:
+    builders:
+      freezed:
+        generate_for:
+          - lib/core/models/*.dart
+          - lib/features/*/models/*.dart
+      injectable_generator:
+        generate_for:
+          - lib/core/injection.dart
+      auto_route_generator:
+        generate_for:
+          - lib/core/routing/app_router.dart
+```
+
 ## 🚨 Critical Rules to Prevent Linter Errors
 
 > **ZERO TOLERANCE POLICY**: No linting errors, no warnings, no exceptions. Every issue must be resolved before commit.
@@ -17,6 +1195,7 @@ description: Dart coding style guidelines to prevent linter errors and warnings
 4. 🔥 **avoid_catches_without_on_clauses** - Use `on` clause in catch blocks
 5. 🔥 **prefer_const_constructors** - Add `const` wherever possible
 6. 🔥 **avoid_print** - Replace with `Console.info()` or proper logging
+7. 🔥 **deprecated_member_use** - Replace deprecated Color.value and Color.alpha usage
 
 ### 1. Cascade Operators (`..`) - MANDATORY for Multiple Calls
 
@@ -371,7 +1550,112 @@ test(
 }
 ```
 
-### 7. Error Handling - Specific Exception Classes
+### 7. Flutter 3.27+ Color Deprecation Guidelines - MANDATORY
+
+**CRITICAL**: Flutter 3.27.0+ deprecated `Color.value` and `Color.alpha` for wide gamut color support.
+
+#### **7.1. Replace Color.value with toARGB32()**
+
+```dart
+// ❌ DEPRECATED: Color.value (Flutter 3.27+)
+int colorValue = myColor.value;
+expect(color.value, equals(0xFF2196F3));
+
+// ✅ CORRECT: Use toARGB32() for explicit conversion
+int colorValue = myColor.toARGB32();
+expect(color.toARGB32(), equals(0xFF2196F3));
+```
+
+#### **7.2. Replace Color.alpha with Component Accessors**
+
+```dart
+// ❌ DEPRECATED: Color.alpha (Flutter 3.27+)
+int alphaValue = color.alpha;
+expect(color.alpha, equals(255));
+
+// ✅ CORRECT: Use component accessor with conversion
+int alphaValue = (color.a * 255.0).round() & 0xff;
+expect((color.a * 255.0).round() & 0xff, equals(255));
+```
+
+#### **7.3. Use Component Accessors for Color Values**
+
+```dart
+// ❌ DEPRECATED: Old component accessors
+int redValue = color.red;
+int greenValue = color.green;
+int blueValue = color.blue;
+
+// ✅ CORRECT: New floating-point component accessors
+double redComponent = color.r;     // 0.0-1.0 range
+double greenComponent = color.g;   // 0.0-1.0 range
+double blueComponent = color.b;    // 0.0-1.0 range
+double alphaComponent = color.a;   // 0.0-1.0 range
+
+// ✅ CORRECT: Convert to integer when needed
+int redInt = (color.r * 255.0).round() & 0xff;
+int greenInt = (color.g * 255.0).round() & 0xff;
+int blueInt = (color.b * 255.0).round() & 0xff;
+int alphaInt = (color.a * 255.0).round() & 0xff;
+```
+
+#### **7.4. Color Conversion Utilities**
+
+```dart
+// ✅ HELPER: Extension for easy integer conversion
+extension IntColorComponents on Color {
+  int get intAlpha => (a * 255.0).round() & 0xff;
+  int get intRed => (r * 255.0).round() & 0xff;
+  int get intGreen => (g * 255.0).round() & 0xff;
+  int get intBlue => (b * 255.0).round() & 0xff;
+}
+
+// Usage:
+final color = Colors.blue;
+expect(color.intRed, equals(33));    // Blue color red component
+expect(color.intAlpha, equals(255)); // Fully opaque
+```
+
+#### **7.5. Test File Color Comparisons**
+
+```dart
+// ❌ DEPRECATED: In test files
+expect(lerped.primary.value, closeTo(expectedGrey.value, 0x010101));
+expect(color.alpha, equals(255));
+
+// ✅ CORRECT: In test files
+expect(lerped.primary.toARGB32(), closeTo(expectedGrey.toARGB32(), 0x010101));
+expect((color.a * 255.0).round() & 0xff, equals(255));
+```
+
+#### **7.6. MaterialColor Creation**
+
+```dart
+// ✅ CORRECT: Create MaterialColor with toARGB32()
+MaterialColor createMaterialColor(Color color) {
+  final List<double> strengths = <double>[.05];
+  final Map<int, Color> swatch = {};
+
+  for (var i = 1; i < 10; i++) {
+    strengths.add(0.1 * i);
+  }
+
+  for (final strength in strengths) {
+    final double ds = 0.5 - strength;
+    swatch[(strength * 1000).round()] = Color.fromRGBO(
+      (color.r + ((ds < 0 ? color.r : (1 - color.r)) * ds)).clamp(0.0, 1.0),
+      (color.g + ((ds < 0 ? color.g : (1 - color.g)) * ds)).clamp(0.0, 1.0),
+      (color.b + ((ds < 0 ? color.b : (1 - color.b)) * ds)).clamp(0.0, 1.0),
+      1,
+    );
+  }
+
+  // Use toARGB32() instead of value
+  return MaterialColor(color.toARGB32(), swatch);
+}
+```
+
+### 8. Error Handling - Specific Exception Classes
 
 ```dart
 // ❌ AVOID: Generic exceptions
@@ -1177,16 +2461,17 @@ These MUST be fixed immediately:
 3. **lines_longer_than_80_chars** errors
 4. **avoid_catches_without_on_clauses** - missing `on` clause in catch blocks
 5. **avoid_print** in production code
-6. **Missing const** constructors
-7. **Unused imports**
-8. **unused_field** warnings
-9. **unnecessary_underscores** in parameter names
-10. **unnecessary_statements** and dead code
-11. **depend_on_referenced_packages** - missing dependencies
-12. **Memory leaks** (undisposed resources)
-13. **Security vulnerabilities** (unvalidated input)
-14. **Performance anti-patterns** (unnecessary rebuilds)
-15. **Architecture violations** (direct environment access)
+6. **deprecated_member_use** warnings (Color.value, Color.alpha)
+7. **Missing const** constructors
+8. **Unused imports**
+9. **unused_field** warnings
+10. **unnecessary_underscores** in parameter names
+11. **unnecessary_statements** and dead code
+12. **depend_on_referenced_packages** - missing dependencies
+13. **Memory leaks** (undisposed resources)
+14. **Security vulnerabilities** (unvalidated input)
+15. **Performance anti-patterns** (unnecessary rebuilds)
+16. **Architecture violations** (direct environment access)
 
 ## 📋 Quick Reference: Error → Solution (Copy-Paste Ready)
 
@@ -1201,6 +2486,8 @@ These MUST be fixed immediately:
 | `omit_local_variable_types`                 | Replace type with `var` | `for (var i = 0; i < 10; i++)`                                        |
 | `prefer_const_constructors`                 | Add `const` keyword     | `const Text('Hello')`                                                 |
 | `avoid_print`                               | Use Console abstraction | `Console.info('message')`                                             |
+| `deprecated_member_use` (Color.value)       | Use toARGB32()          | `expect(color.toARGB32(), equals(0xFF2196F3))`                        |
+| `deprecated_member_use` (Color.alpha)       | Use component accessor  | `expect((color.a * 255.0).round() & 0xff, equals(255))`               |
 | `unnecessary_lambdas`                       | Use tear-off            | `items.map(Object.toString)`                                          |
 | `prefer_final_locals`                       | Change to `final`       | `final message = 'Hello';`                                            |
 | `unused_field`                              | Remove or use field     | Remove field or use in methods                                        |

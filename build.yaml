@@ -45,11 +45,16 @@ targets:
             - lib/**/infrastructure/*.dart
         # Performance: Exclude test and generated files
         enabled: true
+      widgetbook_generator|widgetbook_generator_builder:
+        options:
+          path: widgetbook
+        enabled: true
     # Performance: Limit source scanning
     sources:
       include:
         - $package$
         - lib/**
+        - widgetbook/** # Include widgetbook folder for stories generation
         - test/bdd/** # Include BDD test folder for generation
         - pubspec.yaml
       exclude:
