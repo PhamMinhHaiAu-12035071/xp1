@@ -2152,6 +2152,111 @@ feature_name/
 └── feature.dart  # Barrel export
 ```
 
+### Widget Architecture Standards
+
+#### 3-Layer Widget Organization
+
+```
+lib/
+├── core/widgets/                   # 🔧 INFRASTRUCTURE LAYER
+│   ├── responsive_initializer.dart # Global responsive setup
+│   ├── base_scaffold.dart         # Framework utilities
+│   └── loading_overlay.dart       # App-wide utilities
+├── shared/widgets/                # 🧱 BUSINESS LAYER (Atomic Design)
+│   ├── atoms/                     # Basic reusable components
+│   │   ├── custom_button.dart
+│   │   ├── custom_input.dart
+│   │   └── custom_card.dart
+│   ├── molecules/                 # Composite components
+│   │   ├── search_bar.dart
+│   │   ├── user_avatar.dart
+│   │   └── stats_card.dart
+│   └── organisms/                 # Complex sections
+│       ├── navigation_drawer.dart
+│       └── header_section.dart
+└── features/*/widgets/            # 🏠 FEATURE-SPECIFIC
+    └── feature_specific_widget.dart
+```
+
+#### Widget Layer Rules
+
+**CORE WIDGETS (Infrastructure Layer):**
+
+- ✅ Framework-level utilities (`ResponsiveInitializer`, `BaseScaffold`)
+- ✅ App-wide cross-cutting concerns (`LoadingOverlay`, `ErrorBoundary`)
+- ✅ Low-level platform abstractions
+- ❌ No business logic or domain knowledge
+- ❌ No feature-specific styling
+
+**SHARED WIDGETS (Business Layer - Atomic Design):**
+
+- ✅ Reusable business components following Atomic Design
+- ✅ `atoms/`: Basic UI elements (`CustomButton`, `CustomInput`)
+- ✅ `molecules/`: Composite components (`SearchBar`, `UserAvatar`)
+- ✅ `organisms/`: Complex sections (`NavigationDrawer`, `HeaderSection`)
+- ✅ Cross-feature reusability
+- ❌ No feature-specific business logic
+
+**FEATURE WIDGETS (Feature Layer):**
+
+- ✅ Feature-specific UI components
+- ✅ Tightly coupled to feature domain logic
+- ✅ Can use shared widgets as building blocks
+- ❌ No cross-feature dependencies
+
+#### Widget Creation Guidelines
+
+**Naming Conventions for Widgets:**
+
+```dart
+// ✅ CORRECT: Widget naming patterns
+class CustomButton extends StatelessWidget {}      // atoms/
+class SearchBar extends StatelessWidget {}         // molecules/
+class NavigationDrawer extends StatelessWidget {}  // organisms/
+class HomePageHeader extends StatelessWidget {}    // feature-specific
+
+// ❌ WRONG: Inconsistent naming
+class Button extends StatelessWidget {}           // Too generic
+class UserSearchWidget extends StatelessWidget {} // Redundant "Widget"
+```
+
+**Widget Documentation Standards:**
+
+````dart
+// ✅ CORRECT: Atomic Design widget documentation
+/// A reusable button component that follows the design system.
+///
+/// This is an atomic component that can be used across features.
+/// Supports different variants, sizes, and states.
+///
+/// Example:
+/// ```dart
+/// CustomButton(
+///   text: 'Click me',
+///   onPressed: () => print('Pressed'),
+///   variant: ButtonVariant.primary,
+/// )
+/// ```
+class CustomButton extends StatelessWidget {
+  /// Creates a custom button with the specified properties.
+  const CustomButton({
+    required this.text,
+    required this.onPressed,
+    super.key,
+    this.variant = ButtonVariant.primary,
+  });
+
+  /// The text to display on the button.
+  final String text;
+
+  /// Called when the button is pressed.
+  final VoidCallback onPressed;
+
+  /// The visual variant of the button.
+  final ButtonVariant variant;
+}
+````
+
 ### File Naming Rules
 
 ```dart
@@ -2695,13 +2800,13 @@ During vibe coding, run these commands to ensure English compliance:
 npx cspell doc/**/*.md README.md --no-progress
 
 # 2. Analyze code for linting (includes comment validation)
-dart run rps analyze
+make analyze
 
 # 3. Format code consistently
-dart run rps format
+make format
 
 # 4. Complete validation pipeline
-dart run rps pre-commit  # Must pass for English compliance
+make pre-commit  # Must pass for English compliance
 ```
 
 #### **📚 English Documentation Standards**
@@ -2780,13 +2885,13 @@ group('UserManager', () {
 
 ```bash
 # After writing any documentation or comments
-dart run rps analyze              # Check for linting issues
+make analyze              # Check for linting issues
 
 # After creating markdown files
 npx cspell [filename].md --no-progress  # Verify English content
 
 # After adding error messages or strings
-dart run rps format               # Ensure formatting compliance
+make format               # Ensure formatting compliance
 ```
 
 #### **Emergency English Fixes:**
@@ -2822,22 +2927,14 @@ make test                      # Run all tests
 make test-coverage            # Run tests with coverage
 ```
 
-**RPS Alternative Commands:**
-
-```bash
-dart run rps check            # Format + analyze
-dart run rps test             # Run tests
-dart run rps test-coverage    # Tests with coverage
-```
-
 ### 🔧 During Coding (After Each Significant Change)
 
 After writing code, immediately run:
 
 ```bash
 # Quick validation (run frequently)
-dart run rps format           # Auto-fix formatting
-dart run rps analyze          # Check for issues
+make format           # Auto-fix formatting
+make analyze          # Check for issues
 flutter test --dart-define=ENVIRONMENT=development  # Quick test
 ```
 
@@ -2855,9 +2952,9 @@ Before committing, ALWAYS run:
 
 ```bash
 # Complete validation pipeline
-dart run rps pre-commit       # Format + analyze + test
+make pre-commit               # Format + analyze + test
 
-# OR use make command
+# OR use individual commands
 make check                    # Format + analyze only
 make test                     # Verify tests pass
 
@@ -2883,10 +2980,10 @@ make local-ci                 # Complete pipeline
 make check && make test
 
 # During development (after each change)
-dart run rps format && dart run rps analyze
+make format && make analyze
 
 # Before committing (mandatory)
-dart run rps pre-commit
+make pre-commit
 
 # Before pushing (ultimate validation)
 make local-ci
@@ -2896,35 +2993,23 @@ make local-ci
 
 ```bash
 # Test all environments
-dart run rps generate-env-dev && dart run rps test
-dart run rps generate-env-staging && dart run rps test
-dart run rps generate-env-prod && dart run rps test
+make generate-env-dev && make test
+make generate-env-staging && make test
+make generate-env-prod && make test
 ```
 
 ### 🚨 Critical Command Reference
 
-| **Phase**       | **Required Commands**                          | **Purpose**           |
-| --------------- | ---------------------------------------------- | --------------------- |
-| **Pre-Work**    | `make check` + `make test`                     | Ensure clean baseline |
-| **During Work** | `dart run rps format` + `dart run rps analyze` | Continuous validation |
-| **Pre-Commit**  | `dart run rps pre-commit`                      | Complete validation   |
-| **Pre-Push**    | `make local-ci`                                | Full CI pipeline      |
+| **Phase**       | **Required Commands**          | **Purpose**           |
+| --------------- | ------------------------------ | --------------------- |
+| **Pre-Work**    | `make check` + `make test`     | Ensure clean baseline |
+| **During Work** | `make format` + `make analyze` | Continuous validation |
+| **Pre-Commit**  | `make pre-commit`              | Complete validation   |
+| **Pre-Push**    | `make local-ci`                | Full CI pipeline      |
 
 ### 🎨 Tool Integration Hierarchy
 
-#### **1. RPS Scripts (Primary)**
-
-```bash
-# Most commonly used commands
-dart run rps format           # Format code
-dart run rps analyze          # Analyze code
-dart run rps test             # Run tests
-dart run rps test-coverage    # Coverage testing
-dart run rps check            # Format + analyze
-dart run rps pre-commit       # Full pre-commit validation
-```
-
-#### **2. Makefile (CI Equivalent)**
+#### **1. Makefile Commands (Primary)**
 
 ```bash
 # GitHub Actions equivalent
@@ -2949,7 +3034,7 @@ git push                     # Triggers pre-push hooks
 #### **When Linting Fails:**
 
 ```bash
-dart run rps format          # Fix formatting issues
+make format                  # Fix formatting issues
 dart analyze --fatal-infos   # See specific errors
 dart fix --apply             # Auto-fix some issues
 ```
@@ -2958,7 +3043,7 @@ dart fix --apply             # Auto-fix some issues
 
 ```bash
 flutter clean && flutter pub get    # Reset environment
-dart run rps generate-env-dev       # Regenerate environment
+make generate-env-dev               # Regenerate environment
 flutter test --dart-define=ENVIRONMENT=development
 ```
 
@@ -2995,12 +3080,12 @@ git pull
 make check && make test
 
 # 2. During development (after each feature/fix)
-dart run rps format
-dart run rps analyze
+make format
+make analyze
 flutter test
 
 # 3. Before committing
-dart run rps pre-commit
+make pre-commit
 
 # 4. Before pushing
 make local-ci
@@ -3014,25 +3099,25 @@ make coverage-open  # Verify coverage
 
 ```bash
 # Minimum viable commands (never skip these)
-dart run rps format           # 1. Fix formatting
-dart run rps analyze          # 2. Check for errors
+make format                   # 1. Fix formatting
+make analyze                  # 2. Check for errors
 flutter test                  # 3. Verify tests pass
 
 # If time allows
-dart run rps pre-commit       # Complete validation
+make pre-commit               # Complete validation
 ```
 
 ### 🏆 Advanced Vibe Coding (Performance Mode)
 
 ```bash
 # Parallel execution for speed
-dart run rps format & dart run rps analyze & wait
+make format & make analyze & wait
 
 # Environment-specific rapid testing
 flutter test --dart-define=ENVIRONMENT=development --coverage
 
 # Continuous validation during development
-watch -n 30 'dart run rps check'  # Auto-check every 30 seconds
+watch -n 30 'make check'  # Auto-check every 30 seconds
 ```
 
 **Remember**: These commands are your safety net. Running them religiously prevents the majority of CI failures and maintains code quality standards. Make them muscle memory!

@@ -135,7 +135,8 @@
     "Liskov",
     "microkernels",
     "rhdj",
-    "amsn"
+    "amsn",
+    "vsync"
   ],
   "ignorePaths": [
     "build/**",

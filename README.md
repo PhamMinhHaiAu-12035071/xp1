@@ -40,6 +40,69 @@ _\*Xp1 works on iOS, Android, Web, and Windows._
 
 ---
 
+## Project Structure 🏗️
+
+This project follows a **layered architecture** with **Atomic Design principles** for widget organization:
+
+```
+lib/
+├── core/                           # 🔧 INFRASTRUCTURE LAYER
+│   ├── widgets/                    # Framework & app-wide utilities
+│   │   ├── responsive_initializer.dart  # Global responsive setup
+│   │   ├── base_scaffold.dart          # Framework utilities
+│   │   └── loading_overlay.dart        # App-wide utilities
+│   ├── styles/                     # Design system
+│   ├── themes/                     # Theme configuration
+│   └── infrastructure/             # Cross-cutting concerns
+├── shared/                         # 🧱 BUSINESS LAYER
+│   ├── widgets/                    # Reusable business components
+│   │   ├── atoms/                  # Basic UI elements
+│   │   │   ├── custom_button.dart
+│   │   │   ├── custom_input.dart
+│   │   │   └── custom_card.dart
+│   │   ├── molecules/              # Composite components
+│   │   │   ├── search_bar.dart
+│   │   │   ├── user_avatar.dart
+│   │   │   └── stats_card.dart
+│   │   └── organisms/              # Complex UI sections
+│   │       ├── navigation_drawer.dart
+│   │       └── header_section.dart
+│   └── utilities/                  # Business utilities
+├── features/                       # 📱 FEATURE LAYER
+│   ├── home/
+│   │   └── presentation/
+│   │       ├── pages/              # 📄 Full-screen pages
+│   │       └── widgets/            # 🏠 Feature-specific widgets
+│   ├── authentication/
+│   └── profile/
+└── l10n/                          # 🌐 Internationalization
+```
+
+### Widget Organization Strategy
+
+#### 1. **Core Widgets** (`lib/core/widgets/`)
+
+- **Purpose**: Infrastructure and framework-level widgets
+- **Examples**: `ResponsiveInitializer`, `BaseScaffold`, `LoadingOverlay`
+- **When to use**: App-wide utilities, framework extensions, global setup
+
+#### 2. **Shared Widgets** (`lib/shared/widgets/`)
+
+- **Purpose**: Reusable business components following Atomic Design
+- **Structure**:
+  - **Atoms**: Basic UI building blocks (buttons, inputs, cards)
+  - **Molecules**: Composite components (search bars, user avatars)
+  - **Organisms**: Complex UI sections (navigation drawers, headers)
+- **When to use**: Components used across multiple features
+
+#### 3. **Feature Widgets** (`lib/features/*/widgets/`)
+
+- **Purpose**: Feature-specific components
+- **Examples**: `HomeCarousel`, `ProfileForm`, `LoginButton`
+- **When to use**: Components specific to one feature only
+
+---
+
 ## Tech Stack 🛠️
 
 ### State Management & Architecture

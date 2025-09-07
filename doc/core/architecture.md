@@ -85,6 +85,124 @@
 
 ### Component Architecture
 
+#### Widget Organization Architecture
+
+The project implements a **layered architecture** with **Atomic Design principles** for optimal code organization and maintainability:
+
+```
+lib/
+├── core/                           # 🔧 INFRASTRUCTURE LAYER
+│   ├── widgets/                    # Framework & app-wide utilities
+│   │   ├── responsive_initializer.dart  # Global responsive setup
+│   │   ├── base_scaffold.dart          # Framework utilities
+│   │   └── loading_overlay.dart        # App-wide utilities
+│   ├── styles/                     # Design system
+│   ├── themes/                     # Theme configuration
+│   └── infrastructure/             # Cross-cutting concerns
+├── shared/                         # 🧱 BUSINESS LAYER
+│   ├── widgets/                    # Reusable business components
+│   │   ├── atoms/                  # Basic UI elements
+│   │   │   ├── custom_button.dart
+│   │   │   ├── custom_input.dart
+│   │   │   └── custom_card.dart
+│   │   ├── molecules/              # Composite components
+│   │   │   ├── search_bar.dart
+│   │   │   ├── user_avatar.dart
+│   │   │   └── stats_card.dart
+│   │   └── organisms/              # Complex UI sections
+│   │       ├── navigation_drawer.dart
+│   │       └── header_section.dart
+│   └── utilities/                  # Business utilities
+├── features/                       # 📱 FEATURE LAYER
+│   ├── home/
+│   │   └── presentation/
+│   │       ├── pages/              # 📄 Full-screen pages
+│   │       └── widgets/            # 🏠 Feature-specific widgets
+│   └── ...
+```
+
+#### Widget Layer Definitions
+
+##### 1. **Core Widgets Layer** (`lib/core/widgets/`)
+
+- **Responsibility**: Infrastructure and framework-level concerns
+- **Characteristics**:
+  - No business logic dependencies
+  - Framework extensions and utilities
+  - Global app setup components
+  - Technical infrastructure widgets
+
+**Examples:**
+
+```dart
+// ResponsiveInitializer - Global responsive setup
+class ResponsiveInitializer extends StatelessWidget {
+  // Framework-level responsive configuration
+}
+
+// BaseScaffold - Framework utility
+class BaseScaffold extends StatelessWidget {
+  // Common scaffold structure with navigation
+}
+
+// LoadingOverlay - App-wide utility
+class LoadingOverlay extends StatelessWidget {
+  // Global loading state display
+}
+```
+
+##### 2. **Shared Widgets Layer** (`lib/shared/widgets/`)
+
+- **Responsibility**: Reusable business components following Atomic Design
+- **Structure**:
+
+**Atoms** (`shared/widgets/atoms/`):
+
+```dart
+// Basic UI building blocks
+class CustomButton extends StatelessWidget {} // Primary button component
+class CustomInput extends StatelessWidget {}  // Text input component
+class CustomCard extends StatelessWidget {}   // Card container component
+```
+
+**Molecules** (`shared/widgets/molecules/`):
+
+```dart
+// Composite components combining atoms
+class SearchBar extends StatelessWidget {}     // Search input with icon
+class UserAvatar extends StatelessWidget {}    // User image with status
+class StatsCard extends StatelessWidget {}     // Card with statistics
+```
+
+**Organisms** (`shared/widgets/organisms/`):
+
+```dart
+// Complex UI sections
+class NavigationDrawer extends StatelessWidget {} // App navigation
+class HeaderSection extends StatelessWidget {}    // Page header with actions
+```
+
+##### 3. **Feature Widgets Layer** (`lib/features/*/widgets/`)
+
+- **Responsibility**: Feature-specific UI components
+- **Characteristics**:
+  - Specific to one feature domain
+  - Contains business logic integration
+  - Uses shared widgets as building blocks
+
+```dart
+// Feature-specific widgets
+features/home/presentation/widgets/
+├── home_carousel.dart      # Home-specific carousel
+├── trending_section.dart   # Home trending display
+└── quick_actions.dart      # Home quick action buttons
+
+features/profile/presentation/widgets/
+├── profile_form.dart       # Profile editing form
+├── avatar_selector.dart    # Profile image selection
+└── settings_panel.dart     # Profile settings
+```
+
 #### Navigation Architecture
 
 ```

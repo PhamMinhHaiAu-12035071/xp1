@@ -51,6 +51,7 @@ dependencies:
   # === UI & THEMING ===
   flutter_screenutil: ^5.9.3 # Responsive design utilities
   google_fonts: ^6.2.1 # Google Fonts integration
+  nil: ^1.1.1 # Lightweight null widget for conditional rendering
 
   # === UTILITIES ===
   intl: ^0.20.2 # Internationalization utilities

@@ -125,26 +125,303 @@ class CounterText extends StatelessWidget {
 }
 ```
 
+### Widget Organization & Architecture
+
+#### Widget Layer Strategy
+
+This project follows a **3-layer widget architecture** combining **Clean Architecture** with **Atomic Design** principles:
+
+```
+lib/
+├── core/widgets/                   # 🔧 INFRASTRUCTURE LAYER
+├── shared/widgets/                 # 🧱 BUSINESS LAYER (Atomic Design)
+└── features/*/widgets/             # 📱 FEATURE LAYER
+```
+
+#### 1. **Core Widgets Layer** (`lib/core/widgets/`)
+
+**Purpose**: Framework utilities and infrastructure concerns
+
+```dart
+// ✅ Good: Core widget examples
+core/widgets/
+├── responsive_initializer.dart     # Global responsive setup
+├── base_scaffold.dart              # Common scaffold structure
+├── loading_overlay.dart            # App-wide loading states
+├── error_boundary.dart             # Global error handling
+└── navigation_wrapper.dart         # Navigation infrastructure
+
+// ✅ Good: Core widget characteristics
+class ResponsiveInitializer extends StatelessWidget {
+  // ✅ No business logic
+  // ✅ Framework-level utility
+  // ✅ App-wide configuration
+  // ✅ Technical infrastructure
+}
+
+// ❌ Avoid: Business logic in core widgets
+class UserProfileCard extends StatelessWidget {
+  // ❌ Business domain logic doesn't belong in core
+}
+```
+
+#### 2. **Shared Widgets Layer** (`lib/shared/widgets/`)
+
+**Purpose**: Reusable business components following Atomic Design
+
+##### **Atoms** (`shared/widgets/atoms/`)
+
+Basic UI building blocks - smallest components
+
+```dart
+// ✅ Good: Atomic components
+atoms/
+├── custom_button.dart              # Primary/secondary buttons
+├── custom_input.dart               # Text input fields
+├── custom_card.dart                # Container cards
+├── avatar_image.dart               # User avatar display
+├── status_badge.dart               # Status indicators
+└── icon_button.dart                # Icon-based buttons
+
+// ✅ Good: Atom implementation
+class CustomButton extends StatelessWidget {
+  const CustomButton({
+    required this.text,
+    required this.onPressed,
+    this.type = ButtonType.primary,
+    super.key,
+  });
+
+  final String text;
+  final VoidCallback? onPressed;
+  final ButtonType type;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton(
+      onPressed: onPressed,
+      style: _getButtonStyle(type),
+      child: Text(text),
+    );
+  }
+}
+```
+
+##### **Molecules** (`shared/widgets/molecules/`)
+
+Composite components combining atoms
+
+```dart
+// ✅ Good: Molecular components
+molecules/
+├── search_bar.dart                 # Search input + icon + action
+├── user_avatar.dart                # Avatar + status + name
+├── stats_card.dart                 # Card + icon + numbers + label
+├── action_button.dart              # Button + icon + text
+├── input_field.dart                # Label + input + validation
+└── navigation_item.dart            # Icon + label + badge
+
+// ✅ Good: Molecule implementation
+class SearchBar extends StatelessWidget {
+  const SearchBar({
+    required this.onChanged,
+    this.hint = 'Search...',
+    this.onFilter,
+    super.key,
+  });
+
+  final ValueChanged<String> onChanged;
+  final String hint;
+  final VoidCallback? onFilter;
+
+  @override
+  Widget build(BuildContext context) {
+    return Row(
+      children: [
+        // Uses atoms as building blocks
+        Expanded(
+          child: CustomInput(
+            hint: hint,
+            onChanged: onChanged,
+            prefixIcon: Icons.search,
+          ),
+        ),
+        if (onFilter != null)
+          CustomIconButton(
+            icon: Icons.filter_list,
+            onPressed: onFilter,
+          ),
+      ],
+    );
+  }
+}
+```
+
+##### **Organisms** (`shared/widgets/organisms/`)
+
+Complex UI sections combining molecules and atoms
+
+```dart
+// ✅ Good: Organism components
+organisms/
+├── navigation_drawer.dart          # Complete navigation sidebar
+├── header_section.dart             # App bar with actions and search
+├── user_profile_section.dart       # Complete user profile display
+├── stats_dashboard.dart            # Statistics overview section
+├── action_bottom_sheet.dart        # Modal with multiple actions
+└── data_table_section.dart         # Complete data table with controls
+
+// ✅ Good: Organism implementation
+class HeaderSection extends StatelessWidget {
+  const HeaderSection({
+    required this.title,
+    this.subtitle,
+    this.onSearch,
+    this.actions = const [],
+    super.key,
+  });
+
+  final String title;
+  final String? subtitle;
+  final ValueChanged<String>? onSearch;
+  final List<Widget> actions;
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      padding: const EdgeInsets.all(16),
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.start,
+        children: [
+          // Uses molecules and atoms
+          Row(
+            children: [
+              Expanded(
+                child: Column(
+                  crossAxisAlignment: CrossAxisAlignment.start,
+                  children: [
+                    Text(title, style: AppTextStyles.headingLarge),
+                    if (subtitle != null)
+                      Text(subtitle!, style: AppTextStyles.bodyMedium),
+                  ],
+                ),
+              ),
+              ...actions,
+            ],
+          ),
+          if (onSearch != null) ...[
+            const SizedBox(height: 16),
+            SearchBar(onChanged: onSearch!),
+          ],
+        ],
+      ),
+    );
+  }
+}
+```
+
+#### 3. **Feature Widgets Layer** (`lib/features/*/widgets/`)
+
+**Purpose**: Feature-specific components
+
+```dart
+// ✅ Good: Feature-specific widgets
+features/home/presentation/widgets/
+├── home_carousel.dart              # Home-specific carousel
+├── trending_section.dart           # Home trending content
+├── quick_actions.dart              # Home quick action buttons
+├── welcome_banner.dart             # Home welcome message
+└── recent_activity.dart            # Home recent activity list
+
+features/profile/presentation/widgets/
+├── profile_form.dart               # Profile editing form
+├── avatar_selector.dart            # Profile image selection
+├── settings_panel.dart             # Profile settings panel
+├── achievements_grid.dart          # Profile achievements display
+└── activity_history.dart          # Profile activity timeline
+
+// ✅ Good: Feature widget implementation
+class HomeCarousel extends StatelessWidget {
+  const HomeCarousel({
+    required this.items,
+    this.onItemTap,
+    super.key,
+  });
+
+  final List<CarouselItem> items;
+  final ValueChanged<CarouselItem>? onItemTap;
+
+  @override
+  Widget build(BuildContext context) {
+    return SizedBox(
+      height: 200,
+      child: PageView.builder(
+        itemCount: items.length,
+        itemBuilder: (context, index) {
+          final item = items[index];
+          // Uses shared widgets as building blocks
+          return CustomCard(
+            onTap: () => onItemTap?.call(item),
+            child: Column(
+              children: [
+                // Feature-specific layout using shared components
+                Expanded(child: Image.network(item.imageUrl)),
+                Padding(
+                  padding: const EdgeInsets.all(8),
+                  child: Text(item.title, style: AppTextStyles.bodyLarge),
+                ),
+              ],
+            ),
+          );
+        },
+      ),
+    );
+  }
+}
+```
+
+#### Widget Decision Tree
+
+Use this decision tree to determine widget placement:
+
+```dart
+// Decision process for widget placement
+1. ❓ Is it framework/infrastructure related?
+   ✅ YES → Place in `core/widgets/`
+
+2. ❓ Is it reusable across multiple features?
+   ✅ YES → Place in `shared/widgets/` (Atomic Design level)
+
+3. ❓ Is it specific to one feature?
+   ✅ YES → Place in `features/*/widgets/`
+
+// Examples:
+ResponsiveInitializer → core/widgets/ (framework setup)
+CustomButton → shared/widgets/atoms/ (reusable across features)
+HomeCarousel → features/home/widgets/ (specific to home feature)
+```
+
 ### Feature Organization
 
-#### Directory Structure (Updated for Navigation)
+#### Directory Structure (Updated with Widget Architecture)
 
 ```
 feature_name/
 ├── presentation/
-│   └── pages/
-│       ├── feature_page.dart
-│       └── widgets/
-│           ├── feature_widget.dart
-│           └── feature_card.dart
-├── cubit/
+│   ├── pages/                      # Full-screen pages
+│   │   └── feature_page.dart
+│   └── widgets/                    # Feature-specific widgets
+│       ├── feature_carousel.dart   # Feature-specific components
+│       ├── feature_form.dart       # Feature business forms
+│       └── feature_section.dart    # Feature content sections
+├── cubit/                          # State management
 │   ├── feature_cubit.dart
 │   └── feature_state.dart
-├── models/
+├── models/                         # Data models
 │   ├── feature_model.dart          # Freezed models
 │   ├── feature_model.freezed.dart  # Generated file
 │   └── feature_model.g.dart        # Generated JSON
-└── feature.dart  # Barrel export (optional)
+└── feature.dart                    # Barrel export (optional)
 ```
 
 #### Navigation Data Structures (Linus Principle)
