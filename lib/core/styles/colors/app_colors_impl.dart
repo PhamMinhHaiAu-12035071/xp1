@@ -682,43 +682,43 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT COLOR ACCESS ===
 
-  @override
+  /// Direct access to amber light color value
   Color get amberLightColor => const Color(0xFFFF9575);
 
-  @override
+  /// Direct access to amber light hover color value
   Color get amberLightHoverColor => const Color(0xFFFF8C5C);
 
-  @override
+  /// Direct access to amber light active color value
   Color get amberLightActiveColor => const Color(0xFFFF8347);
 
-  @override
+  /// Direct access to amber normal color value
   Color get amberNormalColor => const Color(0xFFFF6B35);
 
-  @override
+  /// Direct access to amber normal hover color value
   Color get amberNormalHoverColor => const Color(0xFFFF5A1F);
 
-  @override
+  /// Direct access to amber normal active color value
   Color get amberNormalActiveColor => const Color(0xFFE55A2B);
 
-  @override
+  /// Direct access to amber dark color value
   Color get amberDarkColor => const Color(0xFFCC5429);
 
-  @override
+  /// Direct access to amber dark hover color value
   Color get amberDarkHoverColor => const Color(0xFFB8481F);
 
-  @override
+  /// Direct access to amber dark active color value
   Color get amberDarkActiveColor => const Color(0xFFA53D1A);
 
-  @override
+  /// Direct access to amber darker color value
   Color get amberDarkerColor => const Color(0xFF923315);
 
-  @override
+  /// Direct access to blue complement color value
   Color get blueComplementColor => const Color(0xFF357DFF);
 
-  @override
+  /// Direct access to teal accent color value
   Color get tealAccentColor => const Color(0xFF35FFB8);
 
-  @override
+  /// Direct access to charcoal color value
   Color get charcoalColor => const Color(0xFF2D3436);
 
   // === GREY PALETTE IMPLEMENTATION (Based on Figma Design System) ===
@@ -895,34 +895,34 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT GREY COLOR ACCESS ===
 
-  @override
+  /// Direct access to grey light color value
   Color get greyLightColor => const Color(0xFFE9E9E9);
 
-  @override
+  /// Direct access to grey light hover color value
   Color get greyLightHoverColor => const Color(0xFFDEDEDE);
 
-  @override
+  /// Direct access to grey light active color value
   Color get greyLightActiveColor => const Color(0xFFBBBBBB);
 
-  @override
+  /// Direct access to grey normal color value
   Color get greyNormalColor => const Color(0xFF242424);
 
-  @override
+  /// Direct access to grey normal hover color value
   Color get greyNormalHoverColor => const Color(0xFF202020);
 
-  @override
+  /// Direct access to grey normal active color value
   Color get greyNormalActiveColor => const Color(0xFF1D1D1D);
 
-  @override
+  /// Direct access to grey dark color value
   Color get greyDarkColor => const Color(0xFF1B1B1B);
 
-  @override
+  /// Direct access to grey dark hover color value
   Color get greyDarkHoverColor => const Color(0xFF161616);
 
-  @override
+  /// Direct access to grey dark active color value
   Color get greyDarkActiveColor => const Color(0xFF101010);
 
-  @override
+  /// Direct access to grey darker color value
   Color get greyDarkerColor => const Color(0xFF0D0D0D);
 
   // === BLUE PALETTE IMPLEMENTATION (Complete Design System) ===
@@ -1099,34 +1099,34 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT BLUE COLOR ACCESS ===
 
-  @override
+  /// Direct access to blue light color value
   Color get blueLightColor => const Color(0xFFEBF3FF);
 
-  @override
+  /// Direct access to blue light hover color value
   Color get blueLightHoverColor => const Color(0xFFD7E7FF);
 
-  @override
+  /// Direct access to blue light active color value
   Color get blueLightActiveColor => const Color(0xFFAFCFFF);
 
-  @override
+  /// Direct access to blue normal color value
   Color get blueNormalColor => const Color(0xFF357DFF);
 
-  @override
+  /// Direct access to blue normal hover color value
   Color get blueNormalHoverColor => const Color(0xFF2366E6);
 
-  @override
+  /// Direct access to blue normal active color value
   Color get blueNormalActiveColor => const Color(0xFF1C57CC);
 
-  @override
+  /// Direct access to blue dark color value
   Color get blueDarkColor => const Color(0xFF1548B3);
 
-  @override
+  /// Direct access to blue dark hover color value
   Color get blueDarkHoverColor => const Color(0xFF0E3999);
 
-  @override
+  /// Direct access to blue dark active color value
   Color get blueDarkActiveColor => const Color(0xFF0A2D80);
 
-  @override
+  /// Direct access to blue darker color value
   Color get blueDarkerColor => const Color(0xFF072166);
 
   // === SLATE PALETTE IMPLEMENTATION (Dark Blue System) ===
@@ -1303,34 +1303,34 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT SLATE COLOR ACCESS ===
 
-  @override
+  /// Direct access to slate light color value
   Color get slateLightColor => const Color(0xFFE8F0FF);
 
-  @override
+  /// Direct access to slate light hover color value
   Color get slateLightHoverColor => const Color(0xFFD1E2FF);
 
-  @override
+  /// Direct access to slate light active color value
   Color get slateLightActiveColor => const Color(0xFFA3C7FF);
 
-  @override
+  /// Direct access to slate normal color value
   Color get slateNormalColor => const Color(0xFF1E3A8A);
 
-  @override
+  /// Direct access to slate normal hover color value
   Color get slateNormalHoverColor => const Color(0xFF1B3474);
 
-  @override
+  /// Direct access to slate normal active color value
   Color get slateNormalActiveColor => const Color(0xFF182E5E);
 
-  @override
+  /// Direct access to slate dark color value
   Color get slateDarkColor => const Color(0xFF152848);
 
-  @override
+  /// Direct access to slate dark hover color value
   Color get slateDarkHoverColor => const Color(0xFF122233);
 
-  @override
+  /// Direct access to slate dark active color value
   Color get slateDarkActiveColor => const Color(0xFF0F1C2E);
 
-  @override
+  /// Direct access to slate darker color value
   Color get slateDarkerColor => const Color(0xFF0C1629);
 
   // === GREEN PALETTE IMPLEMENTATION (Complete Design System) ===
@@ -1507,34 +1507,34 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT GREEN COLOR ACCESS ===
 
-  @override
+  /// Direct access to green light color value
   Color get greenLightColor => const Color(0xFFECFDF5);
 
-  @override
+  /// Direct access to green light hover color value
   Color get greenLightHoverColor => const Color(0xFFD1FAE5);
 
-  @override
+  /// Direct access to green light active color value
   Color get greenLightActiveColor => const Color(0xFFA7F3D0);
 
-  @override
+  /// Direct access to green normal color value
   Color get greenNormalColor => const Color(0xFF10B981);
 
-  @override
+  /// Direct access to green normal hover color value
   Color get greenNormalHoverColor => const Color(0xFF059669);
 
-  @override
+  /// Direct access to green normal active color value
   Color get greenNormalActiveColor => const Color(0xFF047857);
 
-  @override
+  /// Direct access to green dark color value
   Color get greenDarkColor => const Color(0xFF065F46);
 
-  @override
+  /// Direct access to green dark hover color value
   Color get greenDarkHoverColor => const Color(0xFF064E3B);
 
-  @override
+  /// Direct access to green dark active color value
   Color get greenDarkActiveColor => const Color(0xFF022C22);
 
-  @override
+  /// Direct access to green darker color value
   Color get greenDarkerColor => const Color(0xFF012A20);
 
   // === PINK PALETTE IMPLEMENTATION (Complete Design System) ===
@@ -1711,34 +1711,34 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT PINK COLOR ACCESS ===
 
-  @override
+  /// Direct access to pink light color value
   Color get pinkLightColor => const Color(0xFFFDF2F8);
 
-  @override
+  /// Direct access to pink light hover color value
   Color get pinkLightHoverColor => const Color(0xFFFCE7F3);
 
-  @override
+  /// Direct access to pink light active color value
   Color get pinkLightActiveColor => const Color(0xFFF9A8D4);
 
-  @override
+  /// Direct access to pink normal color value
   Color get pinkNormalColor => const Color(0xFFEC4899);
 
-  @override
+  /// Direct access to pink normal hover color value
   Color get pinkNormalHoverColor => const Color(0xFFDB2777);
 
-  @override
+  /// Direct access to pink normal active color value
   Color get pinkNormalActiveColor => const Color(0xFFBE185D);
 
-  @override
+  /// Direct access to pink dark color value
   Color get pinkDarkColor => const Color(0xFF9D174D);
 
-  @override
+  /// Direct access to pink dark hover color value
   Color get pinkDarkHoverColor => const Color(0xFF831843);
 
-  @override
+  /// Direct access to pink dark active color value
   Color get pinkDarkActiveColor => const Color(0xFF701A43);
 
-  @override
+  /// Direct access to pink darker color value
   Color get pinkDarkerColor => const Color(0xFF4C1D2E);
 
   // === ORANGE PALETTE IMPLEMENTATION (Complete Design System) ===
@@ -1915,34 +1915,34 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT ORANGE COLOR ACCESS ===
 
-  @override
+  /// Direct access to orange light color value
   Color get orangeLightColor => const Color(0xFFFFF5E6);
 
-  @override
+  /// Direct access to orange light hover color value
   Color get orangeLightHoverColor => const Color(0xFFFFEDCC);
 
-  @override
+  /// Direct access to orange light active color value
   Color get orangeLightActiveColor => const Color(0xFFFFE0B3);
 
-  @override
+  /// Direct access to orange normal color value
   Color get orangeNormalColor => const Color(0xFFFF7F00);
 
-  @override
+  /// Direct access to orange normal hover color value
   Color get orangeNormalHoverColor => const Color(0xFFE67300);
 
-  @override
+  /// Direct access to orange normal active color value
   Color get orangeNormalActiveColor => const Color(0xFFCC6600);
 
-  @override
+  /// Direct access to orange dark color value
   Color get orangeDarkColor => const Color(0xFFB35900);
 
-  @override
+  /// Direct access to orange dark hover color value
   Color get orangeDarkHoverColor => const Color(0xFF994D00);
 
-  @override
+  /// Direct access to orange dark active color value
   Color get orangeDarkActiveColor => const Color(0xFF804000);
 
-  @override
+  /// Direct access to orange darker color value
   Color get orangeDarkerColor => const Color(0xFF663300);
 
   // === RED PALETTE IMPLEMENTATION (Complete Design System) ===
@@ -2119,34 +2119,34 @@ class AppColorsImpl implements AppColors {
 
   // === DIRECT RED COLOR ACCESS ===
 
-  @override
+  /// Direct access to red light color value
   Color get redLightColor => const Color(0xFFFEF2F2);
 
-  @override
+  /// Direct access to red light hover color value
   Color get redLightHoverColor => const Color(0xFFFCE7E7);
 
-  @override
+  /// Direct access to red light active color value
   Color get redLightActiveColor => const Color(0xFFF8D7DA);
 
-  @override
+  /// Direct access to red normal color value
   Color get redNormalColor => const Color(0xFFDC3545);
 
-  @override
+  /// Direct access to red normal hover color value
   Color get redNormalHoverColor => const Color(0xFFC82333);
 
-  @override
+  /// Direct access to red normal active color value
   Color get redNormalActiveColor => const Color(0xFFB21E2F);
 
-  @override
+  /// Direct access to red dark color value
   Color get redDarkColor => const Color(0xFF9C1A2B);
 
-  @override
+  /// Direct access to red dark hover color value
   Color get redDarkHoverColor => const Color(0xFF861727);
 
-  @override
+  /// Direct access to red dark active color value
   Color get redDarkActiveColor => const Color(0xFF701323);
 
-  @override
+  /// Direct access to red darker color value
   Color get redDarkerColor => const Color(0xFF5A0F1F);
 
   // === BACKWARD COMPATIBILITY IMPLEMENTATIONS ===

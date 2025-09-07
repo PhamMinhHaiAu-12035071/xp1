@@ -225,7 +225,7 @@ class Colors extends StatelessWidget {
                 children: [
                   _buildFigmaColorSwatch(
                     'Light',
-                    colors.amberLightColor,
+                    colors.amberLight,
                     '#fff6e9',
                     'rgb(255, 246, 233)',
                     '19.61 AAA AAA',
@@ -235,7 +235,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :hover',
-                    colors.amberLightHoverColor,
+                    colors.amberLightHover,
                     '#fff2dd',
                     'rgb(255, 242, 221)',
                     '19.00 AAA AAA',
@@ -245,7 +245,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :active',
-                    colors.amberLightActiveColor,
+                    colors.amberLightActive,
                     '#fee4ba',
                     'rgb(254, 228, 186)',
                     '17.02 AAA AAA',
@@ -255,7 +255,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal',
-                    colors.amberNormalColor,
+                    colors.amberNormal,
                     '#fca91f',
                     'rgb(252, 169, 31)',
                     '10.83 AAA AAA',
@@ -265,7 +265,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :hover',
-                    colors.amberNormalHoverColor,
+                    colors.amberNormalHover,
                     '#e3981c',
                     'rgb(227, 152, 28)',
                     '8.77 AAA AAA',
@@ -275,7 +275,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :active',
-                    colors.amberNormalActiveColor,
+                    colors.amberNormalActive,
                     '#ca8719',
                     'rgb(202, 135, 25)',
                     '6.99 AAA AA',
@@ -285,7 +285,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark',
-                    colors.amberDarkColor,
+                    colors.amberDark,
                     '#bd7f17',
                     'rgb(189, 127, 23)',
                     '6.21 AAA AA',
@@ -295,7 +295,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :hover',
-                    colors.amberDarkHoverColor,
+                    colors.amberDarkHover,
                     '#976513',
                     'rgb(151, 101, 19)',
                     '4.19 AA',
@@ -305,7 +305,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :active',
-                    colors.amberDarkActiveColor,
+                    colors.amberDarkActive,
                     '#714c0e',
                     'rgb(113, 76, 14)',
                     '2.74',
@@ -315,7 +315,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Darker',
-                    colors.amberDarkerColor,
+                    colors.amberDarker,
                     '#583b0b',
                     'rgb(88, 59, 11)',
                     '2.05',
@@ -353,7 +353,7 @@ class Colors extends StatelessWidget {
             Expanded(
               child: _buildProfessionalColorCard(
                 'Blue Complement',
-                colors.blueComplementColor,
+                colors.blueComplement,
                 '#357DFF',
                 'Links, info states, secondary actions',
                 textStyles,
@@ -363,7 +363,7 @@ class Colors extends StatelessWidget {
             Expanded(
               child: _buildProfessionalColorCard(
                 'Teal Accent',
-                colors.tealAccentColor,
+                colors.tealAccent,
                 '#35FFB8',
                 'Success states, positive feedback',
                 textStyles,
@@ -416,7 +416,7 @@ class Colors extends StatelessWidget {
                 children: [
                   _buildFigmaColorSwatch(
                     'Light',
-                    colors.greyLightColor,
+                    colors.greyLight,
                     '#e9e9e9',
                     'rgb(233, 233, 233)',
                     '18.54 AAA AAA',
@@ -426,7 +426,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :hover',
-                    colors.greyLightHoverColor,
+                    colors.greyLightHover,
                     '#dedede',
                     'rgb(222, 222, 222)',
                     '17.89 AAA AAA',
@@ -436,7 +436,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :active',
-                    colors.greyLightActiveColor,
+                    colors.greyLightActive,
                     '#bbbbbb',
                     'rgb(187, 187, 187)',
                     '14.12 AAA AAA',
@@ -446,7 +446,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal',
-                    colors.greyNormalColor,
+                    colors.greyNormal,
                     '#242424',
                     'rgb(36, 36, 36)',
                     '1.96',
@@ -456,7 +456,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :hover',
-                    colors.greyNormalHoverColor,
+                    colors.greyNormalHover,
                     '#202020',
                     'rgb(32, 32, 32)',
                     '1.61',
@@ -466,7 +466,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :active',
-                    colors.greyNormalActiveColor,
+                    colors.greyNormalActive,
                     '#1d1d1d',
                     'rgb(29, 29, 29)',
                     '1.42',
@@ -476,7 +476,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark',
-                    colors.greyDarkColor,
+                    colors.greyDark,
                     '#1b1b1b',
                     'rgb(27, 27, 27)',
                     '1.31',
@@ -486,7 +486,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :hover',
-                    colors.greyDarkHoverColor,
+                    colors.greyDarkHover,
                     '#161616',
                     'rgb(22, 22, 22)',
                     '1.14',
@@ -496,7 +496,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :active',
-                    colors.greyDarkActiveColor,
+                    colors.greyDarkActive,
                     '#101010',
                     'rgb(16, 16, 16)',
                     '0.95',
@@ -506,7 +506,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Darker',
-                    colors.greyDarkerColor,
+                    colors.greyDarker,
                     '#0d0d0d',
                     'rgb(13, 13, 13)',
                     '0.85',
@@ -593,7 +593,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal',
-                    colors.blueComplementColor,
+                    colors.blueComplement,
                     '#357dff',
                     'rgb(53, 125, 255)',
                     '5.89 AAA AA',
@@ -887,7 +887,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal',
-                    colors.tealAccentColor,
+                    colors.tealAccent,
                     '#10b981',
                     'rgb(16, 185, 129)',
                     '7.93 AAA AAA',
@@ -1004,7 +1004,7 @@ class Colors extends StatelessWidget {
                 children: [
                   _buildFigmaColorSwatch(
                     'Light',
-                    colors.pinkLightColor,
+                    colors.pinkLight,
                     '#fdf2f8',
                     'rgb(253, 242, 248)',
                     '19.65 AAA AAA',
@@ -1014,7 +1014,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :hover',
-                    colors.pinkLightHoverColor,
+                    colors.pinkLightHover,
                     '#fce7f3',
                     'rgb(252, 231, 243)',
                     '18.98 AAA AAA',
@@ -1024,7 +1024,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :active',
-                    colors.pinkLightActiveColor,
+                    colors.pinkLightActive,
                     '#f9a8d4',
                     'rgb(249, 168, 212)',
                     '15.42 AAA AAA',
@@ -1034,7 +1034,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal',
-                    colors.pinkNormalColor,
+                    colors.pinkNormal,
                     '#ec4899',
                     'rgb(236, 72, 153)',
                     '6.85 AAA AA',
@@ -1044,7 +1044,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :hover',
-                    colors.pinkNormalHoverColor,
+                    colors.pinkNormalHover,
                     '#db2777',
                     'rgb(219, 39, 119)',
                     '5.12 AAA AA',
@@ -1054,7 +1054,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :active',
-                    colors.pinkNormalActiveColor,
+                    colors.pinkNormalActive,
                     '#be185d',
                     'rgb(190, 24, 93)',
                     '3.89 AA',
@@ -1064,7 +1064,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark',
-                    colors.pinkDarkColor,
+                    colors.pinkDark,
                     '#9d174d',
                     'rgb(157, 23, 77)',
                     '2.94',
@@ -1074,7 +1074,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :hover',
-                    colors.pinkDarkHoverColor,
+                    colors.pinkDarkHover,
                     '#831843',
                     'rgb(131, 24, 67)',
                     '2.31',
@@ -1084,7 +1084,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :active',
-                    colors.pinkDarkActiveColor,
+                    colors.pinkDarkActive,
                     '#701a43',
                     'rgb(112, 26, 67)',
                     '1.88',
@@ -1094,7 +1094,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Darker',
-                    colors.pinkDarkerColor,
+                    colors.pinkDarker,
                     '#4c1d2e',
                     'rgb(76, 29, 46)',
                     '1.51',
@@ -1151,7 +1151,7 @@ class Colors extends StatelessWidget {
                 children: [
                   _buildFigmaColorSwatch(
                     'Light',
-                    colors.orangeLightColor,
+                    colors.orangeLight,
                     '#fff5e6',
                     'rgb(255, 245, 230)',
                     '19.45 AAA AAA',
@@ -1161,7 +1161,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :hover',
-                    colors.orangeLightHoverColor,
+                    colors.orangeLightHover,
                     '#ffedcc',
                     'rgb(255, 237, 204)',
                     '18.89 AAA AAA',
@@ -1171,7 +1171,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :active',
-                    colors.orangeLightActiveColor,
+                    colors.orangeLightActive,
                     '#ffe0b3',
                     'rgb(255, 224, 179)',
                     '17.42 AAA AAA',
@@ -1181,7 +1181,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal',
-                    colors.orangeNormalColor,
+                    colors.orangeNormal,
                     '#ff7f00',
                     'rgb(255, 127, 0)',
                     '9.85 AAA AAA',
@@ -1191,7 +1191,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :hover',
-                    colors.orangeNormalHoverColor,
+                    colors.orangeNormalHover,
                     '#e67300',
                     'rgb(230, 115, 0)',
                     '8.21 AAA AAA',
@@ -1201,7 +1201,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :active',
-                    colors.orangeNormalActiveColor,
+                    colors.orangeNormalActive,
                     '#cc6600',
                     'rgb(204, 102, 0)',
                     '6.78 AAA AA',
@@ -1211,7 +1211,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark',
-                    colors.orangeDarkColor,
+                    colors.orangeDark,
                     '#b35900',
                     'rgb(179, 89, 0)',
                     '5.52 AAA AA',
@@ -1221,7 +1221,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :hover',
-                    colors.orangeDarkHoverColor,
+                    colors.orangeDarkHover,
                     '#994d00',
                     'rgb(153, 77, 0)',
                     '4.42 AA',
@@ -1231,7 +1231,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :active',
-                    colors.orangeDarkActiveColor,
+                    colors.orangeDarkActive,
                     '#804000',
                     'rgb(128, 64, 0)',
                     '3.45 AA',
@@ -1241,7 +1241,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Darker',
-                    colors.orangeDarkerColor,
+                    colors.orangeDarker,
                     '#663300',
                     'rgb(102, 51, 0)',
                     '2.63',
@@ -1298,7 +1298,7 @@ class Colors extends StatelessWidget {
                 children: [
                   _buildFigmaColorSwatch(
                     'Light',
-                    colors.redLightColor,
+                    colors.redLight,
                     '#fef2f2',
                     'rgb(254, 242, 242)',
                     '19.52 AAA AAA',
@@ -1308,7 +1308,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :hover',
-                    colors.redLightHoverColor,
+                    colors.redLightHover,
                     '#fce7e7',
                     'rgb(252, 231, 231)',
                     '18.98 AAA AAA',
@@ -1318,7 +1318,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Light :active',
-                    colors.redLightActiveColor,
+                    colors.redLightActive,
                     '#f8d7da',
                     'rgb(248, 215, 218)',
                     '17.15 AAA AAA',
@@ -1328,7 +1328,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal',
-                    colors.redNormalColor,
+                    colors.redNormal,
                     '#dc3545',
                     'rgb(220, 53, 69)',
                     '6.12 AAA AA',
@@ -1338,7 +1338,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :hover',
-                    colors.redNormalHoverColor,
+                    colors.redNormalHover,
                     '#c82333',
                     'rgb(200, 35, 51)',
                     '5.23 AAA AA',
@@ -1348,7 +1348,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Normal :active',
-                    colors.redNormalActiveColor,
+                    colors.redNormalActive,
                     '#b21e2f',
                     'rgb(178, 30, 47)',
                     '4.12 AA',
@@ -1358,7 +1358,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark',
-                    colors.redDarkColor,
+                    colors.redDark,
                     '#9c1a2b',
                     'rgb(156, 26, 43)',
                     '3.21 AA',
@@ -1368,7 +1368,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :hover',
-                    colors.redDarkHoverColor,
+                    colors.redDarkHover,
                     '#861727',
                     'rgb(134, 23, 39)',
                     '2.54 AA',
@@ -1378,7 +1378,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Dark :active',
-                    colors.redDarkActiveColor,
+                    colors.redDarkActive,
                     '#701323',
                     'rgb(112, 19, 35)',
                     '2.01',
@@ -1388,7 +1388,7 @@ class Colors extends StatelessWidget {
                   const SizedBox(height: 16),
                   _buildFigmaColorSwatch(
                     'Darker',
-                    colors.redDarkerColor,
+                    colors.redDarker,
                     '#5a0f1f',
                     'rgb(90, 15, 31)',
                     '1.56',

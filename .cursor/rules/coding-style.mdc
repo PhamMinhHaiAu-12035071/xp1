@@ -1655,6 +1655,26 @@ MaterialColor createMaterialColor(Color color) {
 }
 ```
 
+#### **7.7. ⚡ Color Deprecation Prevention Checklist**
+
+**Before writing any Color-related code, remember:**
+
+- ✅ **ALWAYS** use `color.toARGB32()` instead of `color.value`
+- ✅ **ALWAYS** use `(color.a * 255.0).round() & 0xff` instead of `color.alpha`
+- ✅ **Test files**: Replace `.value` with `.toARGB32()` in all `expect()` statements
+- ✅ **Line length**: Break long color comparisons with proper indentation
+- ❌ **NEVER** use deprecated `Color.value` or `Color.alpha` properties
+
+**Quick Search & Replace for Mass Fixes:**
+
+```bash
+# Find all Color.value usage
+grep -r "\.value" test/ lib/
+
+# Replace pattern in test files
+sed -i '' 's/\.value/.toARGB32()/g' test/**/*.dart
+```
+
 ### 8. Error Handling - Specific Exception Classes
 
 ```dart

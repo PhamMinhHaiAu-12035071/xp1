@@ -275,36 +275,39 @@ void main() {
         expect(amberPale[50], equals(const Color(0xFFFFF4F0)));
       });
 
-      // === Direct Color Access Tests ===
-      test('all amber direct color access should be correct', () {
-        expect(appColors.amberLightColor, equals(const Color(0xFFFF9575)));
-        expect(
-          appColors.amberLightHoverColor,
-          equals(const Color(0xFFFF8C5C)),
-        );
-        expect(
-          appColors.amberLightActiveColor,
-          equals(const Color(0xFFFF8347)),
-        );
-        expect(appColors.amberNormalColor, equals(const Color(0xFFFF6B35)));
-        expect(
-          appColors.amberNormalHoverColor,
-          equals(const Color(0xFFFF5A1F)),
-        );
-        expect(
-          appColors.amberNormalActiveColor,
-          equals(const Color(0xFFE55A2B)),
-        );
-        expect(appColors.amberDarkColor, equals(const Color(0xFFCC5429)));
-        expect(
-          appColors.amberDarkHoverColor,
-          equals(const Color(0xFFB8481F)),
-        );
-        expect(
-          appColors.amberDarkActiveColor,
-          equals(const Color(0xFFA53D1A)),
-        );
-        expect(appColors.amberDarkerColor, equals(const Color(0xFF923315)));
+      // === MaterialColor as Color Tests ===
+      test('all amber MaterialColor can be used directly as Color', () {
+        // MaterialColor can be used directly as Color
+        expect(appColors.amberLight, isA<MaterialColor>());
+        expect(appColors.amberLight, isA<Color>());
+        expect(appColors.amberLight.toARGB32(), equals(0xFFFF9575));
+
+        expect(appColors.amberLightHover, isA<MaterialColor>());
+        expect(appColors.amberLightHover.toARGB32(), equals(0xFFFF8C5C));
+
+        expect(appColors.amberLightActive, isA<MaterialColor>());
+        expect(appColors.amberLightActive.toARGB32(), equals(0xFFFF8347));
+
+        expect(appColors.amberNormal, isA<MaterialColor>());
+        expect(appColors.amberNormal.toARGB32(), equals(0xFFFF6B35));
+
+        expect(appColors.amberNormalHover, isA<MaterialColor>());
+        expect(appColors.amberNormalHover.toARGB32(), equals(0xFFFF5A1F));
+
+        expect(appColors.amberNormalActive, isA<MaterialColor>());
+        expect(appColors.amberNormalActive.toARGB32(), equals(0xFFE55A2B));
+
+        expect(appColors.amberDark, isA<MaterialColor>());
+        expect(appColors.amberDark.toARGB32(), equals(0xFFCC5429));
+
+        expect(appColors.amberDarkHover, isA<MaterialColor>());
+        expect(appColors.amberDarkHover.toARGB32(), equals(0xFFB8481F));
+
+        expect(appColors.amberDarkActive, isA<MaterialColor>());
+        expect(appColors.amberDarkActive.toARGB32(), equals(0xFFA53D1A));
+
+        expect(appColors.amberDarker, isA<MaterialColor>());
+        expect(appColors.amberDarker.toARGB32(), equals(0xFF923315));
       });
 
       // === Amber Palette Consistency Tests ===
@@ -353,11 +356,11 @@ void main() {
       });
 
       test('blueComplementColor should provide direct access', () {
-        expect(appColors.blueComplementColor, equals(const Color(0xFF357DFF)));
+        expect(appColors.blueComplement.toARGB32(), equals(0xFF357DFF));
       });
 
       test('tealAccentColor should provide direct access', () {
-        expect(appColors.tealAccentColor, equals(const Color(0xFF35FFB8)));
+        expect(appColors.tealAccent.toARGB32(), equals(0xFF35FFB8));
       });
     });
 
@@ -453,19 +456,16 @@ void main() {
       });
 
       test('all grey direct access colors should be correct', () {
-        expect(appColors.greyLightColor, equals(const Color(0xFFE9E9E9)));
-        expect(appColors.greyLightHoverColor, equals(const Color(0xFFDEDEDE)));
-        expect(appColors.greyLightActiveColor, equals(const Color(0xFFBBBBBB)));
-        expect(appColors.greyNormalColor, equals(const Color(0xFF242424)));
-        expect(appColors.greyNormalHoverColor, equals(const Color(0xFF202020)));
-        expect(
-          appColors.greyNormalActiveColor,
-          equals(const Color(0xFF1D1D1D)),
-        );
-        expect(appColors.greyDarkColor, equals(const Color(0xFF1B1B1B)));
-        expect(appColors.greyDarkHoverColor, equals(const Color(0xFF161616)));
-        expect(appColors.greyDarkActiveColor, equals(const Color(0xFF101010)));
-        expect(appColors.greyDarkerColor, equals(const Color(0xFF0D0D0D)));
+        expect(appColors.greyLight.toARGB32(), equals(0xFFE9E9E9));
+        expect(appColors.greyLightHover.toARGB32(), equals(0xFFDEDEDE));
+        expect(appColors.greyLightActive.toARGB32(), equals(0xFFBBBBBB));
+        expect(appColors.greyNormal.toARGB32(), equals(0xFF242424));
+        expect(appColors.greyNormalHover.toARGB32(), equals(0xFF202020));
+        expect(appColors.greyNormalActive.toARGB32(), equals(0xFF1D1D1D));
+        expect(appColors.greyDark.toARGB32(), equals(0xFF1B1B1B));
+        expect(appColors.greyDarkHover.toARGB32(), equals(0xFF161616));
+        expect(appColors.greyDarkActive.toARGB32(), equals(0xFF101010));
+        expect(appColors.greyDarker.toARGB32(), equals(0xFF0D0D0D));
       });
 
       test('all grey MaterialColors should have proper swatch values', () {
@@ -526,74 +526,74 @@ void main() {
       });
 
       test('charcoalColor should provide direct access', () {
-        expect(appColors.charcoalColor, equals(const Color(0xFF2D3436)));
-        expect(appColors.charcoalColor, isA<Color>());
+        expect(appColors.charcoal.toARGB32(), equals(0xFF2D3436));
+        expect(appColors.charcoal, isA<Color>());
       });
     });
 
     group('Basic Color properties', () {
       test('bgMain should return correct color', () {
-        expect(appColors.bgMain, equals(const Color(0xFFFFFFFF)));
+        expect(appColors.bgMain.toARGB32(), equals(0xFFFFFFFF));
       });
 
       test('accent should return correct color', () {
-        expect(appColors.accent, equals(const Color(0xFFE0E7FF)));
+        expect(appColors.accent.toARGB32(), equals(0xFFE0E7FF));
       });
 
       test('textPrimary should return correct color', () {
-        expect(appColors.textPrimary, equals(const Color(0xFF1E293B)));
+        expect(appColors.textPrimary.toARGB32(), equals(0xFF1E293B));
       });
 
       test('textSecondary should return correct color', () {
-        expect(appColors.textSecondary, equals(const Color(0xFF64748B)));
+        expect(appColors.textSecondary.toARGB32(), equals(0xFF64748B));
       });
 
       test('slateBlue should return correct color', () {
-        expect(appColors.slateBlue, equals(const Color(0xFF607395)));
+        expect(appColors.slateBlue.toARGB32(), equals(0xFF607395));
       });
 
       test('onboardingBackground should return correct color', () {
-        expect(appColors.onboardingBackground, equals(const Color(0xFFE9F0F2)));
+        expect(appColors.onboardingBackground.toARGB32(), equals(0xFFE9F0F2));
       });
 
       test('onboardingGradientStart should return correct color', () {
         expect(
-          appColors.onboardingGradientStart,
-          equals(const Color(0xFF00B3C6)),
+          appColors.onboardingGradientStart.toARGB32(),
+          equals(0xFF00B3C6),
         );
       });
 
       test('onboardingGradientEnd should return correct color', () {
         expect(
-          appColors.onboardingGradientEnd,
-          equals(const Color(0xFF5D84B4)),
+          appColors.onboardingGradientEnd.toARGB32(),
+          equals(0xFF5D84B4),
         );
       });
     });
 
     group('Dark mode Color properties', () {
       test('bgMainDark should return correct color', () {
-        expect(appColors.bgMainDark, equals(const Color(0xFF121212)));
+        expect(appColors.bgMainDark.toARGB32(), equals(0xFF121212));
       });
 
       test('primaryDark should return correct color', () {
-        expect(appColors.primaryDark, equals(const Color(0xFF3B82F6)));
+        expect(appColors.primaryDark.toARGB32(), equals(0xFF3B82F6));
       });
 
       test('secondaryDark should return correct color', () {
-        expect(appColors.secondaryDark, equals(const Color(0xFF6366F1)));
+        expect(appColors.secondaryDark.toARGB32(), equals(0xFF6366F1));
       });
 
       test('accentDark should return correct color', () {
-        expect(appColors.accentDark, equals(const Color(0xFF1E293B)));
+        expect(appColors.accentDark.toARGB32(), equals(0xFF1E293B));
       });
 
       test('textPrimaryDark should return correct color', () {
-        expect(appColors.textPrimaryDark, equals(const Color(0xFFF1F5F9)));
+        expect(appColors.textPrimaryDark.toARGB32(), equals(0xFFF1F5F9));
       });
 
       test('textSecondaryDark should return correct color', () {
-        expect(appColors.textSecondaryDark, equals(const Color(0xFFCBD5E1)));
+        expect(appColors.textSecondaryDark.toARGB32(), equals(0xFFCBD5E1));
       });
     });
 
@@ -745,73 +745,43 @@ void main() {
 
     group('Blue Palette Direct Color Access Tests', () {
       test('should return correct blue light color', () {
-        expect(
-          appColors.blueLightColor,
-          equals(const Color(0xFFEBF3FF)),
-        );
+        expect(appColors.blueLight.toARGB32(), equals(0xFFEBF3FF));
       });
 
       test('should return correct blue light hover color', () {
-        expect(
-          appColors.blueLightHoverColor,
-          equals(const Color(0xFFD7E7FF)),
-        );
+        expect(appColors.blueLightHover.toARGB32(), equals(0xFFD7E7FF));
       });
 
       test('should return correct blue light active color', () {
-        expect(
-          appColors.blueLightActiveColor,
-          equals(const Color(0xFFAFCFFF)),
-        );
+        expect(appColors.blueLightActive.toARGB32(), equals(0xFFAFCFFF));
       });
 
       test('should return correct blue normal color', () {
-        expect(
-          appColors.blueNormalColor,
-          equals(const Color(0xFF357DFF)),
-        );
+        expect(appColors.blueNormal.toARGB32(), equals(0xFF357DFF));
       });
 
       test('should return correct blue normal hover color', () {
-        expect(
-          appColors.blueNormalHoverColor,
-          equals(const Color(0xFF2366E6)),
-        );
+        expect(appColors.blueNormalHover.toARGB32(), equals(0xFF2366E6));
       });
 
       test('should return correct blue normal active color', () {
-        expect(
-          appColors.blueNormalActiveColor,
-          equals(const Color(0xFF1C57CC)),
-        );
+        expect(appColors.blueNormalActive.toARGB32(), equals(0xFF1C57CC));
       });
 
       test('should return correct blue dark color', () {
-        expect(
-          appColors.blueDarkColor,
-          equals(const Color(0xFF1548B3)),
-        );
+        expect(appColors.blueDark.toARGB32(), equals(0xFF1548B3));
       });
 
       test('should return correct blue dark hover color', () {
-        expect(
-          appColors.blueDarkHoverColor,
-          equals(const Color(0xFF0E3999)),
-        );
+        expect(appColors.blueDarkHover.toARGB32(), equals(0xFF0E3999));
       });
 
       test('should return correct blue dark active color', () {
-        expect(
-          appColors.blueDarkActiveColor,
-          equals(const Color(0xFF0A2D80)),
-        );
+        expect(appColors.blueDarkActive.toARGB32(), equals(0xFF0A2D80));
       });
 
       test('should return correct blue darker color', () {
-        expect(
-          appColors.blueDarkerColor,
-          equals(const Color(0xFF072166)),
-        );
+        expect(appColors.blueDarker.toARGB32(), equals(0xFF072166));
       });
     });
 
@@ -885,73 +855,43 @@ void main() {
 
     group('Slate Palette Direct Color Access Tests', () {
       test('should return correct slate light color', () {
-        expect(
-          appColors.slateLightColor,
-          equals(const Color(0xFFE8F0FF)),
-        );
+        expect(appColors.slateLight.toARGB32(), equals(0xFFE8F0FF));
       });
 
       test('should return correct slate light hover color', () {
-        expect(
-          appColors.slateLightHoverColor,
-          equals(const Color(0xFFD1E2FF)),
-        );
+        expect(appColors.slateLightHover.toARGB32(), equals(0xFFD1E2FF));
       });
 
       test('should return correct slate light active color', () {
-        expect(
-          appColors.slateLightActiveColor,
-          equals(const Color(0xFFA3C7FF)),
-        );
+        expect(appColors.slateLightActive.toARGB32(), equals(0xFFA3C7FF));
       });
 
       test('should return correct slate normal color', () {
-        expect(
-          appColors.slateNormalColor,
-          equals(const Color(0xFF1E3A8A)),
-        );
+        expect(appColors.slateNormal.toARGB32(), equals(0xFF1E3A8A));
       });
 
       test('should return correct slate normal hover color', () {
-        expect(
-          appColors.slateNormalHoverColor,
-          equals(const Color(0xFF1B3474)),
-        );
+        expect(appColors.slateNormalHover.toARGB32(), equals(0xFF1B3474));
       });
 
       test('should return correct slate normal active color', () {
-        expect(
-          appColors.slateNormalActiveColor,
-          equals(const Color(0xFF182E5E)),
-        );
+        expect(appColors.slateNormalActive.toARGB32(), equals(0xFF182E5E));
       });
 
       test('should return correct slate dark color', () {
-        expect(
-          appColors.slateDarkColor,
-          equals(const Color(0xFF152848)),
-        );
+        expect(appColors.slateDark.toARGB32(), equals(0xFF152848));
       });
 
       test('should return correct slate dark hover color', () {
-        expect(
-          appColors.slateDarkHoverColor,
-          equals(const Color(0xFF122233)),
-        );
+        expect(appColors.slateDarkHover.toARGB32(), equals(0xFF122233));
       });
 
       test('should return correct slate dark active color', () {
-        expect(
-          appColors.slateDarkActiveColor,
-          equals(const Color(0xFF0F1C2E)),
-        );
+        expect(appColors.slateDarkActive.toARGB32(), equals(0xFF0F1C2E));
       });
 
       test('should return correct slate darker color', () {
-        expect(
-          appColors.slateDarkerColor,
-          equals(const Color(0xFF0C1629)),
-        );
+        expect(appColors.slateDarker.toARGB32(), equals(0xFF0C1629));
       });
     });
 
@@ -1025,73 +965,43 @@ void main() {
 
     group('Green Palette Direct Color Access Tests', () {
       test('should return correct green light color', () {
-        expect(
-          appColors.greenLightColor,
-          equals(const Color(0xFFECFDF5)),
-        );
+        expect(appColors.greenLight.toARGB32(), equals(0xFFECFDF5));
       });
 
       test('should return correct green light hover color', () {
-        expect(
-          appColors.greenLightHoverColor,
-          equals(const Color(0xFFD1FAE5)),
-        );
+        expect(appColors.greenLightHover.toARGB32(), equals(0xFFD1FAE5));
       });
 
       test('should return correct green light active color', () {
-        expect(
-          appColors.greenLightActiveColor,
-          equals(const Color(0xFFA7F3D0)),
-        );
+        expect(appColors.greenLightActive.toARGB32(), equals(0xFFA7F3D0));
       });
 
       test('should return correct green normal color', () {
-        expect(
-          appColors.greenNormalColor,
-          equals(const Color(0xFF10B981)),
-        );
+        expect(appColors.greenNormal.toARGB32(), equals(0xFF10B981));
       });
 
       test('should return correct green normal hover color', () {
-        expect(
-          appColors.greenNormalHoverColor,
-          equals(const Color(0xFF059669)),
-        );
+        expect(appColors.greenNormalHover.toARGB32(), equals(0xFF059669));
       });
 
       test('should return correct green normal active color', () {
-        expect(
-          appColors.greenNormalActiveColor,
-          equals(const Color(0xFF047857)),
-        );
+        expect(appColors.greenNormalActive.toARGB32(), equals(0xFF047857));
       });
 
       test('should return correct green dark color', () {
-        expect(
-          appColors.greenDarkColor,
-          equals(const Color(0xFF065F46)),
-        );
+        expect(appColors.greenDark.toARGB32(), equals(0xFF065F46));
       });
 
       test('should return correct green dark hover color', () {
-        expect(
-          appColors.greenDarkHoverColor,
-          equals(const Color(0xFF064E3B)),
-        );
+        expect(appColors.greenDarkHover.toARGB32(), equals(0xFF064E3B));
       });
 
       test('should return correct green dark active color', () {
-        expect(
-          appColors.greenDarkActiveColor,
-          equals(const Color(0xFF022C22)),
-        );
+        expect(appColors.greenDarkActive.toARGB32(), equals(0xFF022C22));
       });
 
       test('should return correct green darker color', () {
-        expect(
-          appColors.greenDarkerColor,
-          equals(const Color(0xFF012A20)),
-        );
+        expect(appColors.greenDarker.toARGB32(), equals(0xFF012A20));
       });
     });
 
@@ -1165,73 +1075,43 @@ void main() {
 
     group('Pink Palette Direct Color Access Tests', () {
       test('should return correct pink light color', () {
-        expect(
-          appColors.pinkLightColor,
-          equals(const Color(0xFFFDF2F8)),
-        );
+        expect(appColors.pinkLight.toARGB32(), equals(0xFFFDF2F8));
       });
 
       test('should return correct pink light hover color', () {
-        expect(
-          appColors.pinkLightHoverColor,
-          equals(const Color(0xFFFCE7F3)),
-        );
+        expect(appColors.pinkLightHover.toARGB32(), equals(0xFFFCE7F3));
       });
 
       test('should return correct pink light active color', () {
-        expect(
-          appColors.pinkLightActiveColor,
-          equals(const Color(0xFFF9A8D4)),
-        );
+        expect(appColors.pinkLightActive.toARGB32(), equals(0xFFF9A8D4));
       });
 
       test('should return correct pink normal color', () {
-        expect(
-          appColors.pinkNormalColor,
-          equals(const Color(0xFFEC4899)),
-        );
+        expect(appColors.pinkNormal.toARGB32(), equals(0xFFEC4899));
       });
 
       test('should return correct pink normal hover color', () {
-        expect(
-          appColors.pinkNormalHoverColor,
-          equals(const Color(0xFFDB2777)),
-        );
+        expect(appColors.pinkNormalHover.toARGB32(), equals(0xFFDB2777));
       });
 
       test('should return correct pink normal active color', () {
-        expect(
-          appColors.pinkNormalActiveColor,
-          equals(const Color(0xFFBE185D)),
-        );
+        expect(appColors.pinkNormalActive.toARGB32(), equals(0xFFBE185D));
       });
 
       test('should return correct pink dark color', () {
-        expect(
-          appColors.pinkDarkColor,
-          equals(const Color(0xFF9D174D)),
-        );
+        expect(appColors.pinkDark.toARGB32(), equals(0xFF9D174D));
       });
 
       test('should return correct pink dark hover color', () {
-        expect(
-          appColors.pinkDarkHoverColor,
-          equals(const Color(0xFF831843)),
-        );
+        expect(appColors.pinkDarkHover.toARGB32(), equals(0xFF831843));
       });
 
       test('should return correct pink dark active color', () {
-        expect(
-          appColors.pinkDarkActiveColor,
-          equals(const Color(0xFF701A43)),
-        );
+        expect(appColors.pinkDarkActive.toARGB32(), equals(0xFF701A43));
       });
 
       test('should return correct pink darker color', () {
-        expect(
-          appColors.pinkDarkerColor,
-          equals(const Color(0xFF4C1D2E)),
-        );
+        expect(appColors.pinkDarker.toARGB32(), equals(0xFF4C1D2E));
       });
     });
 
@@ -1305,73 +1185,43 @@ void main() {
 
     group('Orange Palette Direct Color Access Tests', () {
       test('should return correct orange light color', () {
-        expect(
-          appColors.orangeLightColor,
-          equals(const Color(0xFFFFF5E6)),
-        );
+        expect(appColors.orangeLight.toARGB32(), equals(0xFFFFF5E6));
       });
 
       test('should return correct orange light hover color', () {
-        expect(
-          appColors.orangeLightHoverColor,
-          equals(const Color(0xFFFFEDCC)),
-        );
+        expect(appColors.orangeLightHover.toARGB32(), equals(0xFFFFEDCC));
       });
 
       test('should return correct orange light active color', () {
-        expect(
-          appColors.orangeLightActiveColor,
-          equals(const Color(0xFFFFE0B3)),
-        );
+        expect(appColors.orangeLightActive.toARGB32(), equals(0xFFFFE0B3));
       });
 
       test('should return correct orange normal color', () {
-        expect(
-          appColors.orangeNormalColor,
-          equals(const Color(0xFFFF7F00)),
-        );
+        expect(appColors.orangeNormal.toARGB32(), equals(0xFFFF7F00));
       });
 
       test('should return correct orange normal hover color', () {
-        expect(
-          appColors.orangeNormalHoverColor,
-          equals(const Color(0xFFE67300)),
-        );
+        expect(appColors.orangeNormalHover.toARGB32(), equals(0xFFE67300));
       });
 
       test('should return correct orange normal active color', () {
-        expect(
-          appColors.orangeNormalActiveColor,
-          equals(const Color(0xFFCC6600)),
-        );
+        expect(appColors.orangeNormalActive.toARGB32(), equals(0xFFCC6600));
       });
 
       test('should return correct orange dark color', () {
-        expect(
-          appColors.orangeDarkColor,
-          equals(const Color(0xFFB35900)),
-        );
+        expect(appColors.orangeDark.toARGB32(), equals(0xFFB35900));
       });
 
       test('should return correct orange dark hover color', () {
-        expect(
-          appColors.orangeDarkHoverColor,
-          equals(const Color(0xFF994D00)),
-        );
+        expect(appColors.orangeDarkHover.toARGB32(), equals(0xFF994D00));
       });
 
       test('should return correct orange dark active color', () {
-        expect(
-          appColors.orangeDarkActiveColor,
-          equals(const Color(0xFF804000)),
-        );
+        expect(appColors.orangeDarkActive.toARGB32(), equals(0xFF804000));
       });
 
       test('should return correct orange darker color', () {
-        expect(
-          appColors.orangeDarkerColor,
-          equals(const Color(0xFF663300)),
-        );
+        expect(appColors.orangeDarker.toARGB32(), equals(0xFF663300));
       });
     });
 
@@ -1451,73 +1301,43 @@ void main() {
 
     group('Red Palette Direct Color Access Tests', () {
       test('should return correct red light color', () {
-        expect(
-          appColors.redLightColor,
-          equals(const Color(0xFFFEF2F2)),
-        );
+        expect(appColors.redLight.toARGB32(), equals(0xFFFEF2F2));
       });
 
       test('should return correct red light hover color', () {
-        expect(
-          appColors.redLightHoverColor,
-          equals(const Color(0xFFFCE7E7)),
-        );
+        expect(appColors.redLightHover.toARGB32(), equals(0xFFFCE7E7));
       });
 
       test('should return correct red light active color', () {
-        expect(
-          appColors.redLightActiveColor,
-          equals(const Color(0xFFF8D7DA)),
-        );
+        expect(appColors.redLightActive.toARGB32(), equals(0xFFF8D7DA));
       });
 
       test('should return correct red normal color', () {
-        expect(
-          appColors.redNormalColor,
-          equals(const Color(0xFFDC3545)),
-        );
+        expect(appColors.redNormal.toARGB32(), equals(0xFFDC3545));
       });
 
       test('should return correct red normal hover color', () {
-        expect(
-          appColors.redNormalHoverColor,
-          equals(const Color(0xFFC82333)),
-        );
+        expect(appColors.redNormalHover.toARGB32(), equals(0xFFC82333));
       });
 
       test('should return correct red normal active color', () {
-        expect(
-          appColors.redNormalActiveColor,
-          equals(const Color(0xFFB21E2F)),
-        );
+        expect(appColors.redNormalActive.toARGB32(), equals(0xFFB21E2F));
       });
 
       test('should return correct red dark color', () {
-        expect(
-          appColors.redDarkColor,
-          equals(const Color(0xFF9C1A2B)),
-        );
+        expect(appColors.redDark.toARGB32(), equals(0xFF9C1A2B));
       });
 
       test('should return correct red dark hover color', () {
-        expect(
-          appColors.redDarkHoverColor,
-          equals(const Color(0xFF861727)),
-        );
+        expect(appColors.redDarkHover.toARGB32(), equals(0xFF861727));
       });
 
       test('should return correct red dark active color', () {
-        expect(
-          appColors.redDarkActiveColor,
-          equals(const Color(0xFF701323)),
-        );
+        expect(appColors.redDarkActive.toARGB32(), equals(0xFF701323));
       });
 
       test('should return correct red darker color', () {
-        expect(
-          appColors.redDarkerColor,
-          equals(const Color(0xFF5A0F1F)),
-        );
+        expect(appColors.redDarker.toARGB32(), equals(0xFF5A0F1F));
       });
     });
   });

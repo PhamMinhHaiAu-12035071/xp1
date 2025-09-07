@@ -171,46 +171,10 @@ abstract class AppColors {
   /// Used for page backgrounds, card backgrounds
   MaterialColor get lightGray;
 
-  // === DIRECT COLOR ACCESS ===
-
-  /// Direct access to amber light color
-  Color get amberLightColor;
-
-  /// Direct access to amber light hover color
-  Color get amberLightHoverColor;
-
-  /// Direct access to amber light active color
-  Color get amberLightActiveColor;
-
-  /// Direct access to amber normal color (main brand color)
-  Color get amberNormalColor;
-
-  /// Direct access to amber normal hover color
-  Color get amberNormalHoverColor;
-
-  /// Direct access to amber normal active color
-  Color get amberNormalActiveColor;
-
-  /// Direct access to amber dark color
-  Color get amberDarkColor;
-
-  /// Direct access to amber dark hover color
-  Color get amberDarkHoverColor;
-
-  /// Direct access to amber dark active color
-  Color get amberDarkActiveColor;
-
-  /// Direct access to amber darker color
-  Color get amberDarkerColor;
-
-  /// Direct access to blue complement color
-  Color get blueComplementColor;
-
-  /// Direct access to teal accent color
-  Color get tealAccentColor;
-
-  /// Direct access to charcoal color
-  Color get charcoalColor;
+  // === MaterialColor Usage Note ===
+  // All MaterialColor getters above can be used directly as Color
+  // since MaterialColor extends Color. Use materialColor[shade] for
+  // specific shades if needed.
 
   // === GREY PALETTE (Based on Figma Design System) ===
 
@@ -254,38 +218,6 @@ abstract class AppColors {
   /// Used for strongest contrast, darkest backgrounds
   MaterialColor get greyDarker;
 
-  // === DIRECT GREY COLOR ACCESS ===
-
-  /// Direct access to grey light color
-  Color get greyLightColor;
-
-  /// Direct access to grey light hover color
-  Color get greyLightHoverColor;
-
-  /// Direct access to grey light active color
-  Color get greyLightActiveColor;
-
-  /// Direct access to grey normal color (main neutral color)
-  Color get greyNormalColor;
-
-  /// Direct access to grey normal hover color
-  Color get greyNormalHoverColor;
-
-  /// Direct access to grey normal active color
-  Color get greyNormalActiveColor;
-
-  /// Direct access to grey dark color
-  Color get greyDarkColor;
-
-  /// Direct access to grey dark hover color
-  Color get greyDarkHoverColor;
-
-  /// Direct access to grey dark active color
-  Color get greyDarkActiveColor;
-
-  /// Direct access to grey darker color
-  Color get greyDarkerColor;
-
   // === BLUE PALETTE (Complete Design System) ===
 
   /// Blue light color (#EBF3FF)
@@ -327,38 +259,6 @@ abstract class AppColors {
   /// Blue darker color (#072166)
   /// Used for strongest blue contrast, darkest blue backgrounds
   MaterialColor get blueDarker;
-
-  // === DIRECT BLUE COLOR ACCESS ===
-
-  /// Direct access to blue light color
-  Color get blueLightColor;
-
-  /// Direct access to blue light hover color
-  Color get blueLightHoverColor;
-
-  /// Direct access to blue light active color
-  Color get blueLightActiveColor;
-
-  /// Direct access to blue normal color (main blue color)
-  Color get blueNormalColor;
-
-  /// Direct access to blue normal hover color
-  Color get blueNormalHoverColor;
-
-  /// Direct access to blue normal active color
-  Color get blueNormalActiveColor;
-
-  /// Direct access to blue dark color
-  Color get blueDarkColor;
-
-  /// Direct access to blue dark hover color
-  Color get blueDarkHoverColor;
-
-  /// Direct access to blue dark active color
-  Color get blueDarkActiveColor;
-
-  /// Direct access to blue darker color
-  Color get blueDarkerColor;
 
   // === SLATE PALETTE (Dark Blue System) ===
 
@@ -402,38 +302,6 @@ abstract class AppColors {
   /// Used for strongest slate contrast, darkest slate backgrounds
   MaterialColor get slateDarker;
 
-  // === DIRECT SLATE COLOR ACCESS ===
-
-  /// Direct access to slate light color
-  Color get slateLightColor;
-
-  /// Direct access to slate light hover color
-  Color get slateLightHoverColor;
-
-  /// Direct access to slate light active color
-  Color get slateLightActiveColor;
-
-  /// Direct access to slate normal color (main slate color)
-  Color get slateNormalColor;
-
-  /// Direct access to slate normal hover color
-  Color get slateNormalHoverColor;
-
-  /// Direct access to slate normal active color
-  Color get slateNormalActiveColor;
-
-  /// Direct access to slate dark color
-  Color get slateDarkColor;
-
-  /// Direct access to slate dark hover color
-  Color get slateDarkHoverColor;
-
-  /// Direct access to slate dark active color
-  Color get slateDarkActiveColor;
-
-  /// Direct access to slate darker color
-  Color get slateDarkerColor;
-
   // === GREEN PALETTE (Complete Design System) ===
 
   /// Green light color (#ECFDF5)
@@ -475,38 +343,6 @@ abstract class AppColors {
   /// Green darker color (#012A20)
   /// Used for strongest green contrast, darkest green backgrounds
   MaterialColor get greenDarker;
-
-  // === DIRECT GREEN COLOR ACCESS ===
-
-  /// Direct access to green light color
-  Color get greenLightColor;
-
-  /// Direct access to green light hover color
-  Color get greenLightHoverColor;
-
-  /// Direct access to green light active color
-  Color get greenLightActiveColor;
-
-  /// Direct access to green normal color (main green color)
-  Color get greenNormalColor;
-
-  /// Direct access to green normal hover color
-  Color get greenNormalHoverColor;
-
-  /// Direct access to green normal active color
-  Color get greenNormalActiveColor;
-
-  /// Direct access to green dark color
-  Color get greenDarkColor;
-
-  /// Direct access to green dark hover color
-  Color get greenDarkHoverColor;
-
-  /// Direct access to green dark active color
-  Color get greenDarkActiveColor;
-
-  /// Direct access to green darker color
-  Color get greenDarkerColor;
 
   // === PINK PALETTE (Complete Design System) ===
 
@@ -550,38 +386,6 @@ abstract class AppColors {
   /// Used for strongest pink contrast, darkest pink backgrounds
   MaterialColor get pinkDarker;
 
-  // === DIRECT PINK COLOR ACCESS ===
-
-  /// Direct access to pink light color
-  Color get pinkLightColor;
-
-  /// Direct access to pink light hover color
-  Color get pinkLightHoverColor;
-
-  /// Direct access to pink light active color
-  Color get pinkLightActiveColor;
-
-  /// Direct access to pink normal color (main pink color)
-  Color get pinkNormalColor;
-
-  /// Direct access to pink normal hover color
-  Color get pinkNormalHoverColor;
-
-  /// Direct access to pink normal active color
-  Color get pinkNormalActiveColor;
-
-  /// Direct access to pink dark color
-  Color get pinkDarkColor;
-
-  /// Direct access to pink dark hover color
-  Color get pinkDarkHoverColor;
-
-  /// Direct access to pink dark active color
-  Color get pinkDarkActiveColor;
-
-  /// Direct access to pink darker color
-  Color get pinkDarkerColor;
-
   // === ORANGE PALETTE (Complete Design System) ===
 
   /// Orange light color (#FFF5E6)
@@ -624,38 +428,6 @@ abstract class AppColors {
   /// Used for strongest orange contrast, darkest orange backgrounds
   MaterialColor get orangeDarker;
 
-  // === DIRECT ORANGE COLOR ACCESS ===
-
-  /// Direct access to orange light color
-  Color get orangeLightColor;
-
-  /// Direct access to orange light hover color
-  Color get orangeLightHoverColor;
-
-  /// Direct access to orange light active color
-  Color get orangeLightActiveColor;
-
-  /// Direct access to orange normal color (main orange color)
-  Color get orangeNormalColor;
-
-  /// Direct access to orange normal hover color
-  Color get orangeNormalHoverColor;
-
-  /// Direct access to orange normal active color
-  Color get orangeNormalActiveColor;
-
-  /// Direct access to orange dark color
-  Color get orangeDarkColor;
-
-  /// Direct access to orange dark hover color
-  Color get orangeDarkHoverColor;
-
-  /// Direct access to orange dark active color
-  Color get orangeDarkActiveColor;
-
-  /// Direct access to orange darker color
-  Color get orangeDarkerColor;
-
   // === RED PALETTE (Complete Design System) ===
 
   /// Red light color (#FEF2F2)
@@ -697,36 +469,4 @@ abstract class AppColors {
   /// Red darker color (#5A0F1F)
   /// Used for strongest red contrast, darkest red backgrounds
   MaterialColor get redDarker;
-
-  // === DIRECT RED COLOR ACCESS ===
-
-  /// Direct access to red light color
-  Color get redLightColor;
-
-  /// Direct access to red light hover color
-  Color get redLightHoverColor;
-
-  /// Direct access to red light active color
-  Color get redLightActiveColor;
-
-  /// Direct access to red normal color (main red color)
-  Color get redNormalColor;
-
-  /// Direct access to red normal hover color
-  Color get redNormalHoverColor;
-
-  /// Direct access to red normal active color
-  Color get redNormalActiveColor;
-
-  /// Direct access to red dark color
-  Color get redDarkColor;
-
-  /// Direct access to red dark hover color
-  Color get redDarkHoverColor;
-
-  /// Direct access to red dark active color
-  Color get redDarkActiveColor;
-
-  /// Direct access to red darker color
-  Color get redDarkerColor;
 }

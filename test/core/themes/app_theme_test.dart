@@ -146,54 +146,31 @@ class TestAppColors implements AppColors {
   MaterialColor get lightGray => throw UnimplementedError();
 
   // === DIRECT COLOR ACCESS (Test stubs) ===
-  @override
   Color get amberLightColor => throw UnimplementedError();
-  @override
   Color get amberLightHoverColor => throw UnimplementedError();
-  @override
   Color get amberLightActiveColor => throw UnimplementedError();
-  @override
   Color get amberNormalColor => throw UnimplementedError();
-  @override
   Color get amberNormalHoverColor => throw UnimplementedError();
-  @override
   Color get amberNormalActiveColor => throw UnimplementedError();
-  @override
   Color get amberDarkColor => throw UnimplementedError();
-  @override
   Color get amberDarkHoverColor => throw UnimplementedError();
-  @override
   Color get amberDarkActiveColor => throw UnimplementedError();
-  @override
   Color get amberDarkerColor => throw UnimplementedError();
 
-  @override
   Color get orangeLightColor => throw UnimplementedError();
-  @override
   Color get orangeLightHoverColor => throw UnimplementedError();
-  @override
   Color get orangeLightActiveColor => throw UnimplementedError();
-  @override
   Color get orangeNormalColor => throw UnimplementedError();
-  @override
   Color get orangeNormalHoverColor => throw UnimplementedError();
-  @override
   Color get orangeNormalActiveColor => throw UnimplementedError();
-  @override
   Color get orangeDarkColor => throw UnimplementedError();
-  @override
   Color get orangeDarkHoverColor => throw UnimplementedError();
-  @override
   Color get orangeDarkActiveColor => throw UnimplementedError();
-  @override
   Color get orangeDarkerColor => throw UnimplementedError();
 
   // === BACKWARD COMPATIBILITY DIRECT ACCESS (Test stubs) ===
-  @override
   Color get blueComplementColor => throw UnimplementedError();
-  @override
   Color get tealAccentColor => throw UnimplementedError();
-  @override
   Color get charcoalColor => throw UnimplementedError();
 
   // === GREY PALETTE (Test stubs) ===
@@ -219,25 +196,15 @@ class TestAppColors implements AppColors {
   MaterialColor get greyDarker => throw UnimplementedError();
 
   // === DIRECT GREY COLOR ACCESS (Test stubs) ===
-  @override
   Color get greyLightColor => throw UnimplementedError();
-  @override
   Color get greyLightHoverColor => throw UnimplementedError();
-  @override
   Color get greyLightActiveColor => throw UnimplementedError();
-  @override
   Color get greyNormalColor => throw UnimplementedError();
-  @override
   Color get greyNormalHoverColor => throw UnimplementedError();
-  @override
   Color get greyNormalActiveColor => throw UnimplementedError();
-  @override
   Color get greyDarkColor => throw UnimplementedError();
-  @override
   Color get greyDarkHoverColor => throw UnimplementedError();
-  @override
   Color get greyDarkActiveColor => throw UnimplementedError();
-  @override
   Color get greyDarkerColor => throw UnimplementedError();
 
   // === BLUE PALETTE IMPLEMENTATIONS ===
@@ -263,25 +230,15 @@ class TestAppColors implements AppColors {
   @override
   MaterialColor get blueDarker => throw UnimplementedError();
 
-  @override
   Color get blueLightColor => throw UnimplementedError();
-  @override
   Color get blueLightHoverColor => throw UnimplementedError();
-  @override
   Color get blueLightActiveColor => throw UnimplementedError();
-  @override
   Color get blueNormalColor => throw UnimplementedError();
-  @override
   Color get blueNormalHoverColor => throw UnimplementedError();
-  @override
   Color get blueNormalActiveColor => throw UnimplementedError();
-  @override
   Color get blueDarkColor => throw UnimplementedError();
-  @override
   Color get blueDarkHoverColor => throw UnimplementedError();
-  @override
   Color get blueDarkActiveColor => throw UnimplementedError();
-  @override
   Color get blueDarkerColor => throw UnimplementedError();
 
   // === SLATE PALETTE IMPLEMENTATIONS ===
@@ -307,25 +264,15 @@ class TestAppColors implements AppColors {
   @override
   MaterialColor get slateDarker => throw UnimplementedError();
 
-  @override
   Color get slateLightColor => throw UnimplementedError();
-  @override
   Color get slateLightHoverColor => throw UnimplementedError();
-  @override
   Color get slateLightActiveColor => throw UnimplementedError();
-  @override
   Color get slateNormalColor => throw UnimplementedError();
-  @override
   Color get slateNormalHoverColor => throw UnimplementedError();
-  @override
   Color get slateNormalActiveColor => throw UnimplementedError();
-  @override
   Color get slateDarkColor => throw UnimplementedError();
-  @override
   Color get slateDarkHoverColor => throw UnimplementedError();
-  @override
   Color get slateDarkActiveColor => throw UnimplementedError();
-  @override
   Color get slateDarkerColor => throw UnimplementedError();
 
   // === GREEN PALETTE IMPLEMENTATIONS ===
@@ -351,25 +298,15 @@ class TestAppColors implements AppColors {
   @override
   MaterialColor get greenDarker => throw UnimplementedError();
 
-  @override
   Color get greenLightColor => throw UnimplementedError();
-  @override
   Color get greenLightHoverColor => throw UnimplementedError();
-  @override
   Color get greenLightActiveColor => throw UnimplementedError();
-  @override
   Color get greenNormalColor => throw UnimplementedError();
-  @override
   Color get greenNormalHoverColor => throw UnimplementedError();
-  @override
   Color get greenNormalActiveColor => throw UnimplementedError();
-  @override
   Color get greenDarkColor => throw UnimplementedError();
-  @override
   Color get greenDarkHoverColor => throw UnimplementedError();
-  @override
   Color get greenDarkActiveColor => throw UnimplementedError();
-  @override
   Color get greenDarkerColor => throw UnimplementedError();
 
   // === PINK PALETTE IMPLEMENTATIONS ===
@@ -420,25 +357,15 @@ class TestAppColors implements AppColors {
 
   // === DIRECT PINK COLOR ACCESS ===
 
-  @override
   Color get pinkLightColor => throw UnimplementedError();
-  @override
   Color get pinkLightHoverColor => throw UnimplementedError();
-  @override
   Color get pinkLightActiveColor => throw UnimplementedError();
-  @override
   Color get pinkNormalColor => throw UnimplementedError();
-  @override
   Color get pinkNormalHoverColor => throw UnimplementedError();
-  @override
   Color get pinkNormalActiveColor => throw UnimplementedError();
-  @override
   Color get pinkDarkColor => throw UnimplementedError();
-  @override
   Color get pinkDarkHoverColor => throw UnimplementedError();
-  @override
   Color get pinkDarkActiveColor => throw UnimplementedError();
-  @override
   Color get pinkDarkerColor => throw UnimplementedError();
 
   // === RED PALETTE IMPLEMENTATIONS ===
@@ -475,34 +402,24 @@ class TestAppColors implements AppColors {
 
   // === DIRECT RED COLOR ACCESS ===
 
-  @override
   Color get redLightColor => throw UnimplementedError();
 
-  @override
   Color get redLightHoverColor => throw UnimplementedError();
 
-  @override
   Color get redLightActiveColor => throw UnimplementedError();
 
-  @override
   Color get redNormalColor => throw UnimplementedError();
 
-  @override
   Color get redNormalHoverColor => throw UnimplementedError();
 
-  @override
   Color get redNormalActiveColor => throw UnimplementedError();
 
-  @override
   Color get redDarkColor => throw UnimplementedError();
 
-  @override
   Color get redDarkHoverColor => throw UnimplementedError();
 
-  @override
   Color get redDarkActiveColor => throw UnimplementedError();
 
-  @override
   Color get redDarkerColor => throw UnimplementedError();
 }
 
