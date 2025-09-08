@@ -50,6 +50,7 @@ dependencies:
 
   # === UI & THEMING ===
   flutter_screenutil: ^5.9.3 # Responsive design utilities
+  flutter_svg: ^2.0.10+1 # SVG rendering support (ESSENTIAL - no built-in Flutter support)
   google_fonts: ^6.2.1 # Google Fonts integration
   nil: ^1.1.1 # Lightweight null widget for conditional rendering
 
@@ -94,7 +95,7 @@ flutter:
   generate: true # Enable code generation
   uses-material-design: true # Use Material Design icons
 
-  # Enhanced organized asset structure for image management
+  # Enhanced organized asset structure for image and SVG management
   assets:
     # Common shared images
     - assets/images/common/
@@ -108,5 +109,9 @@ flutter:
     - assets/images/placeholders/
     - assets/images/icons/
 
-    # Keep existing structure if any
-    - assets/icons/
+    # SVG Icons by category (organized structure for TDD)
+    - assets/icons/ui/
+    - assets/icons/status/
+    - assets/icons/action/
+    - assets/icons/brand/
+    - assets/icons/navigation/

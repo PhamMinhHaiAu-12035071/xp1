@@ -150,6 +150,23 @@ This project also implements environment management using sealed classes and fac
 - **Dependency Injection**: `@LazySingleton` pattern following existing codebase architecture
 - **Test Coverage**: 100% coverage with TDD Red-Green-Refactor approach
 
+#### SVG Asset Management
+
+- **Flutter SVG Approach**: Essential `flutter_svg` package for vector graphics support (no built-in SVG support in Flutter)
+- **Service Layer**: `lib/core/services/svg_icon_service.dart` - Abstract service interface with responsive sizing & tap handling
+- **Implementation**: `lib/core/services/svg_icon_service_impl.dart` - Professional SVG implementation with DI
+- **Asset Constants**: `lib/core/assets/app_icons.dart` - Centralized SVG icon path management with size constants
+- **Asset Implementation**: `lib/core/assets/app_icons_impl.dart` - Concrete SVG paths with DI (`@LazySingleton`)
+- **Organized Structure**: Category-based organization (`ui/`, `status/`, `action/`, `brand/`, `navigation/`)
+- **Color Filtering**: Built-in theming support with `ColorFilter.mode()` for dynamic icon colors
+- **Responsive Sizing**: `IconSizeConstants` class (16, 24, 32, 48px) with `flutter_screenutil` integration
+- **Loading States**: Placeholder builders with `CircularProgressIndicator` during SVG loading
+- **Accessibility**: Semantic labels support for screen readers
+- **Tap Handling**: Optional `GestureDetector` wrapping with conditional rendering
+- **Critical Assets**: Preloading list for performance optimization
+- **Test Coverage**: 100% TDD coverage (Phase 0: Setup → Phase 1: RED → Phase 2: GREEN → Phase 3: REFACTOR)
+- **Production Usage**: DI pattern `getIt<AppIcons>()` + `getIt<SvgIconService>()`, direct instantiation for tests
+
 #### Design System & Styling
 
 - **Color System**: `lib/core/styles/colors/app_colors.dart` - Abstract color contracts with comprehensive palettes
@@ -450,6 +467,115 @@ testWidgets('should display image with responsive sizing', (tester) async {
 testWidgets('should handle error with default fallback', (tester) async {
   // Test triggers default Icon(Icons.broken_image) fallback
   expect(find.byIcon(Icons.broken_image), findsOneWidget);
+});
+```
+
+**SVG Asset Management (flutter_svg Integration):**
+
+```dart
+// Dependency injection (following existing patterns)
+final appIcons = GetIt.instance<AppIcons>();
+final iconService = GetIt.instance<SvgIconService>();
+
+// Basic usage - responsive SVG with theming support
+Widget buildSearchIcon() {
+  return iconService.svgIcon(
+    appIcons.search,
+    size: appIcons.iconSizes.medium, // 24px
+    color: Theme.of(context).primaryColor,
+  );
+}
+
+// Interactive SVG with tap handling
+Widget buildNavigationIcon() {
+  return iconService.svgIcon(
+    appIcons.arrowBack,
+    size: appIcons.iconSizes.large, // 32px
+    color: Colors.white,
+    onTap: () => Navigator.pop(context),
+    semanticLabel: 'Go back',
+  );
+}
+
+// Status indicators with color coding
+Widget buildStatusIcon(AppState state) {
+  final (iconPath, color) = switch (state) {
+    AppState.success => (appIcons.success, Colors.green),
+    AppState.error => (appIcons.error, Colors.red),
+    AppState.warning => (appIcons.warning, Colors.orange),
+    AppState.info => (appIcons.info, Colors.blue),
+  };
+  
+  return iconService.svgIcon(iconPath, color: color);
+}
+
+// Critical SVG preloading for performance
+Future<void> preloadCriticalSvgIcons(BuildContext context) async {
+  for (final iconPath in appIcons.criticalIcons) {
+    // SVGs are cached automatically by flutter_svg
+    await precachePicture(
+      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, iconPath),
+      context,
+    );
+  }
+}
+
+// Standard icon sizes
+final smallIcon = appIcons.iconSizes.small;    // 16px
+final mediumIcon = appIcons.iconSizes.medium;  // 24px  
+final largeIcon = appIcons.iconSizes.large;    // 32px
+final xLargeIcon = appIcons.iconSizes.xLarge;  // 48px
+```
+
+**SVG Asset Testing (100% TDD Coverage):**
+
+```dart
+// Test SVG service with responsive sizing
+testWidgets('should display SVG icon with responsive sizing', (tester) async {
+  final service = const SvgIconServiceImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          ScreenUtil.init(context, designSize: const Size(375, 812));
+          return service.svgIcon(
+            'assets/icons/ui/search.svg',
+            color: Colors.blue,
+          );
+        },
+      ),
+    ),
+  );
+
+  expect(find.byType(SvgPicture), findsOneWidget);
+});
+
+// Test tap handling functionality
+testWidgets('should handle tap events when provided', (tester) async {
+  var tapped = false;
+  final service = const SvgIconServiceImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: service.svgIcon(
+        'assets/icons/ui/close.svg',
+        onTap: () => tapped = true,
+      ),
+    ),
+  );
+  
+  await tester.tap(find.byType(GestureDetector));
+  expect(tapped, isTrue);
+});
+
+// Test icon size constants
+test('should provide consistent icon size constants', () {
+  final icons = const AppIconsImpl();
+  expect(icons.iconSizes.small, equals(16));
+  expect(icons.iconSizes.medium, equals(24));
+  expect(icons.iconSizes.large, equals(32));
+  expect(icons.iconSizes.xLarge, equals(48));
 });
 ```
 

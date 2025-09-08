@@ -3276,6 +3276,207 @@ testWidgets('should handle error states with default fallback', (
 
 ---
 
+## 🖼️ SVG Asset Management - Flutter SVG Approach
+
+**THE GOLDEN RULE:** Use the established SVG Asset service with flutter_svg package for scalable, themeable, and responsive vector icons with dependency injection.
+
+### Service Injection Pattern - MANDATORY
+
+```dart
+// ❌ WRONG: Direct flutter_svg usage without service layer
+Widget buildIcon() {
+  return SvgPicture.asset(
+    'assets/icons/search.svg',
+    width: 24,
+    colorFilter: ColorFilter.mode(Colors.blue, BlendMode.srcIn),
+  );
+}
+
+// ✅ CORRECT: Use SvgIconService with dependency injection
+class SearchWidget extends StatelessWidget {
+  const SearchWidget({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final iconService = GetIt.instance<SvgIconService>();
+    final appIcons = GetIt.instance<AppIcons>();
+    
+    return iconService.svgIcon(
+      appIcons.search,
+      size: appIcons.iconSizes.medium,  // 24px, automatically responsive
+      color: Theme.of(context).primaryColor,
+      semanticLabel: 'Search',
+    );
+  }
+}
+```
+
+### SVG Path Management - CENTRALIZED & TYPE-SAFE
+
+```dart
+// ❌ WRONG: Hard-coded SVG paths scattered throughout code
+Widget buildBackButton() {
+  return SvgPicture.asset('assets/icons/ui/arrow_back.svg');
+}
+
+Widget buildMenuIcon() {
+  return SvgPicture.asset('assets/icons/ui/menu.svg');
+}
+
+// ✅ CORRECT: Use AppIcons service with centralized paths
+class NavigationHeader extends StatelessWidget {
+  const NavigationHeader({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    final iconService = GetIt.instance<SvgIconService>();
+    final appIcons = GetIt.instance<AppIcons>();
+    
+    return Row(
+      children: [
+        iconService.svgIcon(
+          appIcons.arrowBack,  // Type-safe, centralized path
+          onTap: () => Navigator.pop(context),
+          size: appIcons.iconSizes.large,  // Consistent sizing
+        ),
+        const Spacer(),
+        iconService.svgIcon(
+          appIcons.menu,  // No magic strings
+          size: appIcons.iconSizes.medium,
+        ),
+      ],
+    );
+  }
+}
+```
+
+### Interactive SVG Handling - TAP & GESTURE SUPPORT
+
+```dart
+// ❌ WRONG: Manual GestureDetector wrapping
+Widget buildCloseIcon() {
+  return GestureDetector(
+    onTap: () => Navigator.pop(context),
+    child: SvgPicture.asset(
+      'assets/icons/ui/close.svg',
+      width: 24,
+    ),
+  );
+}
+
+// ✅ CORRECT: Service handles interaction automatically  
+Widget buildCloseIcon() {
+  final iconService = GetIt.instance<SvgIconService>();
+  final appIcons = GetIt.instance<AppIcons>();
+  
+  return iconService.svgIcon(
+    appIcons.close,
+    size: appIcons.iconSizes.medium,
+    onTap: () => Navigator.pop(context),
+    semanticLabel: 'Close dialog',
+  );
+}
+```
+
+### Theme-Aware SVG Coloring - DYNAMIC THEMING
+
+```dart
+// ❌ WRONG: Static colors that don't adapt to themes
+Widget buildStatusIcon() {
+  return SvgPicture.asset(
+    'assets/icons/status/success.svg',
+    colorFilter: const ColorFilter.mode(Colors.green, BlendMode.srcIn),
+  );
+}
+
+// ✅ CORRECT: Use theme-aware colors with switch expressions
+Widget buildStatusIcon(AppStatus status) {
+  final iconService = GetIt.instance<SvgIconService>();
+  final appIcons = GetIt.instance<AppIcons>();
+  
+  final (iconPath, color) = switch (status) {
+    AppStatus.success => (appIcons.success, Colors.green),
+    AppStatus.error => (appIcons.error, Colors.red),
+    AppStatus.warning => (appIcons.warning, Colors.orange),
+    AppStatus.info => (appIcons.info, Theme.of(context).primaryColor),
+  };
+  
+  return iconService.svgIcon(iconPath, color: color);
+}
+```
+
+### SVG Size Consistency - STANDARDIZED DIMENSIONS
+
+```dart
+// ❌ WRONG: Inconsistent, magic number sizes
+Widget buildIconSet() {
+  return Row(
+    children: [
+      SvgPicture.asset('icon1.svg', width: 20),    // Random sizes
+      SvgPicture.asset('icon2.svg', width: 28),    // No consistency
+      SvgPicture.asset('icon3.svg', width: 35),    // Hard to maintain
+    ],
+  );
+}
+
+// ✅ CORRECT: Use standardized icon sizes from IconSizeConstants
+Widget buildIconSet() {
+  final iconService = GetIt.instance<SvgIconService>();
+  final appIcons = GetIt.instance<AppIcons>();
+  
+  return Row(
+    children: [
+      iconService.svgIcon(appIcons.edit, size: appIcons.iconSizes.small),    // 16px
+      iconService.svgIcon(appIcons.delete, size: appIcons.iconSizes.medium), // 24px  
+      iconService.svgIcon(appIcons.filter, size: appIcons.iconSizes.large),  // 32px
+    ],
+  );
+}
+```
+
+### SVG Testing Patterns - 100% TDD COVERAGE
+
+```dart
+// ✅ CORRECT: SVG service testing with proper mocking
+testWidgets('should display themed SVG icon with tap handling', (tester) async {
+  const service = SvgIconServiceImpl();
+  var tapped = false;
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          ScreenUtil.init(context, designSize: const Size(375, 812));
+          return service.svgIcon(
+            'assets/icons/ui/close.svg',
+            color: Colors.red,
+            onTap: () => tapped = true,
+            semanticLabel: 'Close',
+          );
+        },
+      ),
+    ),
+  );
+
+  expect(find.byType(SvgPicture), findsOneWidget);
+  expect(find.byType(GestureDetector), findsOneWidget);
+  
+  await tester.tap(find.byType(GestureDetector));
+  expect(tapped, isTrue);
+});
+
+// Test icon size constants
+test('should provide consistent icon size constants', () {
+  const icons = AppIconsImpl();
+  expect(icons.iconSizes.small, equals(16));
+  expect(icons.iconSizes.medium, equals(24));  
+  expect(icons.iconSizes.large, equals(32));
+  expect(icons.iconSizes.xLarge, equals(48));
+});
+```
+
+---
+
 ## 🎨 Design System & Styling - Comprehensive Approach
 
 **THE GOLDEN RULE:** Use the established Design System services with dependency injection for consistent, maintainable, and type-safe styling across the application.
