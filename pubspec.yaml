@@ -68,7 +68,7 @@ dev_dependencies:
   envied_generator: ^1.2.0 # Code generator for envied package
   freezed: ^3.2.0 # Code generator for immutable data classes
   injectable_generator: ^2.6.1 # Code generator for injectable package
-  json_serializable: ^6.7.1 # Code generator for JSON serialization
+  json_serializable: ^6.11.1 # Code generator for JSON serialization
   slang_build_runner: ^4.8.0 # Generator for slang (if using build_runner)
 
   # === TESTING FRAMEWORKS ===
