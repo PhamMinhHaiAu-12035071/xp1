@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:xp1/core/routing/app_router.dart';
+import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_cubit.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_state.dart';
 import 'package:xp1/features/splash/presentation/widgets/splash_content.dart';
@@ -33,9 +34,9 @@ class SplashPage extends StatelessWidget {
             },
           );
         },
-        child: const Scaffold(
-          backgroundColor: Colors.orange, // Simple color, no design system dep
-          body: SplashContent(),
+        child: Scaffold(
+          backgroundColor: context.colors.orangeNormal,
+          body: const SplashContent(),
         ),
       ),
     );

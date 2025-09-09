@@ -10,6 +10,8 @@ import 'package:mocktail/mocktail.dart';
 import 'package:xp1/core/assets/app_images.dart';
 import 'package:xp1/core/routing/app_router.dart';
 import 'package:xp1/core/services/asset_image_service.dart';
+import 'package:xp1/core/styles/colors/app_colors.dart';
+import 'package:xp1/core/styles/colors/app_colors_impl.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_cubit.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_state.dart';
 import 'package:xp1/features/splash/presentation/pages/splash_page.dart';
@@ -31,7 +33,7 @@ class FakePageRouteInfo extends Fake implements PageRouteInfo {}
 /// These tests validate the simplified splash screen that:
 /// - Uses only loading and ready states
 /// - Shows background.png via SplashContent with orange background
-/// - Uses simple orange background without design system
+/// - Uses design system orange background for consistency
 /// - Has timer-based navigation without complex error handling
 void main() {
   group('SplashPage (Simplified) Tests', () {
@@ -63,6 +65,7 @@ void main() {
         mockAssetImageService,
       );
       GetIt.instance.registerSingleton<AppImages>(mockAppImages);
+      GetIt.instance.registerSingleton<AppColors>(const AppColorsImpl());
 
       // Setup router mocks
       when(() => mockRouter.replaceAll(any())).thenAnswer((_) async => {});
@@ -94,7 +97,9 @@ void main() {
       GetIt.instance.reset();
     });
 
-    testWidgets('should build with simple orange background', (tester) async {
+    testWidgets('should build with design system orange background', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
@@ -107,9 +112,10 @@ void main() {
       // Should build successfully
       expect(find.byType(SplashPage), findsOneWidget);
 
-      // Should have orange background (not design system color)
+      // Should have orange background from design system
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(scaffold.backgroundColor, equals(Colors.orange));
+      const appColors = AppColorsImpl();
+      expect(scaffold.backgroundColor, equals(appColors.orangeNormal));
     });
 
     testWidgets('should contain simplified dependencies', (tester) async {
