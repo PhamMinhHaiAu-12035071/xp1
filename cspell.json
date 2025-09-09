@@ -138,7 +138,16 @@
     "amsn",
     "vsync",
     "octo",
-    "precache"
+    "precache",
+
+    "hdpi",
+    "mdpi",
+    "xhdpi",
+    "xxhdpi",
+    "xxxhdpi",
+    "imageset",
+    "tappable",
+    "precaching"
   ],
   "ignorePaths": [
     "build/**",
