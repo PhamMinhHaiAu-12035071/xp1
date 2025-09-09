@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:xp1/core/styles/colors/app_colors_impl.dart';
 import 'package:xp1/features/splash/presentation/widgets/atomic/organisms/splash_layout.dart';
 
 import '../../../../../../helpers/test_injection_container.dart';
@@ -79,7 +80,8 @@ void main() {
       expect(decoration!.color, isNotNull);
 
       // Should be orange color (from OrangeBackground atom)
-      expect(decoration.color, equals(const Color(0xFFFF8C00)));
+      const appColors = AppColorsImpl();
+      expect(decoration.color, equals(appColors.orangeNormal));
     });
 
     testWidgets('should display background image', (
@@ -306,7 +308,8 @@ void main() {
 
       // Verify the container has the orange color
       final decoration = container.decoration! as BoxDecoration;
-      expect(decoration.color, equals(const Color(0xFFFF8C00)));
+      const appColors = AppColorsImpl();
+      expect(decoration.color, equals(appColors.orangeNormal));
 
       // Clean up: Reset surface size for other tests
       await tester.binding.setSurfaceSize(null);

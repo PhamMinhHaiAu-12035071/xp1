@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:xp1/core/styles/colors/app_colors_impl.dart';
 import 'package:xp1/features/splash/presentation/widgets/splash_content.dart';
 
 import '../../../../helpers/test_injection_container.dart';
@@ -109,7 +110,8 @@ void main() {
         final container = tester.widget<Container>(find.byType(Container));
         final decoration = container.decoration as BoxDecoration?;
         expect(decoration, isNotNull);
-        expect(decoration!.color, equals(const Color(0xFFFF8C00)));
+        const appColors = AppColorsImpl();
+        expect(decoration!.color, equals(appColors.orangeNormal));
 
         // Should have positioned image
         expect(find.byType(Align), findsOneWidget);

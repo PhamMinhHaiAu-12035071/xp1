@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 
 /// Orange background atom component.
 ///
@@ -19,8 +20,8 @@ class OrangeBackground extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: const BoxDecoration(
-        color: Color(0xFFFF8C00), // Orange color for now - will refactor later
+      decoration: BoxDecoration(
+        color: context.colors.orangeNormal,
       ),
       child: child,
     );
