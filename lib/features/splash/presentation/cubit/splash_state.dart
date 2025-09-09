@@ -8,7 +8,7 @@ part 'splash_state.freezed.dart';
 /// Only includes loading and ready states for simple splash navigation.
 @freezed
 class SplashState with _$SplashState {
-  /// Initial loading state - showing welcome.png.
+  /// Initial loading state.
   const factory SplashState.loading() = SplashLoading;
 
   /// Ready to navigate to main app.

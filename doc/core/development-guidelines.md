@@ -1989,7 +1989,6 @@ lib/
 // ✅ Good: Type-safe asset path management
 abstract class AppImages {
   // Splash Screen Assets
-  static const String welcomeImage = 'assets/images/splash/welcome.png';
   static const String logoImage = 'assets/images/common/logo.png';
 
   // Employee Assets
@@ -2106,7 +2105,7 @@ class SplashImage extends StatelessWidget {
 class BadSplashImage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
-    return Image.asset('assets/images/splash/welcome.png'); // No error handling
+    return Image.asset('assets/images/splash/logo.png'); // No error handling
   }
 }
 ```

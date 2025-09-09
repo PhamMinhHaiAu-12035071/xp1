@@ -359,7 +359,7 @@ final iconSize = AppIcons.large; // 32.0
 assets/
 ├── images/                    # 🖼️ Image Assets
 │   ├── common/                # Shared images (logo.png)
-│   ├── splash/                # Splash screen assets (welcome.png)
+│   ├── splash/                # Splash screen assets
 │   ├── login/                 # Login screen assets
 │   ├── employee/              # Employee-related assets
 │   └── placeholders/          # Placeholder images

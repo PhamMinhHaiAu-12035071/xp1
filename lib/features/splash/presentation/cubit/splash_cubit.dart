@@ -6,8 +6,8 @@ import 'package:xp1/features/splash/presentation/cubit/splash_state.dart';
 
 /// Simplified splash cubit with timer-based navigation.
 ///
-/// This cubit manages a simple splash screen that displays welcome.png
-/// for 2 seconds and then emits ready state for navigation.
+/// This cubit manages a simple splash screen that displays for 2 seconds
+/// and then emits ready state for navigation.
 @injectable
 class SplashCubit extends Cubit<SplashState> {
   /// Creates splash cubit without dependencies.

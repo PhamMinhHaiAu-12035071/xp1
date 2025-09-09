@@ -25,7 +25,7 @@ class SplashPage extends StatelessWidget {
           // Simple pattern matching with only loading and ready states
           state.when(
             loading: () {
-              // Stay on splash screen showing welcome.png
+              // Stay on splash screen
             },
             ready: () {
               // Navigate to main app after 2 seconds

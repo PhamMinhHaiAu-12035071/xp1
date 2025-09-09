@@ -297,7 +297,6 @@ core/
 // app_images.dart - Type-safe asset path management
 abstract class AppImages {
   // Splash Screen Assets
-  static const String welcomeImage = 'assets/images/splash/welcome.png';
   static const String logoImage = 'assets/images/common/logo.png';
 
   // Employee Assets
@@ -421,7 +420,7 @@ class SvgIconServiceImpl implements SvgIconService {
 assets/
 ├── images/                    # 🖼️ Image Assets
 │   ├── common/                # Shared images (logo.png)
-│   ├── splash/                # Splash screen assets (welcome.png)
+│   ├── splash/                # Splash screen assets
 │   ├── login/                 # Login screen assets
 │   ├── employee/              # Employee-related assets
 │   └── placeholders/          # Placeholder images
