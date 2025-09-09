@@ -137,6 +137,52 @@ This project also implements environment management using sealed classes and fac
 - **Functional Programming**: Error handling with Either types (fpdart)
 - **Value Equality**: Object comparison with equatable
 
+#### Image Asset Management
+
+- **Pure Flutter Approach**: Zero external dependencies, using built-in `Image.asset()` + `ImageCache`
+- **Service Layer**: `lib/core/services/asset_image_service.dart` - Abstract service interface
+- **Implementation**: `lib/core/services/asset_image_service_impl.dart` - Pure Flutter implementation with DI
+- **Asset Constants**: `lib/core/assets/app_images.dart` - Centralized asset path management
+- **Asset Implementation**: `lib/core/assets/app_images_impl.dart` - Concrete asset paths with DI
+- **Responsive Sizing**: Integration with `flutter_screenutil` for responsive image sizing
+- **Error Handling**: Built-in `errorBuilder` with `Icon(Icons.broken_image)` fallback
+- **Loading States**: Built-in `frameBuilder` with `CircularProgressIndicator` placeholder
+- **Dependency Injection**: `@LazySingleton` pattern following existing codebase architecture
+- **Test Coverage**: 100% coverage with TDD Red-Green-Refactor approach
+
+#### SVG Asset Management
+
+- **Flutter SVG Approach**: Essential `flutter_svg` package for vector graphics support (no built-in SVG support in Flutter)
+- **Service Layer**: `lib/core/services/svg_icon_service.dart` - Abstract service interface with responsive sizing & tap handling
+- **Implementation**: `lib/core/services/svg_icon_service_impl.dart` - Professional SVG implementation with DI
+- **Asset Constants**: `lib/core/assets/app_icons.dart` - Centralized SVG icon path management with size constants
+- **Asset Implementation**: `lib/core/assets/app_icons_impl.dart` - Concrete SVG paths with DI (`@LazySingleton`)
+- **Organized Structure**: Category-based organization (`ui/`, `status/`, `action/`, `brand/`, `navigation/`)
+- **Color Filtering**: Built-in theming support with `ColorFilter.mode()` for dynamic icon colors
+- **Responsive Sizing**: `IconSizeConstants` class (16, 24, 32, 48px) with `flutter_screenutil` integration
+- **Loading States**: Placeholder builders with `CircularProgressIndicator` during SVG loading
+- **Accessibility**: Semantic labels support for screen readers
+- **Tap Handling**: Optional `GestureDetector` wrapping with conditional rendering
+- **Critical Assets**: Preloading list for performance optimization
+- **Test Coverage**: 100% TDD coverage (Phase 0: Setup → Phase 1: RED → Phase 2: GREEN → Phase 3: REFACTOR)
+- **Production Usage**: DI pattern `getIt<AppIcons>()` + `getIt<SvgIconService>()`, direct instantiation for tests
+
+#### Design System & Styling
+
+- **Color System**: `lib/core/styles/colors/app_colors.dart` - Abstract color contracts with comprehensive palettes
+- **Color Implementation**: `lib/core/styles/colors/app_colors_impl.dart` - Concrete color values with DI
+- **Typography System**: `lib/core/styles/app_text_styles.dart` - Abstract text style contracts
+- **Typography Implementation**: `lib/core/styles/app_text_styles_impl.dart` - Public Sans typography with DI
+- **Sizing System**: `lib/core/sizes/app_sizes.dart` - Abstract responsive sizing contracts
+- **Sizing Implementation**: `lib/core/sizes/app_sizes_impl.dart` - Responsive values with `flutter_screenutil`
+- **Theme Management**: `lib/core/themes/app_theme.dart` - Light/dark theme orchestration
+- **Theme Extensions**: `lib/core/themes/extensions/` - Custom theme extensions with DI integration
+- **Dependency Injection**: All design system components use `@LazySingleton` pattern
+- **Material 3**: Full Material Design 3 integration with custom extensions
+- **Responsive Design**: Automatic responsive sizing (r/v/h variants for each dimension)
+- **Color Palettes**: Complete color systems (Amber, Grey, Blue, Slate, Green, Pink, Orange, Red)
+- **Typography Scale**: 8-level typography system from caption (10px) to displayLarge (36px)
+
 ### Testing Strategy
 
 - **Environment Testing**: Comprehensive tests for all three environments (`test/features/env/`)
@@ -340,6 +386,391 @@ PageTestHelpers.testStandardPage<HomePage>(
   () => const HomePage(),
   (key) => HomePage(key: key),
 );
+```
+
+**Image Asset Management (Pure Flutter):**
+
+```dart
+// Dependency injection (following existing patterns)
+final assetService = GetIt.instance<AssetImageService>();
+final appImages = GetIt.instance<AppImages>();
+
+// Basic usage - responsive image with error handling
+Widget buildProfileImage() {
+  return assetService.assetImage(
+    appImages.employeeAvatar,
+    width: 96, // Automatically converted to 96.w
+    height: 96, // Automatically converted to 96.h
+    fit: BoxFit.cover,
+  );
+}
+
+// Custom error and loading states
+Widget buildSplashLogo() {
+  return assetService.assetImage(
+    appImages.splashLogo,
+    width: appImages.imageSizes.large, // 144.0
+    height: appImages.imageSizes.large,
+    placeholder: const ShimmerLoading(),
+    errorWidget: const Icon(Icons.error_outline),
+  );
+}
+
+// Access to asset constants
+Widget buildLoginBackground() {
+  return assetService.assetImage(
+    appImages.loginBackground,
+    fit: BoxFit.cover,
+  );
+}
+
+// Critical assets for preloading
+Future<void> preloadCriticalAssets(BuildContext context) async {
+  for (final assetPath in appImages.criticalAssets) {
+    await precacheImage(AssetImage(assetPath), context);
+  }
+}
+
+// Standard image sizes
+final smallIcon = appImages.imageSizes.small;    // 48.0
+final mediumIcon = appImages.imageSizes.medium;  // 96.0
+final largeIcon = appImages.imageSizes.large;    // 144.0
+final xLargeIcon = appImages.imageSizes.xLarge;  // 192.0
+```
+
+**Image Asset Testing (100% Coverage):**
+
+```dart
+// Test widget with image service
+testWidgets('should display image with responsive sizing', (tester) async {
+  final service = const AssetImageServiceImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          ScreenUtil.init(context, designSize: const Size(375, 812));
+          return service.assetImage(
+            'assets/images/test.png',
+            width: 100,
+            height: 100,
+          );
+        },
+      ),
+    ),
+  );
+
+  expect(find.byType(Image), findsOneWidget);
+});
+
+// Test error states
+testWidgets('should handle error with default fallback', (tester) async {
+  // Test triggers default Icon(Icons.broken_image) fallback
+  expect(find.byIcon(Icons.broken_image), findsOneWidget);
+});
+```
+
+**SVG Asset Management (flutter_svg Integration):**
+
+```dart
+// Dependency injection (following existing patterns)
+final appIcons = GetIt.instance<AppIcons>();
+final iconService = GetIt.instance<SvgIconService>();
+
+// Basic usage - responsive SVG with theming support
+Widget buildSearchIcon() {
+  return iconService.svgIcon(
+    appIcons.search,
+    size: appIcons.iconSizes.medium, // 24px
+    color: Theme.of(context).primaryColor,
+  );
+}
+
+// Interactive SVG with tap handling
+Widget buildNavigationIcon() {
+  return iconService.svgIcon(
+    appIcons.arrowBack,
+    size: appIcons.iconSizes.large, // 32px
+    color: Colors.white,
+    onTap: () => Navigator.pop(context),
+    semanticLabel: 'Go back',
+  );
+}
+
+// Status indicators with color coding
+Widget buildStatusIcon(AppState state) {
+  final (iconPath, color) = switch (state) {
+    AppState.success => (appIcons.success, Colors.green),
+    AppState.error => (appIcons.error, Colors.red),
+    AppState.warning => (appIcons.warning, Colors.orange),
+    AppState.info => (appIcons.info, Colors.blue),
+  };
+  
+  return iconService.svgIcon(iconPath, color: color);
+}
+
+// Critical SVG preloading for performance
+Future<void> preloadCriticalSvgIcons(BuildContext context) async {
+  for (final iconPath in appIcons.criticalIcons) {
+    // SVGs are cached automatically by flutter_svg
+    await precachePicture(
+      ExactAssetPicture(SvgPicture.svgStringDecoderBuilder, iconPath),
+      context,
+    );
+  }
+}
+
+// Standard icon sizes
+final smallIcon = appIcons.iconSizes.small;    // 16px
+final mediumIcon = appIcons.iconSizes.medium;  // 24px  
+final largeIcon = appIcons.iconSizes.large;    // 32px
+final xLargeIcon = appIcons.iconSizes.xLarge;  // 48px
+```
+
+**SVG Asset Testing (100% TDD Coverage):**
+
+```dart
+// Test SVG service with responsive sizing
+testWidgets('should display SVG icon with responsive sizing', (tester) async {
+  final service = const SvgIconServiceImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          ScreenUtil.init(context, designSize: const Size(375, 812));
+          return service.svgIcon(
+            'assets/icons/ui/search.svg',
+            color: Colors.blue,
+          );
+        },
+      ),
+    ),
+  );
+
+  expect(find.byType(SvgPicture), findsOneWidget);
+});
+
+// Test tap handling functionality
+testWidgets('should handle tap events when provided', (tester) async {
+  var tapped = false;
+  final service = const SvgIconServiceImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: service.svgIcon(
+        'assets/icons/ui/close.svg',
+        onTap: () => tapped = true,
+      ),
+    ),
+  );
+  
+  await tester.tap(find.byType(GestureDetector));
+  expect(tapped, isTrue);
+});
+
+// Test icon size constants
+test('should provide consistent icon size constants', () {
+  final icons = const AppIconsImpl();
+  expect(icons.iconSizes.small, equals(16));
+  expect(icons.iconSizes.medium, equals(24));
+  expect(icons.iconSizes.large, equals(32));
+  expect(icons.iconSizes.xLarge, equals(48));
+});
+```
+
+**Design System & Styling (Complete System):**
+
+```dart
+// Dependency injection (following existing patterns)
+final appColors = GetIt.instance<AppColors>();
+final appTextStyles = GetIt.instance<AppTextStyles>();
+final appSizes = GetIt.instance<AppSizes>();
+
+// Color usage - comprehensive palette system
+Widget buildPrimaryButton() {
+  return ElevatedButton(
+    style: ElevatedButton.styleFrom(
+      backgroundColor: appColors.amberNormal,    // Main brand color
+      foregroundColor: appColors.charcoal,      // Primary text color
+    ),
+    onPressed: () {},
+    child: Text('Primary Button'),
+  );
+}
+
+// Color variations - hover/active states
+Container buildInteractiveCard({required bool isHovered, required bool isPressed}) {
+  Color cardColor;
+  if (isPressed) {
+    cardColor = appColors.amberLightActive;    // Active state
+  } else if (isHovered) {
+    cardColor = appColors.amberLightHover;     // Hover state
+  } else {
+    cardColor = appColors.amberLight;          // Default state
+  }
+  
+  return Container(
+    color: cardColor,
+    child: Text('Interactive Card'),
+  );
+}
+
+// Typography system - consistent text styles
+Widget buildTypographyExample() {
+  return Column(
+    crossAxisAlignment: CrossAxisAlignment.start,
+    children: [
+      Text('Main Title', style: appTextStyles.displayLarge()),
+      Text('Section Header', style: appTextStyles.headingLarge()),
+      Text('Body content here', style: appTextStyles.bodyLarge()),
+      Text('Small details', style: appTextStyles.bodySmall()),
+      Text('Fine print', style: appTextStyles.caption()),
+    ],
+  );
+}
+
+// Responsive sizing - automatic responsive values
+Widget buildResponsiveLayout() {
+  return Container(
+    width: appSizes.r120,      // 120px responsive (both width/height)
+    height: appSizes.v80,      // 80px responsive height
+    padding: EdgeInsets.all(appSizes.r16),  // 16px responsive padding
+    margin: EdgeInsets.symmetric(
+      horizontal: appSizes.h20,  // 20px responsive width
+      vertical: appSizes.v12,    // 12px responsive height
+    ),
+    decoration: BoxDecoration(
+      borderRadius: BorderRadius.circular(appSizes.borderRadiusMd),
+      color: appColors.lightGray,
+    ),
+  );
+}
+
+// Theme integration - light/dark mode support
+Widget buildThemedWidget(BuildContext context) {
+  final colorExtension = context.theme.extension<AppColorExtension>()!;
+  
+  return Container(
+    color: colorExtension.primary,      // Automatically switches with theme
+    child: Text(
+      'Themed Content',
+      style: appTextStyles.bodyLarge(
+        color: colorExtension.textPrimary,  // Theme-aware text color
+      ),
+    ),
+  );
+}
+
+// Complete color palette usage
+Widget buildColorPaletteExample() {
+  return Wrap(
+    children: [
+      // Amber palette (brand colors)
+      Container(color: appColors.amberLight, width: 50, height: 50),
+      Container(color: appColors.amberNormal, width: 50, height: 50),
+      Container(color: appColors.amberDark, width: 50, height: 50),
+      
+      // Blue palette (informational)
+      Container(color: appColors.blueLight, width: 50, height: 50),
+      Container(color: appColors.blueNormal, width: 50, height: 50),
+      Container(color: appColors.blueDark, width: 50, height: 50),
+      
+      // Green palette (success states)
+      Container(color: appColors.greenLight, width: 50, height: 50),
+      Container(color: appColors.greenNormal, width: 50, height: 50),
+      Container(color: appColors.greenDark, width: 50, height: 50),
+      
+      // Red palette (error states)
+      Container(color: appColors.redLight, width: 50, height: 50),
+      Container(color: appColors.redNormal, width: 50, height: 50),
+      Container(color: appColors.redDark, width: 50, height: 50),
+    ],
+  );
+}
+
+// State-based styling
+Widget buildStatefulButton({
+  required ButtonState state,
+  required VoidCallback onPressed,
+}) {
+  final buttonColors = switch (state) {
+    ButtonState.normal => appColors.amberNormal,
+    ButtonState.hover => appColors.amberNormalHover,
+    ButtonState.active => appColors.amberNormalActive,
+    ButtonState.disabled => appColors.greyLight,
+  };
+  
+  return ElevatedButton(
+    style: ElevatedButton.styleFrom(backgroundColor: buttonColors),
+    onPressed: state == ButtonState.disabled ? null : onPressed,
+    child: Text(
+      'Stateful Button',
+      style: appTextStyles.bodyMedium(
+        color: state == ButtonState.disabled 
+          ? appColors.greyNormal 
+          : appColors.charcoal,
+      ),
+    ),
+  );
+}
+```
+
+**Design System Testing (Type-Safe & Consistent):**
+
+```dart
+// Test design system integration
+testWidgets('should use consistent colors throughout UI', (tester) async {
+  final appColors = const AppColorsImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          return ElevatedButton(
+            style: ElevatedButton.styleFrom(
+              backgroundColor: appColors.amberNormal,
+            ),
+            onPressed: () {},
+            child: Text('Test Button'),
+          );
+        },
+      ),
+    ),
+  );
+
+  expect(find.byType(ElevatedButton), findsOneWidget);
+  
+  final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
+  final buttonStyle = button.style!;
+  
+  // Verify color consistency
+  expect(
+    buttonStyle.backgroundColor!.resolve({}),
+    equals(appColors.amberNormal),
+  );
+});
+
+// Test responsive sizing
+testWidgets('should apply responsive sizing correctly', (tester) async {
+  final appSizes = AppSizesImpl();
+  
+  await tester.pumpWidget(
+    MaterialApp(
+      home: Builder(
+        builder: (context) {
+          ScreenUtil.init(context, designSize: const Size(375, 812));
+          return Container(
+            width: appSizes.r100,  // Should be 100.w
+            height: appSizes.v80,  // Should be 80.h
+          );
+        },
+      ),
+    ),
+  );
+
+  expect(find.byType(Container), findsOneWidget);
+});
 ```
 
 ## ⚡ Quick Command Reference

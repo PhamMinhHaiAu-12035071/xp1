@@ -78,12 +78,130 @@
 │                    Flutter Framework                        │
 ├─────────────────────────────────────────────────────────────┤
 │  ┌─────────────┐  ┌─────────────┐  ┌─────────────┐          │
-│  │     iOS     │  │   Android   │  │     Web     │        │
-│  └─────────────┘  └─────────────┘  └─────────────┘        │
+│  │     iOS     │  │   Android   │  │     Web     │          │
+│  └─────────────┘  └─────────────┘  └─────────────┘          │
 └─────────────────────────────────────────────────────────────┘
 ```
 
 ### Component Architecture
+
+#### Widget Organization Architecture
+
+The project implements a **layered architecture** with **Atomic Design principles** for optimal code organization and maintainability:
+
+```
+lib/
+├── core/                           # 🔧 INFRASTRUCTURE LAYER
+│   ├── widgets/                    # Framework & app-wide utilities
+│   │   ├── responsive_initializer.dart  # Global responsive setup
+│   │   ├── base_scaffold.dart          # Framework utilities
+│   │   └── loading_overlay.dart        # App-wide utilities
+│   ├── styles/                     # Design system
+│   ├── themes/                     # Theme configuration
+│   └── infrastructure/             # Cross-cutting concerns
+├── shared/                         # 🧱 BUSINESS LAYER
+│   ├── widgets/                    # Reusable business components
+│   │   ├── atoms/                  # Basic UI elements
+│   │   │   ├── custom_button.dart
+│   │   │   ├── custom_input.dart
+│   │   │   └── custom_card.dart
+│   │   ├── molecules/              # Composite components
+│   │   │   ├── search_bar.dart
+│   │   │   ├── user_avatar.dart
+│   │   │   └── stats_card.dart
+│   │   └── organisms/              # Complex UI sections
+│   │       ├── navigation_drawer.dart
+│   │       └── header_section.dart
+│   └── utilities/                  # Business utilities
+├── features/                       # 📱 FEATURE LAYER
+│   ├── home/
+│   │   └── presentation/
+│   │       ├── pages/              # 📄 Full-screen pages
+│   │       └── widgets/            # 🏠 Feature-specific widgets
+│   └── ...
+```
+
+#### Widget Layer Definitions
+
+##### 1. **Core Widgets Layer** (`lib/core/widgets/`)
+
+- **Responsibility**: Infrastructure and framework-level concerns
+- **Characteristics**:
+  - No business logic dependencies
+  - Framework extensions and utilities
+  - Global app setup components
+  - Technical infrastructure widgets
+
+**Examples:**
+
+```dart
+// ResponsiveInitializer - Global responsive setup
+class ResponsiveInitializer extends StatelessWidget {
+  // Framework-level responsive configuration
+}
+
+// BaseScaffold - Framework utility
+class BaseScaffold extends StatelessWidget {
+  // Common scaffold structure with navigation
+}
+
+// LoadingOverlay - App-wide utility
+class LoadingOverlay extends StatelessWidget {
+  // Global loading state display
+}
+```
+
+##### 2. **Shared Widgets Layer** (`lib/shared/widgets/`)
+
+- **Responsibility**: Reusable business components following Atomic Design
+- **Structure**:
+
+**Atoms** (`shared/widgets/atoms/`):
+
+```dart
+// Basic UI building blocks
+class CustomButton extends StatelessWidget {} // Primary button component
+class CustomInput extends StatelessWidget {}  // Text input component
+class CustomCard extends StatelessWidget {}   // Card container component
+```
+
+**Molecules** (`shared/widgets/molecules/`):
+
+```dart
+// Composite components combining atoms
+class SearchBar extends StatelessWidget {}     // Search input with icon
+class UserAvatar extends StatelessWidget {}    // User image with status
+class StatsCard extends StatelessWidget {}     // Card with statistics
+```
+
+**Organisms** (`shared/widgets/organisms/`):
+
+```dart
+// Complex UI sections
+class NavigationDrawer extends StatelessWidget {} // App navigation
+class HeaderSection extends StatelessWidget {}    // Page header with actions
+```
+
+##### 3. **Feature Widgets Layer** (`lib/features/*/widgets/`)
+
+- **Responsibility**: Feature-specific UI components
+- **Characteristics**:
+  - Specific to one feature domain
+  - Contains business logic integration
+  - Uses shared widgets as building blocks
+
+```dart
+// Feature-specific widgets
+features/home/presentation/widgets/
+├── home_carousel.dart      # Home-specific carousel
+├── trending_section.dart   # Home trending display
+└── quick_actions.dart      # Home quick action buttons
+
+features/profile/presentation/widgets/
+├── profile_form.dart       # Profile editing form
+├── avatar_selector.dart    # Profile image selection
+└── settings_panel.dart     # Profile settings
+```
 
 #### Navigation Architecture
 
@@ -108,6 +226,28 @@ features/home/
 └── home.dart                       # Barrel Export (if needed)
 ```
 
+#### Splash Feature Architecture
+
+```
+features/splash/
+├── presentation/
+│   ├── cubit/
+│   │   ├── splash_cubit.dart       # State management
+│   │   └── splash_state.dart       # Freezed states
+│   ├── pages/
+│   │   └── splash_page.dart        # Full-screen splash page
+│   └── widgets/
+│       ├── atomic/                 # Atomic design components
+│       │   ├── atoms/              # Basic splash elements
+│       │   │   └── splash_logo.dart     # Logo atom
+│       │   ├── molecules/          # Composite components
+│       │   │   └── splash_content.dart  # Content molecule
+│       │   └── organisms/          # Complex layouts
+│       │       └── splash_layout.dart   # Layout organism
+│       └── splash_content.dart     # Main content widget
+└── splash.dart                     # Barrel Export
+```
+
 #### Main Navigation Architecture
 
 ```
@@ -127,14 +267,249 @@ app/
 └── app.dart                        # Barrel Export
 ```
 
+### Asset Management Architecture
+
+#### Contract-Service Pattern for Assets
+
+The project implements a comprehensive asset management system using contract-service patterns for both images and SVG icons:
+
+```
+core/
+├── assets/
+│   ├── images/
+│   │   ├── app_images.dart              # Image contracts interface
+│   │   └── app_images_impl.dart         # Image contracts implementation
+│   ├── icons/
+│   │   ├── app_icons.dart               # SVG icon contracts interface
+│   │   └── app_icons_impl.dart          # SVG icon contracts implementation
+│   └── services/
+│       ├── asset_image_service.dart          # Image service interface
+│       ├── asset_image_service_impl.dart     # Image service implementation
+│       ├── svg_icon_service.dart             # SVG service interface
+│       └── svg_icon_service_impl.dart        # SVG service implementation
+```
+
+#### Image Asset Architecture
+
+**Contract Layer:**
+
+```dart
+// app_images.dart - Type-safe asset path management
+abstract class AppImages {
+  // Splash Screen Assets
+  static const String logoImage = 'assets/images/common/logo.png';
+
+  // Employee Assets
+  static const String employeePlaceholder = 'assets/images/employee/placeholder.png';
+  static const String employeeAvatar = 'assets/images/employee/avatar.png';
+
+  // Common Assets
+  static const String defaultPlaceholder = 'assets/images/placeholders/default.png';
+  static const String errorPlaceholder = 'assets/images/placeholders/error.png';
+}
+```
+
+**Service Layer:**
+
+```dart
+// asset_image_service.dart - Service interface
+abstract class AssetImageService {
+  Widget renderImage({
+    required String assetPath,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+    String? semanticLabel,
+    Widget? errorWidget,
+    Widget? placeholder,
+  });
+
+  Future<void> precacheImage(String assetPath, BuildContext context);
+}
+
+// asset_image_service_impl.dart - Pure Flutter implementation
+class AssetImageServiceImpl implements AssetImageService {
+  @override
+  Widget renderImage({...}) {
+    return Image.asset(
+      assetPath,
+      width: width?.w,  // Responsive sizing with flutter_screenutil
+      height: height?.h,
+      fit: fit,
+      semanticLabel: semanticLabel,
+      frameBuilder: placeholder != null ? ... : null,
+      errorBuilder: errorWidget != null ? ... : defaultErrorBuilder,
+    );
+  }
+}
+```
+
+#### SVG Icon Architecture
+
+**Contract Layer:**
+
+```dart
+// app_icons.dart - SVG icon path management
+abstract class AppIcons {
+  // Navigation Icons
+  static const String homeIcon = 'assets/icons/navigation/home.svg';
+  static const String profileIcon = 'assets/icons/navigation/profile.svg';
+
+  // Action Icons
+  static const String editIcon = 'assets/icons/action/edit.svg';
+  static const String deleteIcon = 'assets/icons/action/delete.svg';
+
+  // Size Constants
+  static const double small = 16.0;
+  static const double medium = 24.0;
+  static const double large = 32.0;
+}
+```
+
+**Service Layer:**
+
+```dart
+// svg_icon_service.dart - SVG service interface
+abstract class SvgIconService {
+  Widget renderIcon({
+    required String assetPath,
+    double? size,
+    Color? color,
+    String? semanticLabel,
+    VoidCallback? onTap,
+    Widget? errorWidget,
+  });
+
+  Future<void> precacheSvg(String assetPath);
+}
+
+// svg_icon_service_impl.dart - flutter_svg implementation
+class SvgIconServiceImpl implements SvgIconService {
+  @override
+  Widget renderIcon({...}) {
+    final svgWidget = SvgPicture.asset(
+      assetPath,
+      width: size?.w,
+      height: size?.h,
+      colorFilter: color != null
+          ? ColorFilter.mode(color, BlendMode.srcIn)
+          : null,
+      semanticsLabel: semanticLabel,
+    );
+
+    // Add tap handling if needed
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8.r),
+        child: Padding(
+          padding: EdgeInsets.all(8.w),
+          child: svgWidget,
+        ),
+      );
+    }
+
+    return svgWidget;
+  }
+}
+```
+
+#### Asset Directory Structure
+
+```
+assets/
+├── images/                    # 🖼️ Image Assets
+│   ├── common/                # Shared images (logo.png)
+│   ├── splash/                # Splash screen assets
+│   ├── login/                 # Login screen assets
+│   ├── employee/              # Employee-related assets
+│   └── placeholders/          # Placeholder images
+└── icons/                     # 🎯 SVG Icon Assets
+    ├── navigation/            # Navigation icons (home.svg, profile.svg)
+    ├── action/                # Action icons (edit.svg, delete.svg, save.svg)
+    ├── status/                # Status icons (success.svg, error.svg)
+    └── ui/                    # UI icons (search.svg, filter.svg, menu.svg)
+```
+
+### Native Splash Screen Architecture
+
+#### Flutter Native Splash Integration
+
+The project uses `flutter_native_splash` for platform-optimized splash screens:
+
+**Configuration Architecture:**
+
+```yaml
+# flutter_native_splash.yaml
+flutter_native_splash:
+  color: "#FF9800" # Orange background
+  color_dark: "#FF9800" # Dark mode support
+
+  android_12: # Android 12 compatibility
+    color: "#FF9800"
+    color_dark: "#FF9800"
+
+  web: true # Multi-platform support
+  android: true
+  ios: true
+
+  remove_after_delay: true # Auto-remove native splash
+```
+
+**Generated Assets Structure:**
+
+```
+# Android Platform
+android/app/src/main/res/
+├── drawable/background.png
+├── drawable-hdpi/background.png
+├── drawable-mdpi/background.png
+├── drawable-xhdpi/background.png
+├── drawable-xxhdpi/background.png
+└── drawable-xxxhdpi/background.png
+
+# iOS Platform
+ios/Runner/Assets.xcassets/LaunchBackground.imageset/
+├── background.png
+├── background@2x.png
+├── background@3x.png
+└── Contents.json
+
+# Web Platform
+web/index.html (with inline CSS styling)
+```
+
+#### Native + Flutter Splash Flow
+
+```
+App Launch → Native Splash (Instant) → Flutter Framework → Flutter Splash → Main App
+     ↑              ↓                        ↓              ↓            ↓
+   Platform    Platform-specific         Framework      Feature     Navigation
+  Optimized      Background             Initialization   Logic       Complete
+```
+
 ## Data Flow Architecture
 
 ### Navigation Flow
 
 ```
+App Launch → Native Splash → Flutter Splash → Main Navigation → User Flow
+     ↑            ↓              ↓                ↓              ↓
+   Platform    Instant        2-Second         Route         Feature
+  Optimized    Display        Delay            Guard         Pages
+
 User Tap → Route Request → Route Guard → Page Resolution → Widget Display
     ↑                                                           ↓
     └───────────── Navigation Complete ←────────────────────────┘
+```
+
+### Splash Screen Flow
+
+```
+App Launch → Native Splash → SplashCubit.initialize() → 2s Delay → Navigation
+     ↑            ↓                     ↓                  ↓           ↓
+   Platform    Orange            SplashState.loading   Complete   MainWrapper
+  Optimized   Background         Show Flutter Splash    State      Route
 ```
 
 ### State Management Flow
@@ -208,6 +583,22 @@ lib/
 │   └── constants/
 │       └── route_constants.dart  # Route path constants
 ├── features/
+│   ├── splash/                          # Splash screen feature
+│   │   └── presentation/
+│   │       ├── cubit/
+│   │       │   ├── splash_cubit.dart    # Splash state management
+│   │       │   └── splash_state.dart    # Freezed splash states
+│   │       ├── pages/
+│   │       │   └── splash_page.dart     # Splash UI
+│   │       └── widgets/
+│   │           ├── atomic/
+│   │           │   ├── atoms/
+│   │           │   │   └── splash_logo.dart     # Logo atom
+│   │           │   ├── molecules/
+│   │           │   │   └── splash_content.dart  # Content molecule
+│   │           │   └── organisms/
+│   │           │       └── splash_layout.dart   # Layout organism
+│   │           └── splash_content.dart           # Main content
 │   ├── authentication/
 │   │   └── presentation/
 │   │       └── pages/

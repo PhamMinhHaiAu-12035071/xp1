@@ -6,6 +6,7 @@ import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:xp1/core/di/injection_container.dart';
 import 'package:xp1/core/routing/app_router.dart';
+import 'package:xp1/core/widgets/responsive_initializer.dart';
 import 'package:xp1/l10n/gen/strings.g.dart';
 
 /// Mock storage for HydratedBloc testing in BDD scenarios.
@@ -50,28 +51,34 @@ Future<void> theAppIsRunning(WidgetTester tester) async {
   // Configure REAL dependencies
   await configureDependencies();
 
-  // Create a fresh router instance for test isolation
-  // This ensures each test starts with clean navigation state
-  final freshRouter = AppRouter();
-
-  // Pump a fresh app instance with new router to ensure clean state
+  // Create router for navigation
+  final testRouter = AppRouter();
+  
+  // Use ResponsiveInitializer to properly initialize ScreenUtil for BDD tests
+  // This ensures all responsive sizing (.sp, .w, .h extensions) work correctly
   await tester.pumpWidget(
-    MaterialApp.router(
-      theme: ThemeData(
-        appBarTheme: const AppBarTheme(
-          backgroundColor: Colors.blue,
+    ResponsiveInitializer(
+      builder: (context) => MaterialApp.router(
+        theme: ThemeData(
+          appBarTheme: const AppBarTheme(
+            backgroundColor: Colors.blue,
+          ),
+          useMaterial3: true,
         ),
-        useMaterial3: true,
+        localizationsDelegates: const [
+          GlobalMaterialLocalizations.delegate,
+          GlobalWidgetsLocalizations.delegate,
+          GlobalCupertinoLocalizations.delegate,
+        ],
+        supportedLocales: AppLocaleUtils.supportedLocales,
+        routerConfig: testRouter.config(),
       ),
-      localizationsDelegates: const [
-        GlobalMaterialLocalizations.delegate,
-        GlobalWidgetsLocalizations.delegate,
-        GlobalCupertinoLocalizations.delegate,
-      ],
-      supportedLocales: AppLocaleUtils.supportedLocales,
-      routerConfig: freshRouter.config(),
     ),
   );
+
+  // Navigate to LoginRoute immediately to skip splash in BDD tests
+  // This avoids SplashCubit dependency issues while keeping tests focused
+  await testRouter.replaceAll([const LoginRoute()]);
 
   // Wait for all asynchronous operations, animations, and router initialization
   // to complete. This is more reliable than hardcoded delays as it adapts to

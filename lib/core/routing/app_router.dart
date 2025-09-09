@@ -6,6 +6,7 @@ import '../../features/features/presentation/pages/features_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
 import '../../features/main_navigation/presentation/pages/main_wrapper_page.dart';
 import '../../features/profile/presentation/pages/profile_page.dart';
+import '../../features/splash/presentation/pages/splash_page.dart';
 import '../../features/statistics/presentation/pages/statistics_page.dart';
 import '../constants/route_constants.dart';
 import '../guards/auth_guard.dart';
@@ -30,11 +31,17 @@ class AppRouter extends RootStackRouter {
 
   @override
   List<AutoRoute> get routes => [
-    /// Login Route
+    /// Splash Route - NEW: Initial route for app startup
+    AutoRoute(
+      page: SplashRoute.page,
+      path: '/splash',
+      initial: true, // Make splash the initial route
+    ),
+
+    /// Login Route - No longer initial
     AutoRoute(
       page: LoginRoute.page,
       path: '/${RouteConstants.login}',
-      initial: true,
     ),
 
     /// Main App Routes with Bottom Navigation

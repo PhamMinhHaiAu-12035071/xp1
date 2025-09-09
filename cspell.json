@@ -135,7 +135,19 @@
     "Liskov",
     "microkernels",
     "rhdj",
-    "amsn"
+    "amsn",
+    "vsync",
+    "octo",
+    "precache",
+
+    "hdpi",
+    "mdpi",
+    "xhdpi",
+    "xxhdpi",
+    "xxxhdpi",
+    "imageset",
+    "tappable",
+    "precaching"
   ],
   "ignorePaths": [
     "build/**",

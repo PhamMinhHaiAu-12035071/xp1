@@ -50,7 +50,9 @@ dependencies:
 
   # === UI & THEMING ===
   flutter_screenutil: ^5.9.3 # Responsive design utilities
+  flutter_svg: ^2.0.10+1 # SVG rendering support (ESSENTIAL - no built-in Flutter support)
   google_fonts: ^6.2.1 # Google Fonts integration
+  nil: ^1.1.1 # Lightweight null widget for conditional rendering
 
   # === UTILITIES ===
   intl: ^0.20.2 # Internationalization utilities
@@ -87,8 +89,30 @@ dev_dependencies:
   # === DEVELOPMENT TOOLS ===
   conventional_commit: ^0.6.1+1 # Git commit message linting
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
+  flutter_native_splash: ^2.4.6 # Native splash screen generation
   very_good_analysis: ^9.0.0 # Very Good Ventures linting rules
 
 flutter:
   generate: true # Enable code generation
   uses-material-design: true # Use Material Design icons
+
+  # Enhanced organized asset structure for image and SVG management
+  assets:
+    # Common shared images
+    - assets/images/common/
+
+    # Feature-specific directories  
+    - assets/images/splash/
+    - assets/images/login/
+    - assets/images/employee/
+
+    # Error handling and placeholders
+    - assets/images/placeholders/
+    - assets/images/icons/
+
+    # SVG Icons by category (organized structure for TDD)
+    - assets/icons/ui/
+    - assets/icons/status/
+    - assets/icons/action/
+    - assets/icons/brand/
+    - assets/icons/navigation/
