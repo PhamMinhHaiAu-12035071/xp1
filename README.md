@@ -69,6 +69,16 @@ lib/
 │   │       └── header_section.dart
 │   └── utilities/                  # Business utilities
 ├── features/                       # 📱 FEATURE LAYER
+│   ├── splash/                     # 🚀 Splash screen feature
+│   │   └── presentation/
+│   │       ├── cubit/              # State management
+│   │       ├── pages/              # SplashPage
+│   │       └── widgets/            # Atomic design components
+│   │           ├── atomic/
+│   │           │   ├── atoms/      # Basic splash elements
+│   │           │   ├── molecules/  # Composite splash components
+│   │           │   └── organisms/  # Complex splash layouts
+│   │           └── splash_content.dart
 │   ├── home/
 │   │   └── presentation/
 │   │       ├── pages/              # 📄 Full-screen pages
@@ -116,6 +126,12 @@ lib/
 - **Freezed**: Type-safe immutable data classes with code generation
 - **JSON Serialization**: Automatic JSON handling with json_serializable
 - **Functional Programming**: Error handling with Either types (fpdart)
+
+### Navigation & User Experience
+
+- **Auto Route**: Type-safe navigation with declarative route configuration
+- **Native Splash Screen**: Professional splash screens with `flutter_native_splash`
+- **Simplified Splash Architecture**: Optimized 2-second splash with automatic navigation
 
 ### Development Tools
 
@@ -263,58 +279,213 @@ make i18n-help               # Show detailed help
 
 ---
 
-## Image Asset Management 🖼️
+## Asset Management 🖼️
 
-### Pure Flutter Image System
+### Complete Asset Management System
 
-This project implements a **zero-dependency** image asset management system using pure Flutter capabilities:
+This project implements a comprehensive asset management system supporting both **images** and **SVG icons** with contract-service architecture patterns:
+
+#### 🖼️ Image Asset Management (Pure Flutter)
 
 - **🚀 Pure Flutter Approach**: No external image libraries - uses built-in `Image.asset()` + `ImageCache`
 - **📱 Responsive Sizing**: Automatic integration with `flutter_screenutil` for responsive design
-- **🛡️ Error Handling**: Built-in error fallbacks with `Icon(Icons.broken_image)`
-- **⏳ Loading States**: Automatic loading indicators with `CircularProgressIndicator`
-- **🏗️ Architecture**: Clean DI pattern following existing codebase standards
+- **🛡️ Error Handling**: Built-in error fallbacks with customizable error widgets
+- **⏳ Loading States**: Automatic loading indicators with placeholder support
+- **🏗️ Architecture**: Clean DI pattern with `AppImages` contract + `AssetImageService`
 - **✅ Test Coverage**: 100% test coverage with TDD approach
+
+#### 🎯 SVG Icon Management (flutter_svg)
+
+- **🎨 SVG Support**: Full SVG rendering with `flutter_svg` package integration
+- **🌈 Color Filtering**: Dynamic color theming and interaction states
+- **📐 Responsive Icons**: Automatic sizing with predefined size constants
+- **👆 Interactive Icons**: Built-in tap handling with visual feedback
+- **♿ Accessibility**: Semantic labels and ARIA support
+- **🔧 Service Pattern**: `AppIcons` contract + `SvgIconService` architecture
 
 ### Quick Usage
 
-```dart
-// Inject the service
-final assetService = GetIt.instance<AssetImageService>();
-final appImages = GetIt.instance<AppImages>();
+#### Image Assets
 
-// Display responsive image with automatic error handling
-Widget buildProfileImage() {
-  return assetService.assetImage(
-    appImages.employeeAvatar,
-    width: 96,  // Automatically becomes 96.w (responsive)
-    height: 96, // Automatically becomes 96.h (responsive)
-    fit: BoxFit.cover,
+```dart
+// Inject image services
+final imageService = GetIt.instance<AssetImageService>();
+
+// Display responsive image with error handling and placeholder
+Widget buildSplashImage() {
+  return imageService.renderImage(
+    assetPath: AppImages.welcomeImage,
+    width: 300,    // Responsive width
+    height: 200,   // Responsive height
+    fit: BoxFit.contain,
+    semanticLabel: 'App welcome logo',
+    placeholder: Container(
+      width: 300.w,
+      height: 200.h,
+      color: Colors.grey.shade200,
+      child: const Center(child: CircularProgressIndicator()),
+    ),
   );
 }
 
-// Use predefined image sizes
-final iconSize = appImages.imageSizes.medium; // 96.0
+// Precache images for performance
+await imageService.precacheImage(AppImages.welcomeImage, context);
+```
+
+#### SVG Icons
+
+```dart
+// Inject SVG services
+final svgService = GetIt.instance<SvgIconService>();
+
+// Display interactive SVG icon with color theming
+Widget buildNavigationIcon({required bool isSelected}) {
+  return svgService.renderIcon(
+    assetPath: AppIcons.homeIcon,
+    size: AppIcons.medium,           // Predefined size constants
+    color: isSelected ? Colors.blue : Colors.grey,
+    onTap: () => handleNavigation(),
+    semanticLabel: 'Home navigation',
+  );
+}
+
+// Use predefined icon sizes
+final iconSize = AppIcons.large; // 32.0
 ```
 
 ### Asset Organization
 
 ```
-assets/images/
-├── common/           # Shared images
-├── splash/           # Splash screen assets
-├── login/            # Login screen assets
-├── employee/         # Employee-related assets
-└── placeholders/     # Placeholder images
+assets/
+├── images/                    # 🖼️ Image Assets
+│   ├── common/                # Shared images (logo.png)
+│   ├── splash/                # Splash screen assets (welcome.png)
+│   ├── login/                 # Login screen assets
+│   ├── employee/              # Employee-related assets
+│   └── placeholders/          # Placeholder images
+└── icons/                     # 🎯 SVG Icon Assets
+    ├── navigation/            # Navigation icons (home.svg, profile.svg)
+    ├── action/                # Action icons (edit.svg, delete.svg, save.svg)
+    ├── status/                # Status icons (success.svg, error.svg)
+    └── ui/                    # UI icons (search.svg, filter.svg, menu.svg)
 ```
 
 ### Key Benefits
 
+#### Images
+
 - **Performance**: Built-in `ImageCache` handles caching automatically
-- **Reliability**: Error states never fail - always shows fallback icon
-- **Maintainability**: Centralized asset path management
+- **Reliability**: Error states never fail - always shows fallback widgets
+- **Responsive**: Automatic responsive sizing with `flutter_screenutil`
+- **Loading States**: Built-in placeholder support for smooth UX
+
+#### SVG Icons
+
+- **Scalability**: Vector graphics scale perfectly at any size
+- **Theming**: Dynamic color filtering for consistent design systems
+- **Interactivity**: Built-in tap handling with visual feedback
+- **Accessibility**: Semantic labels for screen readers
+
+#### Architecture
+
 - **Type Safety**: No magic strings - all paths are typed constants
-- **Responsive**: Automatic responsive sizing across all screen sizes
+- **Maintainability**: Centralized asset path management with contracts
+- **Testability**: 100% test coverage with mocked services
+- **Consistency**: Unified patterns across all asset types
+
+---
+
+## Splash Screen System 🚀
+
+### Native + Flutter Splash Integration
+
+This project implements a comprehensive splash screen system combining **native splash screens** with **Flutter-based splash functionality**:
+
+#### 🏃‍♂️ Native Splash Screen (flutter_native_splash)
+
+- **⚡ Instant Loading**: Native splash displays immediately on app launch
+- **🎨 Platform Optimized**: Automatically generates platform-specific assets
+- **🌈 Consistent Branding**: Orange background (#FF9800) across all platforms
+- **📱 Multi-Platform**: Android, iOS, and Web support with Android 12 compatibility
+
+#### 🛠️ Flutter Splash Feature
+
+- **🏗️ Simplified Architecture**: Clean cubit-based state management
+- **⏱️ Timed Navigation**: Automatic 2-second delay with error handling
+- **🧱 Atomic Design**: Components organized as atoms, molecules, and organisms
+- **🎯 Type-Safe**: Freezed states with comprehensive error handling
+
+### Quick Implementation
+
+#### Native Splash Configuration
+
+```yaml
+# flutter_native_splash.yaml
+flutter_native_splash:
+  color: "#FF9800" # Orange background
+  color_dark: "#FF9800" # Dark mode support
+
+  android_12: # Android 12 compatibility
+    color: "#FF9800"
+    color_dark: "#FF9800"
+
+  web: true # Multi-platform support
+  android: true
+  ios: true
+
+  remove_after_delay: true # Auto-remove native splash
+```
+
+#### Flutter Splash Usage
+
+```dart
+// Simple cubit-based splash with automatic navigation
+class SplashCubit extends Cubit<SplashState> {
+  SplashCubit() : super(const SplashState.initial());
+
+  Future<void> initialize() async {
+    emit(const SplashState.loading());
+
+    try {
+      await Future.delayed(const Duration(seconds: 2));
+      emit(const SplashState.completed());
+    } catch (error) {
+      emit(SplashState.error(error.toString()));
+    }
+  }
+}
+
+// Atomic design splash components
+Widget buildSplashContent() {
+  return const SplashLayout(        // Organism: Complete layout
+    child: SplashContent(           // Molecule: Content grouping
+      logo: SplashLogo(),           // Atom: Logo element
+      indicator: CircularProgressIndicator(),
+    ),
+  );
+}
+```
+
+### Development Commands
+
+```sh
+# Native splash setup and testing
+make splash-setup            # Generate native splash assets
+make splash-test             # Test splash configuration
+make splash-clean            # Clean generated splash files
+
+# Development workflow
+make run-dev                 # Run with splash in development mode
+make build-release           # Build with optimized splash
+```
+
+### Architecture Benefits
+
+- **Performance**: Native splash eliminates loading delays
+- **User Experience**: Seamless transition from native to Flutter splash
+- **Maintainability**: Simplified architecture with clear responsibilities
+- **Testing**: Full test coverage with both unit and widget tests
+- **Cross-Platform**: Consistent experience across all platforms
 
 ---
 
@@ -387,7 +558,7 @@ Complete color palettes with semantic naming and interaction states:
 
 - **Display Large** (36px) - Hero text, main titles
 - **Display Medium** (32px) - Section headings
-- **Heading Large** (24px) - Page titles  
+- **Heading Large** (24px) - Page titles
 - **Heading Medium** (20px) - Subsection headers
 - **Body Large** (16px) - Primary body text
 - **Body Medium** (14px) - Secondary text
@@ -399,7 +570,7 @@ Complete color palettes with semantic naming and interaction states:
 Three variants for every dimension:
 
 - **r** (responsive) - Both width and height
-- **v** (vertical) - Height only  
+- **v** (vertical) - Height only
 - **h** (horizontal) - Width only
 
 Comprehensive scale: 2px → 680px with specialized sizes for common use cases.
@@ -408,7 +579,7 @@ Comprehensive scale: 2px → 680px with specialized sizes for common use cases.
 
 - **Consistency**: Type-safe design tokens prevent inconsistent styling
 - **Performance**: Centralized styling with dependency injection
-- **Maintainability**: Single source of truth for all design decisions  
+- **Maintainability**: Single source of truth for all design decisions
 - **Accessibility**: Semantic color naming and proper contrast ratios
 - **Developer Experience**: IntelliSense support with comprehensive documentation
 

@@ -1957,6 +1957,825 @@ class UserBloc extends Bloc<UserEvent, UserState> {
 }
 ```
 
+## 🎨 Asset Management Guidelines
+
+### Image Asset Management
+
+This project uses a **Pure Flutter Approach** for image asset management, leveraging existing Flutter capabilities with responsive design patterns.
+
+#### Architecture Overview
+
+```dart
+// ✅ Contract-based design pattern
+lib/
+├── core/
+│   ├── assets/
+│   │   ├── images/
+│   │   │   ├── app_images.dart          # Contract interface
+│   │   │   └── app_images_impl.dart     # Implementation
+│   │   └── services/
+│   │       ├── asset_image_service.dart      # Service interface
+│   │       └── asset_image_service_impl.dart # Service implementation
+└── features/
+    └── splash/
+        └── presentation/
+            └── widgets/
+                └── splash_image.dart    # Usage example
+```
+
+#### AppImages Contract Pattern
+
+```dart
+// ✅ Good: Type-safe asset path management
+abstract class AppImages {
+  // Splash Screen Assets
+  static const String welcomeImage = 'assets/images/splash/welcome.png';
+  static const String logoImage = 'assets/images/common/logo.png';
+
+  // Employee Assets
+  static const String employeePlaceholder = 'assets/images/employee/placeholder.png';
+  static const String employeeAvatar = 'assets/images/employee/avatar.png';
+
+  // Common Assets
+  static const String defaultPlaceholder = 'assets/images/placeholders/default.png';
+  static const String errorPlaceholder = 'assets/images/placeholders/error.png';
+}
+
+// ✅ Good: Implementation with validation
+class AppImagesImpl implements AppImages {
+  static const AppImagesImpl _instance = AppImagesImpl._internal();
+  factory AppImagesImpl() => _instance;
+  const AppImagesImpl._internal();
+
+  /// Validates that asset exists in pubspec.yaml
+  bool validateAssetPath(String assetPath) {
+    // Implementation for development-time validation
+    return true;
+  }
+}
+```
+
+#### AssetImageService Pattern
+
+```dart
+// ✅ Good: Service layer for responsive image rendering
+abstract class AssetImageService {
+  /// Render image with responsive sizing and error handling
+  Widget renderImage({
+    required String assetPath,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+    String? semanticLabel,
+    Widget? errorWidget,
+    Widget? placeholder,
+  });
+
+  /// Pre-cache image for performance
+  Future<void> precacheImage(String assetPath, BuildContext context);
+}
+
+// ✅ Good: Implementation with flutter_screenutil integration
+class AssetImageServiceImpl implements AssetImageService {
+  @override
+  Widget renderImage({
+    required String assetPath,
+    double? width,
+    double? height,
+    BoxFit fit = BoxFit.cover,
+    String? semanticLabel,
+    Widget? errorWidget,
+    Widget? placeholder,
+  }) {
+    return Image.asset(
+      assetPath,
+      width: width?.w,  // Responsive width
+      height: height?.h, // Responsive height
+      fit: fit,
+      semanticLabel: semanticLabel,
+      frameBuilder: placeholder != null
+          ? (context, child, frame, wasSynchronouslyLoaded) {
+              if (wasSynchronouslyLoaded) return child;
+              return frame == null ? placeholder! : child;
+            }
+          : null,
+      errorBuilder: errorWidget != null
+          ? (context, error, stackTrace) => errorWidget!
+          : (context, error, stackTrace) => Container(
+              width: width?.w,
+              height: height?.h,
+              color: Colors.grey.shade300,
+              child: Icon(Icons.error, color: Colors.grey.shade600),
+            ),
+    );
+  }
+
+  @override
+  Future<void> precacheImage(String assetPath, BuildContext context) {
+    return precacheImage(AssetImage(assetPath), context);
+  }
+}
+```
+
+#### Usage in Widgets
+
+```dart
+// ✅ Good: Using asset service in widgets
+class SplashImage extends StatelessWidget {
+  const SplashImage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetIt.instance<AssetImageService>().renderImage(
+      assetPath: AppImages.welcomeImage,
+      width: 300,
+      height: 200,
+      fit: BoxFit.cover,
+      semanticLabel: 'Welcome splash image',
+      placeholder: Container(
+        width: 300.w,
+        height: 200.h,
+        color: Colors.grey.shade200,
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+    );
+  }
+}
+
+// ❌ Avoid: Direct asset usage without service layer
+class BadSplashImage extends StatelessWidget {
+  @override
+  Widget build(BuildContext context) {
+    return Image.asset('assets/images/splash/welcome.png'); // No error handling
+  }
+}
+```
+
+### SVG Asset Management
+
+SVG assets require the `flutter_svg` package and follow similar contract-service patterns.
+
+#### AppIcons Contract Pattern
+
+```dart
+// ✅ Good: SVG icon path management
+abstract class AppIcons {
+  // Navigation Icons
+  static const String homeIcon = 'assets/icons/navigation/home.svg';
+  static const String profileIcon = 'assets/icons/navigation/profile.svg';
+  static const String settingsIcon = 'assets/icons/navigation/settings.svg';
+
+  // Action Icons
+  static const String editIcon = 'assets/icons/action/edit.svg';
+  static const String deleteIcon = 'assets/icons/action/delete.svg';
+  static const String saveIcon = 'assets/icons/action/save.svg';
+  static const String cancelIcon = 'assets/icons/action/cancel.svg';
+
+  // Status Icons
+  static const String successIcon = 'assets/icons/status/success.svg';
+  static const String errorIcon = 'assets/icons/status/error.svg';
+  static const String warningIcon = 'assets/icons/status/warning.svg';
+  static const String infoIcon = 'assets/icons/status/info.svg';
+
+  // UI Icons
+  static const String searchIcon = 'assets/icons/ui/search.svg';
+  static const String filterIcon = 'assets/icons/ui/filter.svg';
+  static const String menuIcon = 'assets/icons/ui/menu.svg';
+  static const String closeIcon = 'assets/icons/ui/close.svg';
+  static const String arrowBackIcon = 'assets/icons/ui/arrow_back.svg';
+
+  // Size Constants
+  static const double small = 16.0;
+  static const double medium = 24.0;
+  static const double large = 32.0;
+  static const double extraLarge = 48.0;
+}
+```
+
+#### SvgIconService Pattern
+
+```dart
+// ✅ Good: SVG service with comprehensive features
+abstract class SvgIconService {
+  /// Render SVG icon with responsive sizing and styling
+  Widget renderIcon({
+    required String assetPath,
+    double? size,
+    Color? color,
+    String? semanticLabel,
+    VoidCallback? onTap,
+    Widget? errorWidget,
+  });
+
+  /// Pre-cache SVG for performance
+  Future<void> precacheSvg(String assetPath);
+}
+
+class SvgIconServiceImpl implements SvgIconService {
+  @override
+  Widget renderIcon({
+    required String assetPath,
+    double? size,
+    Color? color,
+    String? semanticLabel,
+    VoidCallback? onTap,
+    Widget? errorWidget,
+  }) {
+    final svgWidget = SvgPicture.asset(
+      assetPath,
+      width: size?.w,
+      height: size?.h,
+      colorFilter: color != null
+          ? ColorFilter.mode(color, BlendMode.srcIn)
+          : null,
+      semanticsLabel: semanticLabel,
+      placeholderBuilder: (context) => Container(
+        width: size?.w,
+        height: size?.h,
+        color: Colors.grey.shade300,
+        child: const Center(child: CircularProgressIndicator()),
+      ),
+    );
+
+    if (onTap != null) {
+      return InkWell(
+        onTap: onTap,
+        borderRadius: BorderRadius.circular(8.r),
+        child: Padding(
+          padding: EdgeInsets.all(8.w),
+          child: svgWidget,
+        ),
+      );
+    }
+
+    return svgWidget;
+  }
+
+  @override
+  Future<void> precacheSvg(String assetPath) async {
+    final loader = SvgAssetLoader(assetPath);
+    await svg.cache.putIfAbsent(
+      loader.cacheKey(null),
+      () => loader.loadBytes(null),
+    );
+  }
+}
+```
+
+#### Usage Examples
+
+```dart
+// ✅ Good: SVG icon usage with service
+class NavigationIcon extends StatelessWidget {
+  const NavigationIcon({
+    required this.iconPath,
+    required this.onTap,
+    this.isSelected = false,
+    super.key,
+  });
+
+  final String iconPath;
+  final VoidCallback onTap;
+  final bool isSelected;
+
+  @override
+  Widget build(BuildContext context) {
+    return GetIt.instance<SvgIconService>().renderIcon(
+      assetPath: iconPath,
+      size: AppIcons.medium,
+      color: isSelected ? Colors.blue : Colors.grey,
+      onTap: onTap,
+      semanticLabel: 'Navigation icon',
+    );
+  }
+}
+
+// ✅ Good: Complex SVG usage
+class ActionButton extends StatelessWidget {
+  const ActionButton({
+    required this.iconPath,
+    required this.label,
+    required this.onPressed,
+    this.isEnabled = true,
+    super.key,
+  });
+
+  final String iconPath;
+  final String label;
+  final VoidCallback onPressed;
+  final bool isEnabled;
+
+  @override
+  Widget build(BuildContext context) {
+    return ElevatedButton.icon(
+      onPressed: isEnabled ? onPressed : null,
+      icon: GetIt.instance<SvgIconService>().renderIcon(
+        assetPath: iconPath,
+        size: AppIcons.small,
+        color: isEnabled ? Colors.white : Colors.grey,
+      ),
+      label: Text(label),
+    );
+  }
+}
+```
+
+### Asset Testing Patterns
+
+#### Image Asset Service Testing
+
+```dart
+// ✅ Good: Comprehensive asset service testing
+void main() {
+  group('AssetImageService', () {
+    late AssetImageService assetImageService;
+    late MockBuildContext mockContext;
+
+    setUp(() {
+      assetImageService = AssetImageServiceImpl();
+      mockContext = MockBuildContext();
+    });
+
+    group('renderImage', () {
+      testWidgets('should render image with correct properties', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: assetImageService.renderImage(
+                assetPath: AppImages.welcomeImage,
+                width: 200,
+                height: 150,
+                fit: BoxFit.cover,
+              ),
+            ),
+          ),
+        );
+
+        expect(find.byType(Image), findsOneWidget);
+
+        final imageWidget = tester.widget<Image>(find.byType(Image));
+        expect(imageWidget.width, equals(200.w));
+        expect(imageWidget.height, equals(150.h));
+        expect(imageWidget.fit, equals(BoxFit.cover));
+      });
+
+      testWidgets('should show error widget on asset load failure', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: assetImageService.renderImage(
+                assetPath: 'invalid/path.png',
+                errorWidget: const Icon(Icons.error, key: Key('error_widget')),
+              ),
+            ),
+          ),
+        );
+
+        await tester.pumpAndSettle();
+        expect(find.byKey(const Key('error_widget')), findsOneWidget);
+      });
+    });
+
+    group('precacheImage', () {
+      testWidgets('should precache image successfully', (tester) async {
+        await tester.pumpWidget(const MaterialApp(home: SizedBox()));
+
+        expect(
+          () => assetImageService.precacheImage(
+            AppImages.welcomeImage,
+            tester.element(find.byType(SizedBox)),
+          ),
+          returnsNormally,
+        );
+      });
+    });
+  });
+}
+```
+
+#### SVG Icon Service Testing
+
+```dart
+// ✅ Good: SVG service testing
+void main() {
+  group('SvgIconService', () {
+    late SvgIconService svgIconService;
+
+    setUp(() {
+      svgIconService = SvgIconServiceImpl();
+    });
+
+    group('renderIcon', () {
+      testWidgets('should render SVG with correct properties', (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: svgIconService.renderIcon(
+                assetPath: AppIcons.homeIcon,
+                size: AppIcons.large,
+                color: Colors.blue,
+              ),
+            ),
+          ),
+        );
+
+        expect(find.byType(SvgPicture), findsOneWidget);
+
+        final svgWidget = tester.widget<SvgPicture>(find.byType(SvgPicture));
+        expect(svgWidget.width, equals(AppIcons.large.w));
+        expect(svgWidget.height, equals(AppIcons.large.h));
+      });
+
+      testWidgets('should make icon tappable when onTap provided', (tester) async {
+        var tapped = false;
+
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: svgIconService.renderIcon(
+                assetPath: AppIcons.editIcon,
+                onTap: () => tapped = true,
+              ),
+            ),
+          ),
+        );
+
+        await tester.tap(find.byType(InkWell));
+        expect(tapped, isTrue);
+      });
+    });
+  });
+}
+```
+
+## 🚀 Splash Screen Development Guidelines
+
+### Simplified Splash Architecture
+
+The splash screen follows a simplified architecture optimized for performance and maintainability.
+
+#### Architecture Overview
+
+```dart
+// ✅ Simplified splash feature structure
+features/splash/
+├── presentation/
+│   ├── cubit/
+│   │   ├── splash_cubit.dart         # State management
+│   │   └── splash_state.dart         # Freezed states
+│   ├── pages/
+│   │   └── splash_page.dart          # Full-screen page
+│   └── widgets/
+│       ├── atomic/
+│       │   ├── atoms/
+│       │   │   └── splash_logo.dart      # Logo atom
+│       │   ├── molecules/
+│       │   │   └── splash_content.dart   # Content molecule
+│       │   └── organisms/
+│       │       └── splash_layout.dart    # Layout organism
+│       └── splash_content.dart       # Main content widget
+└── splash.dart                       # Barrel export
+```
+
+#### SplashCubit Implementation
+
+```dart
+// ✅ Good: Simplified splash cubit
+class SplashCubit extends Cubit<SplashState> {
+  SplashCubit() : super(const SplashState.initial());
+
+  /// Initialize splash screen and navigate after delay
+  Future<void> initialize() async {
+    emit(const SplashState.loading());
+
+    try {
+      // Simple 2-second delay
+      await Future.delayed(const Duration(seconds: 2));
+      emit(const SplashState.completed());
+    } catch (error) {
+      emit(SplashState.error(error.toString()));
+    }
+  }
+}
+
+// ✅ Good: Freezed states for splash
+@freezed
+class SplashState with _$SplashState {
+  const factory SplashState.initial() = SplashInitial;
+  const factory SplashState.loading() = SplashLoading;
+  const factory SplashState.completed() = SplashCompleted;
+  const factory SplashState.error(String message) = SplashError;
+}
+```
+
+#### Atomic Design Implementation
+
+```dart
+// ✅ Good: Splash logo atom
+class SplashLogo extends StatelessWidget {
+  const SplashLogo({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return GetIt.instance<AssetImageService>().renderImage(
+      assetPath: AppImages.welcomeImage,
+      width: 300,
+      height: 200,
+      fit: BoxFit.contain,
+      semanticLabel: 'App welcome logo',
+    );
+  }
+}
+
+// ✅ Good: Splash content molecule
+class SplashContent extends StatelessWidget {
+  const SplashContent({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Column(
+      mainAxisAlignment: MainAxisAlignment.center,
+      children: [
+        const SplashLogo(),
+        SizedBox(height: 24.h),
+        const CircularProgressIndicator(),
+      ],
+    );
+  }
+}
+
+// ✅ Good: Splash layout organism
+class SplashLayout extends StatelessWidget {
+  const SplashLayout({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return Container(
+      decoration: const BoxDecoration(
+        color: Colors.orange, // Native splash background color
+      ),
+      child: const SafeArea(
+        child: Center(
+          child: SplashContent(),
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### SplashPage Implementation
+
+```dart
+// ✅ Good: Complete splash page with BLoC integration
+class SplashPage extends StatelessWidget {
+  const SplashPage({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => GetIt.instance<SplashCubit>()..initialize(),
+      child: const SplashView(),
+    );
+  }
+}
+
+class SplashView extends StatelessWidget {
+  const SplashView({super.key});
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocListener<SplashCubit, SplashState>(
+      listener: (context, state) {
+        state.maybeWhen(
+          completed: () => context.router.pushAndClearStack(
+            const MainWrapperRoute(),
+          ),
+          error: (message) => ScaffoldMessenger.of(context).showSnackBar(
+            SnackBar(content: Text(message)),
+          ),
+          orElse: () {},
+        );
+      },
+      child: const Scaffold(
+        body: SplashLayout(),
+      ),
+    );
+  }
+}
+```
+
+### Native Splash Integration
+
+#### Configuration
+
+```yaml
+# ✅ Good: flutter_native_splash.yaml configuration
+flutter_native_splash:
+  color: "#FF9800" # Orange background
+  color_dark: "#FF9800"
+
+  android_12:
+    color: "#FF9800"
+    color_dark: "#FF9800"
+
+  web: true
+  android: true
+  ios: true
+
+  remove_after_delay: true
+```
+
+#### Platform-Specific Assets
+
+```bash
+# ✅ Generated native splash assets structure
+android/app/src/main/res/
+├── drawable/background.png
+├── drawable-hdpi/background.png
+├── drawable-mdpi/background.png
+├── drawable-xhdpi/background.png
+├── drawable-xxhdpi/background.png
+└── drawable-xxxhdpi/background.png
+
+ios/Runner/Assets.xcassets/LaunchBackground.imageset/
+├── background.png
+├── background@2x.png
+├── background@3x.png
+└── Contents.json
+```
+
+### Splash Testing Patterns
+
+#### Unit Testing
+
+```dart
+// ✅ Good: Splash cubit testing
+void main() {
+  group('SplashCubit', () {
+    late SplashCubit splashCubit;
+
+    setUp(() {
+      splashCubit = SplashCubit();
+    });
+
+    tearDown(() {
+      splashCubit.close();
+    });
+
+    test('initial state should be SplashInitial', () {
+      expect(splashCubit.state, equals(const SplashState.initial()));
+    });
+
+    blocTest<SplashCubit, SplashState>(
+      'should emit [loading, completed] when initialize succeeds',
+      build: () => splashCubit,
+      act: (cubit) => cubit.initialize(),
+      expect: () => [
+        const SplashState.loading(),
+        const SplashState.completed(),
+      ],
+      wait: const Duration(seconds: 3), // Account for 2-second delay
+    );
+
+    blocTest<SplashCubit, SplashState>(
+      'should complete after exactly 2 seconds',
+      build: () => splashCubit,
+      act: (cubit) => cubit.initialize(),
+      verify: (cubit) {
+        expect(cubit.state, equals(const SplashState.completed()));
+      },
+      wait: const Duration(seconds: 3),
+    );
+  });
+}
+```
+
+#### Widget Testing
+
+```dart
+// ✅ Good: Splash page widget testing
+void main() {
+  group('SplashPage', () {
+    testWidgets('should display splash content', (tester) async {
+      await tester.pumpApp(const SplashPage());
+
+      expect(find.byType(SplashLayout), findsOneWidget);
+      expect(find.byType(SplashContent), findsOneWidget);
+      expect(find.byType(SplashLogo), findsOneWidget);
+    });
+
+    testWidgets('should navigate after splash completion', (tester) async {
+      await tester.pumpApp(const SplashPage());
+
+      // Wait for splash to complete
+      await tester.pumpAndSettle(const Duration(seconds: 3));
+
+      // Should have navigated away from splash
+      expect(find.byType(SplashPage), findsNothing);
+    });
+
+    testWidgets('should show error message on failure', (tester) async {
+      // Mock error scenario
+      when(() => mockSplashCubit.initialize())
+          .thenThrow(Exception('Test error'));
+
+      await tester.pumpApp(const SplashPage());
+      await tester.pumpAndSettle();
+
+      expect(find.text('Test error'), findsOneWidget);
+    });
+  });
+}
+```
+
+#### Integration Testing
+
+```dart
+// ✅ Good: Splash flow integration testing
+void main() {
+  group('Splash Flow Integration', () {
+    testWidgets('complete splash to main navigation flow', (tester) async {
+      await tester.pumpWidget(const App());
+
+      // Should start on splash page
+      expect(find.byType(SplashPage), findsOneWidget);
+      expect(find.byType(SplashLogo), findsOneWidget);
+
+      // Wait for splash to complete
+      await tester.pumpAndSettle(const Duration(seconds: 3));
+
+      // Should navigate to main wrapper
+      expect(find.byType(MainWrapperPage), findsOneWidget);
+      expect(find.byType(SplashPage), findsNothing);
+    });
+  });
+}
+```
+
+### Performance Guidelines
+
+#### Image Loading Optimization
+
+```dart
+// ✅ Good: Image precaching for performance
+class SplashPage extends StatefulWidget {
+  const SplashPage({super.key});
+
+  @override
+  State<SplashPage> createState() => _SplashPageState();
+}
+
+class _SplashPageState extends State<SplashPage> {
+  @override
+  void didChangeDependencies() {
+    super.didChangeDependencies();
+
+    // Precache splash image for instant loading
+    GetIt.instance<AssetImageService>().precacheImage(
+      AppImages.welcomeImage,
+      context,
+    );
+  }
+
+  @override
+  Widget build(BuildContext context) {
+    return BlocProvider(
+      create: (_) => GetIt.instance<SplashCubit>()..initialize(),
+      child: const SplashView(),
+    );
+  }
+}
+```
+
+#### Memory Management
+
+```dart
+// ✅ Good: Memory-efficient splash implementation
+class SplashCubit extends Cubit<SplashState> {
+  Timer? _timer;
+
+  SplashCubit() : super(const SplashState.initial());
+
+  Future<void> initialize() async {
+    emit(const SplashState.loading());
+
+    // Use timer instead of Future.delayed for better control
+    _timer = Timer(const Duration(seconds: 2), () {
+      if (!isClosed) {
+        emit(const SplashState.completed());
+      }
+    });
+  }
+
+  @override
+  Future<void> close() {
+    _timer?.cancel();
+    return super.close();
+  }
+}
+```
+
 ## 📚 Documentation Guidelines (Very Good Analysis Standards)
 
 ### Documentation Requirements (Required)

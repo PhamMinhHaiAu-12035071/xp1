@@ -89,6 +89,7 @@ dev_dependencies:
   # === DEVELOPMENT TOOLS ===
   conventional_commit: ^0.6.1+1 # Git commit message linting
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
+  flutter_native_splash: ^2.4.6 # Native splash screen generation
   very_good_analysis: ^9.0.0 # Very Good Ventures linting rules
 
 flutter:

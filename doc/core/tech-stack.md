@@ -104,6 +104,10 @@
   - Code generation for slang translations
   - JSON to Dart code generation
   - Build system integration for i18n
+- **flutter_native_splash**: ^2.4.6
+  - Native splash screen generation for all platforms
+  - Automatic platform configuration
+  - Orange background with app branding
 
 ### Testing Framework
 
@@ -167,6 +171,18 @@ lib/
 │   ├── view/
 │   │   └── app.dart              # Main app widget
 │   └── app.dart                  # Barrel export
+├── features/
+│   ├── splash/                   # Splash screen feature
+│   │   ├── presentation/
+│   │   │   ├── cubit/           # SplashCubit & SplashState
+│   │   │   ├── pages/           # SplashPage
+│   │   │   └── widgets/         # Atomic design components
+│   │   │       ├── atomic/
+│   │   │       │   ├── atoms/   # Basic UI building blocks
+│   │   │       │   ├── molecules/ # Composite components
+│   │   │       │   └── organisms/ # Complex UI sections
+│   │   │       └── splash_content.dart
+│   │   └── splash.dart          # Barrel export
 ├── l10n/                         # Internationalization
 │   ├── i18n/                     # Translation JSON files
 │   │   ├── en.i18n.json          # English translations
@@ -272,6 +288,7 @@ make i18n-analyze
 - `freezed`: Immutable data classes generation
 - `json_serializable`: JSON serialization code generation
 - `slang_build_runner`: Code generation for slang translations
+- `flutter_native_splash`: Native splash screen generation
 - `bloc_test`: BLoC testing utilities
 - `build_runner`: Code generation system
 - `flutter_test`: Flutter testing framework
@@ -295,6 +312,13 @@ make i18n-analyze
 
 - `pubspec.yaml`: Project dependencies and configuration
 - `pubspec.lock`: Locked dependency versions
+
+### Splash Screen Configuration
+
+- `flutter_native_splash.yaml`: Native splash screen configuration
+- Android splash assets: `android/app/src/main/res/drawable*/background.png`
+- iOS splash assets: `ios/Runner/Assets.xcassets/LaunchBackground.imageset/`
+- Web splash styling: `web/index.html` with inline CSS
 
 ## Best Practices
 

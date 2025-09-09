@@ -133,11 +133,41 @@ app.*.map.json
 # Generated l10n files
 lib/l10n/gen/
 
-# Slang generated translation files (generated from source i18n files)
-lib/l10n/i18n/*.g.dart
+# ============================================================================
+# DART CODE GENERATION - UNIVERSAL PATTERNS FOR LIB FOLDER
+# ============================================================================
+# These patterns catch ALL generated files in lib/ regardless of location
+# No need to specify individual paths - covers all code generation tools
 
-# Generated dependency injection files
-lib/core/di/injection_container.config.dart
+# All JSON serialization files (.g.dart) - json_annotation, json_serializable
+lib/**/*.g.dart
+
+# All Auto Route files (.gr.dart) - auto_route_generator
+lib/**/*.gr.dart
+
+# All Freezed files (.freezed.dart) - freezed generator
+lib/**/*.freezed.dart
+
+# All dependency injection config files (.config.dart) - injectable generator
+lib/**/*.config.dart
+
+# All mocking files (.mocks.dart) - mockito, mocktail
+lib/**/*.mocks.dart
+
+# All reflection files (.reflectable.dart) - reflectable
+lib/**/*.reflectable.dart
+
+# All HTTP client files (.chopper.dart) - chopper generator
+lib/**/*.chopper.dart
+
+# All GraphQL files (.graphql.dart) - graphql_codegen
+lib/**/*.graphql.dart
+
+# All part files (.part.dart) - various generators
+lib/**/*.part.dart
+
+# All generic generated files (.gen.dart) - various generators  
+lib/**/*.gen.dart
 
 # BDD generated files (from bdd_widget_test)
 test/bdd/**/*_test.dart
@@ -181,7 +211,7 @@ yarn-error.log*
 # Allow sample/example files to be committed
 !lib/features/env/*.env.example
 lib/features/env/*.env
-lib/features/env/*.g.dart
+# Note: lib/features/env/*.g.dart already covered by lib/**/*.g.dart above
 
 # Stores VSCode versions used for testing VSCode extensions
 .vscode-test
