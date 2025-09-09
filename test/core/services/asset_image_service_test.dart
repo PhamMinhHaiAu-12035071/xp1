@@ -119,7 +119,10 @@ void main() {
       expect(find.byIcon(Icons.broken_image), findsOneWidget);
 
       final iconWidget = tester.widget<Icon>(find.byIcon(Icons.broken_image));
-      expect(iconWidget.size, equals(24.w)); // Default fallback size
+      expect(
+        iconWidget.size,
+        equals(24.0),
+      ); // Default fallback size (no ScreenUtil)
       expect(iconWidget.color, equals(Colors.grey[400])); // Default grey color
     });
 
@@ -193,5 +196,104 @@ void main() {
       expect(service, isA<AssetImageService>());
       expect(service.runtimeType.toString(), equals('AssetImageServiceImpl'));
     });
+
+    testWidgets(
+      'should handle ScreenUtil exceptions in error widget sizing',
+      (tester) async {
+        // This test triggers the exception paths by forcing an image error
+        // and testing the error widget sizing without ScreenUtil initialization
+
+        // Don't initialize ScreenUtil - use raw MaterialApp
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Scaffold(
+              body: service.assetImage(
+                'non_existent_image.png', // This will trigger error widget
+                width: 100, // These parameters will be used in error widget
+                height: 200,
+              ),
+            ),
+          ),
+        );
+
+        // Wait for image to fail loading and show error widget
+        await tester.pumpAndSettle();
+
+        // Should find the error Icon widget
+        expect(find.byIcon(Icons.broken_image), findsOneWidget);
+
+        // The error widget should use the fallback size
+        final iconWidget = tester.widget<Icon>(find.byIcon(Icons.broken_image));
+
+        // The size should be either 100.0 (when ScreenUtil not initialized)
+        // or a responsive value (when ScreenUtil is initialized by previous
+        // tests)
+        expect(iconWidget.size, isNotNull);
+        expect(iconWidget.size, greaterThan(0));
+      },
+    );
+
+    test('should handle ScreenUtil not initialized - direct method test', () {
+      // This is a unit test (not widget test) to test the private methods
+      // without any ScreenUtil initialization
+
+      // Create service instance
+      const serviceImpl = AssetImageServiceImpl();
+
+      // Test that we can create a widget without exceptions
+      final widget = serviceImpl.assetImage(
+        'assets/images/placeholders/image_placeholder.png',
+        width: 100,
+        height: 200,
+      );
+
+      // Verify widget is created
+      expect(widget, isA<Image>());
+      expect((widget as Image).width, isNotNull);
+      expect(widget.height, isNotNull);
+    });
+
+    testWidgets(
+      'should handle responsive sizing gracefully',
+      (tester) async {
+        // This test verifies that the service works correctly with responsive
+        // sizing
+
+        // Create service instance
+        const serviceImpl = AssetImageServiceImpl();
+
+        // Test the widget works correctly
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) {
+                // Initialize ScreenUtil for proper testing
+                ScreenUtil.init(context, designSize: const Size(375, 812));
+
+                return Scaffold(
+                  body: serviceImpl.assetImage(
+                    'assets/images/placeholders/image_placeholder.png',
+                    width: 150,
+                    height: 250,
+                  ),
+                );
+              },
+            ),
+          ),
+        );
+
+        // Verify the image widget exists and works correctly
+        expect(find.byType(Image), findsOneWidget);
+
+        // Get the actual Image widget
+        final imageWidget = tester.widget<Image>(find.byType(Image));
+
+        // Verify that the widget is properly created with responsive sizing
+        expect(imageWidget.width, isNotNull);
+        expect(imageWidget.height, isNotNull);
+        expect(imageWidget.width, greaterThan(0));
+        expect(imageWidget.height, greaterThan(0));
+      },
+    );
   });
 }

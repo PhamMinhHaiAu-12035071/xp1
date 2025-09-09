@@ -172,6 +172,7 @@ alwaysApply: true
 - **AI-Friendly Rules**: Be more AI-friendly with clear processing instructions when you are creating a rule only okay!
 - **Strict Adherence**: In every interaction with the user you will read and follow carefully and STRICTLY the .cursorrules file
 - **Tool Integration**: Always Use MCP Server Sequential Thinking, Context7-MCP, Clear Thought MCP Server, Think Tank
+- **Task Management**: Always use the to-do list tool to manage task processes and track progress throughout development
 
 # 🌐 ENVIRONMENT & ASSUMPTIONS
 

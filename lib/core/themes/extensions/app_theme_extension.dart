@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
+import 'package:xp1/core/assets/app_images.dart';
 import 'package:xp1/core/sizes/app_sizes.dart';
 import 'package:xp1/core/styles/app_text_styles.dart';
 import 'package:xp1/core/styles/colors/app_colors.dart';
@@ -15,4 +16,7 @@ extension AppThemeContext on BuildContext {
 
   /// Access to text styles
   AppTextStyles get textStyles => GetIt.I<AppTextStyles>();
+
+  /// Access to image assets
+  AppImages get images => GetIt.I<AppImages>();
 }

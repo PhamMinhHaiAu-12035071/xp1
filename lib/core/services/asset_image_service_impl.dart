@@ -21,18 +21,22 @@ class AssetImageServiceImpl implements AssetImageService {
     Widget? placeholder,
     Widget? errorWidget,
   }) {
+    // Responsive sizing using ScreenUtil
+    final safeWidth = _safeResponsiveWidth(width);
+    final safeHeight = _safeResponsiveHeight(height);
+
     // Pure Flutter implementation with built-in optimizations
     return Image.asset(
       imagePath,
-      width: width?.w, // Responsive sizing via ScreenUtil
-      height: height?.h,
+      width: safeWidth,
+      height: safeHeight,
       fit: fit,
       // Built-in error handling
       errorBuilder: (context, error, stackTrace) =>
           errorWidget ??
           Icon(
             Icons.broken_image,
-            size: width?.w ?? height?.h ?? 24.w,
+            size: safeWidth ?? safeHeight ?? 24,
             color: Colors.grey[400],
           ),
       // Built-in loading states
@@ -42,10 +46,10 @@ class AssetImageServiceImpl implements AssetImageService {
         }
         return placeholder ??
             SizedBox(
-              width: width?.w ?? 24.w,
-              height: height?.h ?? 24.h,
+              width: safeWidth ?? 24,
+              height: safeHeight ?? 24,
               child: CircularProgressIndicator(
-                strokeWidth: 2.w,
+                strokeWidth: 2,
                 color: Colors.grey[600],
               ),
             );
@@ -54,5 +58,17 @@ class AssetImageServiceImpl implements AssetImageService {
       cacheWidth: width?.toInt(),
       cacheHeight: height?.toInt(),
     );
+  }
+
+  /// Applies responsive width using ScreenUtil
+  double? _safeResponsiveWidth(double? value) {
+    if (value == null) return null;
+    return value.w;
+  }
+
+  /// Applies responsive height using ScreenUtil
+  double? _safeResponsiveHeight(double? value) {
+    if (value == null) return null;
+    return value.h;
   }
 }

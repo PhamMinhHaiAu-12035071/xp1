@@ -28,8 +28,8 @@ class SplashPage extends StatelessWidget {
               // Stay on splash screen
             },
             ready: () {
-              // Navigate to main app after 2 seconds
-              context.router.replaceAll([const MainWrapperRoute()]);
+              // Navigate to login page after 2 seconds
+              context.router.replaceAll([const LoginRoute()]);
             },
           );
         },

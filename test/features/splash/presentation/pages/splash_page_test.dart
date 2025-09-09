@@ -51,8 +51,9 @@ void main() {
       // Register fake for auto_route
       registerFallbackValue(FakePageRouteInfo());
       registerFallbackValue(const MainWrapperRoute());
+      registerFallbackValue(const LoginRoute());
       registerFallbackValue(
-        <PageRouteInfo>[const MainWrapperRoute()],
+        <PageRouteInfo>[const LoginRoute()],
       );
       registerFallbackValue(BoxFit.cover);
 
@@ -196,8 +197,8 @@ void main() {
       await tester.pump(); // Initial pump
       await tester.pump(); // State change pump
 
-      // Should navigate to MainWrapper
-      verify(() => mockRouter.replaceAll([const MainWrapperRoute()])).called(1);
+      // Should navigate to Login
+      verify(() => mockRouter.replaceAll([const LoginRoute()])).called(1);
     });
 
     testWidgets('should handle state changes correctly', (tester) async {
@@ -227,7 +228,7 @@ void main() {
       await tester.pump(); // ready
 
       // Should navigate once for ready state
-      verify(() => mockRouter.replaceAll([const MainWrapperRoute()])).called(1);
+      verify(() => mockRouter.replaceAll([const LoginRoute()])).called(1);
     });
 
     testWidgets('should complete quickly for user experience', (tester) async {
