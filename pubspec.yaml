@@ -49,6 +49,7 @@ dependencies:
   shared_preferences: ^2.3.3 # For locale persistence
 
   # === UI & THEMING ===
+  flutter_keyboard_visibility: ^6.0.0 # Keyboard visibility detection for better UX
   flutter_screenutil: ^5.9.3 # Responsive design utilities
   flutter_svg: ^2.0.10+1 # SVG rendering support (ESSENTIAL - no built-in Flutter support)
   google_fonts: ^6.2.1 # Google Fonts integration

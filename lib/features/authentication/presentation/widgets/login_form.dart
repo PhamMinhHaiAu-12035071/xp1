@@ -1,5 +1,6 @@
 import 'dart:ui' as ui;
 
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:xp1/core/assets/app_icons.dart';
@@ -168,7 +169,6 @@ class _FieldConfig {
     required this.animation,
     required this.prefixIcon,
     required this.label,
-    required this.validator,
     this.obscureText = false,
     this.suffixIcon,
     this.textInputAction = TextInputAction.next,
@@ -181,7 +181,6 @@ class _FieldConfig {
   final Animation<double> animation;
   final Widget prefixIcon;
   final String label;
-  final String? Function(String?) validator;
   final bool obscureText;
   final Widget? suffixIcon;
   final TextInputType keyboardType;
@@ -195,8 +194,12 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   final _passwordController = TextEditingController();
   final _usernameFocusNode = FocusNode();
   final _passwordFocusNode = FocusNode();
+
   bool _obscurePassword = true;
   bool _isLoading = false;
+  bool _hasSubmitted = false;
+  String? _usernameError;
+  String? _passwordError;
   late AnimationController _usernameBorderAnimationController;
   late AnimationController _passwordBorderAnimationController;
   late Animation<double> _usernameBorderAnimation;
@@ -235,7 +238,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     _passwordController.addListener(_onTextChange);
   }
 
-  /// Creates an animation controller with standard configuration.
   AnimationController _createAnimationController() {
     return AnimationController(
       duration: const Duration(milliseconds: 400),
@@ -265,7 +267,17 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
   /// Handles login form submission.
   Future<void> _handleLogin() async {
-    if (!_formKey.currentState!.validate()) return;
+    // Set submitted state to show errors
+    setState(() => _hasSubmitted = true);
+
+    // Validate all fields
+    _validateUsername(_usernameController.text);
+    _validatePassword(_passwordController.text);
+
+    // Check if there are any errors
+    if (_usernameError != null || _passwordError != null) {
+      return;
+    }
 
     setState(() => _isLoading = true);
 
@@ -291,7 +303,34 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   /// Handles text changes to trigger label animation rebuild.
   void _onTextChange() {
     setState(() {
-      // Trigger rebuild for label animation
+      // Clear submit state when user types to hide errors
+      _hasSubmitted = false;
+    });
+  }
+
+  /// Validates username field and updates error state.
+  void _validateUsername(String value) {
+    setState(() {
+      if (value.isEmpty) {
+        _usernameError = t.pages.login.validation.usernameRequired;
+      } else if (value.length < 3) {
+        _usernameError = t.pages.login.validation.usernameMinLength;
+      } else {
+        _usernameError = null;
+      }
+    });
+  }
+
+  /// Validates password field and updates error state.
+  void _validatePassword(String value) {
+    setState(() {
+      if (value.isEmpty) {
+        _passwordError = t.pages.login.validation.passwordRequired;
+      } else if (value.length < 6) {
+        _passwordError = t.pages.login.validation.passwordMinLength;
+      } else {
+        _passwordError = null;
+      }
     });
   }
 
@@ -321,6 +360,50 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     scaleFactor = scaleFactor.clamp(0.7, 1.0);
 
     return baseSpacing * scaleFactor;
+  }
+
+  /// Calculates precise left position for label alignment using LayoutBuilder.
+  ///
+  /// This method ensures the label is perfectly aligned with the text input
+  /// by using LayoutBuilder to measure the actual prefix icon dimensions
+  /// and calculate the exact position.
+  ///
+  /// [prefixIconWidth] The actual measured width of the prefix icon.
+  /// Returns the calculated left position for the label.
+  double _calculateLabelLeftPosition(double prefixIconWidth) {
+    // Base calculation: prefix icon width + content padding + small offset
+    final basePosition = prefixIconWidth + context.sizes.r16 + context.sizes.r4;
+
+    // Platform-specific adjustments
+    if (kIsWeb) {
+      // Web platform may need different offset for better alignment
+      // Reduce the offset slightly for web
+      return basePosition - context.sizes.r2;
+    } else {
+      // Mobile platforms (Android, iOS)
+      return basePosition;
+    }
+  }
+
+  /// Measures the prefix icon width using calculated dimensions.
+  ///
+  /// This method calculates the prefix icon width based on its known
+  /// dimensions: padding (r12) + icon size (r8) + padding (r12) = r32.
+  /// This approach is more reliable than GlobalKey measurement across
+  /// different platforms.
+  double _measurePrefixIconWidth() {
+    // Base calculation: padding (r12) + icon size (r8) + padding (r12) = r32
+    final baseWidth = context.sizes.r12 + context.sizes.r8 + context.sizes.r12;
+
+    // Platform-specific adjustments
+    if (kIsWeb) {
+      // Web platform may have different rendering, adjust accordingly
+      // Reduce the width slightly for better alignment on web
+      return baseWidth - context.sizes.r8;
+    } else {
+      // Mobile platforms (Android, iOS)
+      return baseWidth;
+    }
   }
 
   /// Builds a prefix icon with consistent styling.
@@ -354,25 +437,62 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     );
   }
 
+  /// Builds custom error text widget with consistent styling.
+  /// Only shows error when form has been submitted.
+  Widget _buildErrorText(String? error) {
+    if (error == null || !_hasSubmitted) {
+      return SizedBox(height: context.sizes.v20); // Maintain spacing
+    }
+
+    return AnimatedContainer(
+      duration: const Duration(milliseconds: 200),
+      curve: Curves.easeInOut,
+      height: context.sizes.v20,
+      child: Align(
+        alignment: Alignment.centerLeft,
+        child: Text(
+          error,
+          style: context.textStyles.bodySmall().copyWith(
+            color: Colors.red,
+            fontWeight: FontWeight.w400,
+          ),
+        ),
+      ),
+    );
+  }
+
   /// Builds the eye visibility toggle icon using SVG service with ripple
   /// effect.
   Widget _buildEyeIcon() {
     final iconService = GetIt.instance<SvgIconService>();
     final appIcons = GetIt.instance<AppIcons>();
 
-    return IconButton(
-      onPressed: () => setState(() => _obscurePassword = !_obscurePassword),
-      icon: iconService.svgIcon(
-        _obscurePassword ? appIcons.eye : appIcons.eyeOff,
-        size: context.sizes.r8,
-        color: context.colors.blueNormal,
-        semanticLabel: _obscurePassword
-            ? t.pages.login.semantic.showPassword
-            : t.pages.login.semantic.hidePassword,
+    // Sử dụng Material + InkWell để ripple là hình chữ nhật thay vì hình tròn
+    return Material(
+      color: Colors.transparent,
+      borderRadius: BorderRadius.circular(context.sizes.r32),
+      child: InkWell(
+        borderRadius: BorderRadius.circular(context.sizes.r32),
+        onTap: () {
+          setState(() {
+            _obscurePassword = !_obscurePassword;
+          });
+        },
+        child: SizedBox(
+          width: context.sizes.r32,
+          height: context.sizes.r32,
+          child: Center(
+            child: iconService.svgIcon(
+              _obscurePassword ? appIcons.eye : appIcons.eyeOff,
+              size: context.sizes.r24,
+              color: context.colors.blueNormal,
+              semanticLabel: _obscurePassword
+                  ? t.pages.login.semantic.showPassword
+                  : t.pages.login.semantic.hidePassword,
+            ),
+          ),
+        ),
       ),
-      splashRadius: context.sizes.r16,
-      padding: EdgeInsets.zero,
-      constraints: const BoxConstraints(),
     );
   }
 
@@ -420,10 +540,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         borderRadius: BorderRadius.circular(context.sizes.r8),
         borderSide: BorderSide.none,
       ),
-      errorBorder: OutlineInputBorder(
-        borderRadius: BorderRadius.circular(context.sizes.r8),
-        borderSide: const BorderSide(color: Colors.red),
-      ),
       filled: true,
       fillColor: const Color(0xFFFFFFFF),
       contentPadding: EdgeInsets.symmetric(
@@ -436,6 +552,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   /// Builds a unified animated input field with consistent styling.
   Widget _buildAnimatedField(_FieldConfig config) {
     return Container(
+      height: context.sizes.r48,
       decoration: _createFieldDecoration(),
       child: AnimatedBuilder(
         animation: config.animation,
@@ -460,6 +577,12 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                 keyboardType: config.keyboardType,
                 textInputAction: config.textInputAction,
                 onFieldSubmitted: config.onFieldSubmitted,
+                onChanged: (value) {
+                  // Clear submit state when user types to hide errors
+                  if (_hasSubmitted) {
+                    setState(() => _hasSubmitted = false);
+                  }
+                },
                 decoration: _createInputDecoration(
                   config.prefixIcon,
                   config.suffixIcon,
@@ -473,13 +596,12 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                     : context.textStyles.bodyMedium().copyWith(
                         color: context.colors.blueNormal,
                       ),
-                validator: config.validator,
               ),
-              // Custom positioned label with animation
+              // Custom positioned label with calculated alignment
               AnimatedPositioned(
                 duration: const Duration(milliseconds: 200),
                 curve: Curves.easeInOut,
-                left: context.sizes.r56,
+                left: _calculateLabelLeftPosition(_measurePrefixIconWidth()),
                 top:
                     (config.focusNode.hasFocus ||
                         config.controller.text.isNotEmpty)
@@ -522,15 +644,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         t.pages.login.semantic.usernameIcon,
       ),
       label: t.pages.login.form.username,
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return t.pages.login.validation.usernameRequired;
-        }
-        if (value.length < 3) {
-          return t.pages.login.validation.usernameMinLength;
-        }
-        return null;
-      },
     );
 
     final passwordConfig = _FieldConfig(
@@ -548,20 +661,16 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       obscureText: _obscurePassword,
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _handleLogin(),
-      validator: (value) {
-        if (value == null || value.isEmpty) {
-          return t.pages.login.validation.passwordRequired;
-        }
-        if (value.length < 6) {
-          return t.pages.login.validation.passwordMinLength;
-        }
-        return null;
-      },
     );
 
-    return Form(
-      key: _formKey,
-      child: SingleChildScrollView(
+    return Padding(
+      padding: EdgeInsets.only(
+        left: context.sizes.r24,
+        right: context.sizes.r24,
+        top: context.sizes.r16,
+      ),
+      child: Form(
+        key: _formKey,
         child: Column(
           mainAxisSize: MainAxisSize.min,
           crossAxisAlignment: CrossAxisAlignment.stretch,
@@ -571,13 +680,25 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
             SizedBox(height: _getResponsiveSpacing(context.sizes.v16)),
 
-            // Username field
-            _buildAnimatedField(usernameConfig),
+            // Username field with error message
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAnimatedField(usernameConfig),
+                _buildErrorText(_usernameError),
+              ],
+            ),
 
             SizedBox(height: _getResponsiveSpacing(context.sizes.v20)),
 
-            // Password field
-            _buildAnimatedField(passwordConfig),
+            // Password field with error message
+            Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                _buildAnimatedField(passwordConfig),
+                _buildErrorText(_passwordError),
+              ],
+            ),
 
             SizedBox(height: _getResponsiveSpacing(context.sizes.v12)),
 

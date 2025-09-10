@@ -159,9 +159,8 @@ void main() {
         expect(find.byType(LoginCarousel), findsOneWidget);
 
         // Should have Expanded widgets for proper layout
-        // LoginPage, LoginCarousel, and LoginForm now have multiple Expanded
-        // widgets
-        expect(find.byType(Expanded), findsAtLeastNWidgets(2));
+        // LoginCarousel contains 1 Expanded widget for layout structure
+        expect(find.byType(Expanded), findsOneWidget);
       });
 
       testWidgets(
