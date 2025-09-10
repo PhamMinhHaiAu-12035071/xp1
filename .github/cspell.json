@@ -147,7 +147,13 @@
     "xxxhdpi",
     "imageset",
     "tappable",
-    "precaching"
+    "precaching",
+    
+    "overcomplicate",
+    "usecases",
+    "usecase",
+    "datasource",
+    "phamau"
   ],
   "ignorePaths": [
     "build/**",
