@@ -53,6 +53,12 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
       - name: 🔧 Setup build environment
         run: |
           # Install make if not available
@@ -60,6 +66,11 @@ jobs:
             echo "Installing make..."
             sudo apt-get update
             sudo apt-get install -y make
+          fi
+          # Install lefthook for git hooks
+          if ! command -v lefthook &> /dev/null; then
+            echo "Installing lefthook..."
+            npm install -g @arkweid/lefthook
           fi
           # Make scripts executable
           chmod +x scripts/*.sh || true
@@ -94,6 +105,12 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
       - name: 🔧 Setup build environment
         run: |
           # Install make if not available
@@ -101,6 +118,11 @@ jobs:
             echo "Installing make..."
             sudo apt-get update
             sudo apt-get install -y make
+          fi
+          # Install lefthook for git hooks
+          if ! command -v lefthook &> /dev/null; then
+            echo "Installing lefthook..."
+            npm install -g @arkweid/lefthook
           fi
           # Make scripts executable
           chmod +x scripts/*.sh || true
@@ -135,6 +157,12 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
       - name: 🔧 Setup build environment
         run: |
           # Install make if not available
@@ -142,6 +170,11 @@ jobs:
             echo "Installing make..."
             sudo apt-get update
             sudo apt-get install -y make
+          fi
+          # Install lefthook for git hooks
+          if ! command -v lefthook &> /dev/null; then
+            echo "Installing lefthook..."
+            npm install -g @arkweid/lefthook
           fi
           # Make scripts executable
           chmod +x scripts/*.sh || true
@@ -170,6 +203,12 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      - name: 🔧 Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: "18"
+          cache: "npm"
+
       - name: 🔧 Setup build environment
         run: |
           # Install make if not available
@@ -177,6 +216,11 @@ jobs:
             echo "Installing make..."
             sudo apt-get update
             sudo apt-get install -y make
+          fi
+          # Install lefthook for git hooks
+          if ! command -v lefthook &> /dev/null; then
+            echo "Installing lefthook..."
+            npm install -g @arkweid/lefthook
           fi
           # Make scripts executable
           chmod +x scripts/*.sh || true
