@@ -151,6 +151,11 @@ class AppBootstrap {
 /// modular bootstrap system internally. It handles the complete
 /// initialization and app startup sequence.
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
+  // CRITICAL: Initialize Flutter bindings BEFORE dependency injection
+  // This is required because SharedPreferences and other platform services
+  // need Flutter's platform channels to be available
+  WidgetsFlutterBinding.ensureInitialized();
+
   const appBootstrap = AppBootstrap();
 
   // Execute bootstrap sequence

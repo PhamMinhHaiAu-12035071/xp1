@@ -39,42 +39,42 @@ local-ci: test-scripts semantic-check flutter-ci
 # Quick development commands
 check:
 	@echo "✅ Quick development check..."
-	@fvm dart format lib/ test/ || true
+	@$(DART_CMD) format lib/ test/ || true
 	@if git diff --quiet lib/ test/; then \
 		echo "✅ Code formatted successfully."; \
 	else \
 		echo "❌ Code formatting required."; \
 		exit 1; \
 	fi
-	@fvm dart analyze --fatal-infos
+	@$(DART_CMD) analyze --fatal-infos
 
 check-strict:
 	@echo "🔍 Strict development check..."
-	@fvm dart format lib/ test/ || true
+	@$(DART_CMD) format lib/ test/ || true
 	@if git diff --quiet lib/ test/; then \
 		echo "✅ Code formatted successfully."; \
 	else \
 		echo "❌ Code formatting required."; \
 		exit 1; \
 	fi
-	@fvm dart analyze --fatal-infos --fatal-warnings
+	@$(DART_CMD) analyze --fatal-infos --fatal-warnings
 
 check-all:
 	@echo "🔍 Complete development check..."
-	@fvm dart format lib/ test/ || true
+	@$(DART_CMD) format lib/ test/ || true
 	@if git diff --quiet lib/ test/; then \
 		echo "✅ Code formatted successfully."; \
 	else \
 		echo "❌ Code formatting required."; \
 		exit 1; \
 	fi
-	@fvm dart analyze --fatal-infos
-	@fvm dart run dependency_validator
+	@$(DART_CMD) analyze --fatal-infos
+	@$(DART_CMD) run dependency_validator
 	@very_good packages check licenses --forbidden="GPL-2.0,GPL-3.0,LGPL-2.1,LGPL-3.0,AGPL-3.0,unknown,CC-BY-SA-4.0,SSPL-1.0" --dependency-type="direct-main,direct-dev"
 
 format:
 	@echo "🎨 Formatting code..."
-	@fvm dart format lib/ test/
+	@$(DART_CMD) format lib/ test/
 	@if git diff --quiet lib/ test/; then \
 		echo "✅ Code is already formatted."; \
 	else \
@@ -83,7 +83,7 @@ format:
 
 format-check:
 	@echo "🔍 Checking code format..."
-	@fvm dart format lib/ test/ || true
+	@$(DART_CMD) format lib/ test/ || true
 	@if git diff --quiet lib/ test/; then \
 		echo "✅ Code is properly formatted."; \
 	else \
@@ -94,30 +94,30 @@ format-check:
 
 analyze:
 	@echo "🔍 Analyzing code..."
-	@fvm dart analyze --fatal-infos
+	@$(DART_CMD) analyze --fatal-infos
 
 analyze-quick:
 	@echo "⚡ Quick analysis..."
-	@fvm dart analyze --fatal-infos
+	@$(DART_CMD) analyze --fatal-infos
 
 analyze-strict:
 	@echo "🔍 Strict analysis..."
-	@fvm dart analyze --fatal-infos --fatal-warnings
+	@$(DART_CMD) analyze --fatal-infos --fatal-warnings
 
 validate-deps:
 	@echo "📦 Validating dependencies..."
-	@fvm dart run dependency_validator
+	@$(DART_CMD) run dependency_validator
 
 test:
 	@echo "🧪 Running unit tests..."
-	@fvm flutter test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/
+	@$(FLUTTER_CMD) test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/
 
 # Test coverage commands using flutter test (more reliable than very_good test --coverage)
 coverage:
 	@echo "🧪📊 Running complete coverage workflow..."
 	@echo "1️⃣ Running unit tests with coverage..."
 	@echo "⚠️  Note: Using flutter test --coverage for reliable coverage generation"
-	@fvm flutter test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/ --coverage
+	@$(FLUTTER_CMD) test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/ --coverage
 	@echo "2️⃣ Generating HTML coverage report..."
 	@if command -v genhtml >/dev/null 2>&1; then \
 		genhtml coverage/lcov.info -o coverage/html --title "xp1 Test Coverage"; \
@@ -158,43 +158,43 @@ coverage-clean:
 # Build commands
 build-android:
 	@echo "🤖 Building Android APK..."
-	@fvm flutter build apk --release
+	@$(FLUTTER_CMD) build apk --release
 
 build-ios:
 	@echo "🍎 Building iOS..."
-	@fvm flutter build ios --release
+	@$(FLUTTER_CMD) build ios --release
 
 build-web:
 	@echo "🌐 Building Web..."
-	@fvm flutter build web --release
+	@$(FLUTTER_CMD) build web --release
 
 build-dev:
 	@echo "🔨 Building development APK..."
-	@fvm flutter build apk --debug --dart-define=ENVIRONMENT=development
+	@$(FLUTTER_CMD) build apk --debug --dart-define=ENVIRONMENT=development
 
 build-staging:
 	@echo "🔨 Building staging APK..."
-	@fvm flutter build apk --release --dart-define=ENVIRONMENT=staging
+	@$(FLUTTER_CMD) build apk --release --dart-define=ENVIRONMENT=staging
 
 build-prod:
 	@echo "🔨 Building production APK..."
-	@fvm flutter build apk --release --dart-define=ENVIRONMENT=production
+	@$(FLUTTER_CMD) build apk --release --dart-define=ENVIRONMENT=production
 
 # Environment generation commands
 generate-env-dev:
 	@echo "🏗️ Generating development environment..."
-	@fvm dart run build_runner clean
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner clean
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 
 generate-env-staging:
 	@echo "🏗️ Generating staging environment..."
-	@fvm dart run build_runner clean
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner clean
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
 
 generate-env-prod:
 	@echo "🏗️ Generating production environment..."
-	@fvm dart run build_runner clean
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner clean
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
 
 # Internationalization (i18n) commands using Slang
 i18n-generate:
@@ -255,49 +255,49 @@ i18n-help:
 # Development commands
 deps:
 	@echo "📦 Installing dependencies..."
-	@fvm flutter pub get
+	@$(FLUTTER_CMD) pub get
 	@lefthook install
 
 clean:
 	@echo "🧹 Cleaning build files..."
-	@fvm flutter clean
-	@fvm flutter pub get
+	@$(FLUTTER_CMD) clean
+	@$(FLUTTER_CMD) pub get
 
 reset:
 	@echo "🔄 Resetting project..."
-	@fvm flutter clean
-	@fvm flutter pub get
-	@fvm flutter pub run build_runner build --delete-conflicting-outputs
+	@$(FLUTTER_CMD) clean
+	@$(FLUTTER_CMD) pub get
+	@$(FLUTTER_CMD) pub run build_runner build --delete-conflicting-outputs
 
 # Git hooks and commit commands
 pre-commit:
 	@echo "🚀 Running pre-commit checks..."
-	@fvm dart format lib/ test/ || true
+	@$(DART_CMD) format lib/ test/ || true
 	@if git diff --quiet lib/ test/; then \
 		echo "✅ Code formatted successfully."; \
 	else \
 		echo "❌ Code formatting required."; \
 		exit 1; \
 	fi
-	@fvm dart analyze --fatal-infos
+	@$(DART_CMD) analyze --fatal-infos
 	@make test
 
 # Setup commands
 setup:
 	@echo "⚙️ Setting up project..."
 	@npm install
-	@fvm flutter pub get
+	@$(FLUTTER_CMD) pub get
 	@chmod +x scripts/*.sh
 	@echo "✅ Project setup completed"
 
 setup-full:
 	@echo "⚙️ Complete project setup..."
 	@npm install
-	@fvm flutter pub get
+	@$(FLUTTER_CMD) pub get
 	@chmod +x scripts/*.sh
 	@./scripts/setup-env.sh
 	@lefthook install
-	@fvm dart run tool/validate_commit.dart --help || echo 'Commit validator ready'
+	@$(DART_CMD) run tool/validate_commit.dart --help || echo 'Commit validator ready'
 	@echo "✅ Complete setup finished"
 
 # Git hooks management
@@ -313,19 +313,19 @@ hooks-uninstall:
 test-commit-validation:
 	@echo "✅ Testing commit validation..."
 	@echo 'feat(test): add validation example' > .tmp/test_commit
-	@fvm dart run tool/validate_commit.dart .tmp/test_commit
+	@$(DART_CMD) run tool/validate_commit.dart .tmp/test_commit
 	@rm .tmp/test_commit
 
 # Naming conventions enforcement - Simplified per Linus review
 naming-check:
 	@echo "🔍 Checking naming conventions..."
-	@fvm dart analyze --fatal-infos
+	@$(DART_CMD) analyze --fatal-infos
 	@echo "✅ Naming check completed"
 
 naming-fix:
 	@echo "🔧 Applying naming fixes..."
-	@fvm dart fix --apply
-	@fvm dart format lib/ test/ || true
+	@$(DART_CMD) fix --apply
+	@$(DART_CMD) format lib/ test/ || true
 	@if git diff --quiet lib/ test/; then \
 		echo "✅ Code formatted after naming fixes."; \
 	else \
@@ -428,8 +428,8 @@ license-override: check-very-good-cli
 # Clean and recheck
 license-clean-check:
 	@echo "🧹 Cleaning and rechecking licenses..."
-	@fvm flutter clean
-	@fvm flutter pub get
+	@$(FLUTTER_CMD) clean
+	@$(FLUTTER_CMD) pub get
 	@make license-check
 
 # License help command
@@ -451,52 +451,52 @@ license-help:
 # Private helper target for common installation steps
 .PHONY: _install_common
 _install_common:
-	@fvm flutter clean
-	@fvm flutter pub get
+	@$(FLUTTER_CMD) clean
+	@$(FLUTTER_CMD) pub get
 	@npm install
 	@chmod +x scripts/*.sh
 	@./scripts/setup-env.sh
 	@lefthook install
-	@fvm dart run build_runner clean
+	@$(DART_CMD) run build_runner clean
 
 # Complete environment setup commands for new team members
 install-dev: _install_common
 	@echo "🚀 Setting up complete development environment..."
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 	@echo "✅ Development environment ready!"
 
 install-staging: _install_common
 	@echo "🚀 Setting up complete staging environment..."
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
 	@echo "✅ Staging environment ready!"
 
 install-prod: _install_common
 	@echo "🚀 Setting up complete production environment..."
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
 	@echo "✅ Production environment ready!"
 
 install-all: _install_common
 	@echo "🚀 Setting up ALL environments..."
 	@echo "📦 Building development..."
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/development.env --delete-conflicting-outputs
 	@echo "📦 Building staging..."
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/staging.env --delete-conflicting-outputs
 	@echo "📦 Building production..."
-	@fvm dart run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
 	@echo "🎉 ALL environments ready!"
 
 # Environment-specific run commands
 run-dev:
 	@echo "🏃 Running development environment..."
-	@fvm flutter run --dart-define=ENVIRONMENT=development --target=lib/main_development.dart
+	@$(FLUTTER_CMD) run --dart-define=ENVIRONMENT=development --target=lib/main_development.dart
 
 run-staging:
 	@echo "🏃 Running staging environment..."
-	@fvm flutter run --dart-define=ENVIRONMENT=staging --target=lib/main_staging.dart
+	@$(FLUTTER_CMD) run --dart-define=ENVIRONMENT=staging --target=lib/main_staging.dart
 
 run-prod:
 	@echo "🏃 Running production environment..."
-	@fvm flutter run --dart-define=ENVIRONMENT=production --target=lib/main_production.dart
+	@$(FLUTTER_CMD) run --dart-define=ENVIRONMENT=production --target=lib/main_production.dart
 
 # Help command
 help:
