@@ -109,6 +109,7 @@ flutter:
     - assets/images/icons/
 
     # SVG Icons by category (organized structure for TDD)
+    - assets/icons/ # Root level icons (account.svg, etc.)
     - assets/icons/ui/
     - assets/icons/status/
     - assets/icons/action/

@@ -120,11 +120,12 @@ class _LoginCarouselState extends State<LoginCarousel>
 
   /// Animated transition to next image with fade effect.
   Future<void> _transitionToIndex(int newIndex) async {
-    if (_isTransitioning) return;
+    if (_isTransitioning || !mounted) return;
 
     final images = _getImages(context);
     if (images.isEmpty) return;
 
+    if (!mounted) return;
     setState(() {
       _isTransitioning = true;
       _nextIndex = newIndex % images.length;
@@ -134,6 +135,7 @@ class _LoginCarouselState extends State<LoginCarousel>
     await _fadeController.reverse();
 
     // Update current index
+    if (!mounted) return;
     setState(() {
       _currentIndex = _nextIndex;
     });
@@ -142,6 +144,7 @@ class _LoginCarouselState extends State<LoginCarousel>
     // (AnimatedSmoothIndicator will auto-animate to _currentIndex)
     await _fadeController.forward();
 
+    if (!mounted) return;
     setState(() {
       _isTransitioning = false;
     });
@@ -263,8 +266,7 @@ class _LoginCarouselState extends State<LoginCarousel>
       children: [
         // Enhanced image carousel with fade animation and gesture support
         Expanded(
-          child: Container(
-            color: context.colors.amberDarker,
+          child: SizedBox(
             width: double.infinity,
             child: GestureDetector(
               onTap: () => widget.onImageTap?.call(

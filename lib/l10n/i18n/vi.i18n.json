@@ -20,7 +20,28 @@
       "title": "Đăng nhập",
       "welcomeMessage": "Chào mừng đến với {pageName}",
       "instruction": "Vui lòng đăng nhập để tiếp tục",
-      "forgotPassword": "Quên mật khẩu?"
+      "forgotPassword": "Quên mật khẩu?",
+      "welcome": {
+        "title": "Xin chào!",
+        "subtitle": "Vui lòng đăng nhập"
+      },
+      "form": {
+        "username": "Tên đăng nhập",
+        "password": "Mật khẩu"
+      },
+      "validation": {
+        "usernameRequired": "Vui lòng nhập tên đăng nhập",
+        "usernameMinLength": "Tên đăng nhập phải có ít nhất 3 ký tự",
+        "passwordRequired": "Vui lòng nhập mật khẩu",
+        "passwordMinLength": "Mật khẩu phải có ít nhất 6 ký tự"
+      },
+      "signInButton": "Đăng nhập",
+      "semantic": {
+        "showPassword": "Hiện mật khẩu",
+        "hidePassword": "Ẩn mật khẩu",
+        "usernameIcon": "Biểu tượng tài khoản",
+        "passwordIcon": "Biểu tượng bảo mật"
+      }
     },
     "attendance": {
       "title": "Chấm công",

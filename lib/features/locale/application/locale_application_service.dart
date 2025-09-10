@@ -131,7 +131,7 @@ class LocaleApplicationService {
       await _applyLocaleToSession(
         AppLocale.values.firstWhere(
           (locale) => locale.languageCode == configuration.languageCode,
-          orElse: () => AppLocale.en, // Fallback to English
+          orElse: () => AppLocale.vi, // Fallback to Vietnamese
         ),
       );
 

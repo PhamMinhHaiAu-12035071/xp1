@@ -700,10 +700,10 @@ void main() {
 
       test('should return correct blue normal MaterialColor', () {
         final materialColor = appColors.blueNormal;
-        expect(materialColor.toARGB32(), equals(0xFF357DFF));
-        expect(materialColor[500], equals(const Color(0xFF357DFF)));
-        expect(materialColor[50], equals(const Color(0xFFEBF3FF)));
-        expect(materialColor[900], equals(const Color(0xFF194999)));
+        expect(materialColor.toARGB32(), equals(0xFF8B95A7));
+        expect(materialColor[500], equals(const Color(0xFF8B95A7)));
+        expect(materialColor[50], equals(const Color(0xFFF4F5F7)));
+        expect(materialColor[900], equals(const Color(0xFF535963)));
       });
 
       test('should return correct blue normal hover MaterialColor', () {
@@ -757,7 +757,7 @@ void main() {
       });
 
       test('should return correct blue normal color', () {
-        expect(appColors.blueNormal.toARGB32(), equals(0xFF357DFF));
+        expect(appColors.blueNormal.toARGB32(), equals(0xFF8B95A7));
       });
 
       test('should return correct blue normal hover color', () {

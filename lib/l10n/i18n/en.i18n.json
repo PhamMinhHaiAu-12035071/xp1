@@ -20,7 +20,28 @@
       "title": "Login",
       "welcomeMessage": "Welcome to {pageName}",
       "instruction": "Please login to continue",
-      "forgotPassword": "Forgot Password?"
+      "forgotPassword": "Forgot Password?",
+      "welcome": {
+        "title": "Hello!",
+        "subtitle": "Please sign in"
+      },
+      "form": {
+        "username": "Username",
+        "password": "Password"
+      },
+      "validation": {
+        "usernameRequired": "Please enter your username",
+        "usernameMinLength": "Username must be at least 3 characters",
+        "passwordRequired": "Please enter your password",
+        "passwordMinLength": "Password must be at least 6 characters"
+      },
+      "signInButton": "Sign In",
+      "semantic": {
+        "showPassword": "Show password",
+        "hidePassword": "Hide password",
+        "usernameIcon": "Username account icon",
+        "passwordIcon": "Password security icon"
+      }
     },
     "attendance": {
       "title": "Attendance",

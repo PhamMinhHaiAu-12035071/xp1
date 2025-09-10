@@ -37,6 +37,14 @@ class WidgetbookApp extends StatelessWidget {
             Devices.ios.iPhoneSE,
             Devices.ios.iPhone12ProMax,
 
+            // === ANDROID DEVICES ===
+            DeviceInfo.genericPhone(
+              id: 'design-size',
+              name: 'Design Size',
+              platform: TargetPlatform.android,
+              screenSize: const Size(393, 852),
+            ),
+
             // === TABLETS ===
             Devices.ios.iPadAir4,
             Devices.ios.iPadPro11Inches,

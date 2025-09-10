@@ -68,6 +68,10 @@ abstract class AppColors {
   /// Slate blue color
   Color get slateBlue;
 
+  /// Placeholder text color (#8B95A7)
+  /// Used for input field placeholder text
+  Color get placeholderText;
+
   /// Onboarding background color
   Color get onboardingBackground;
 

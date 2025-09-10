@@ -19,6 +19,12 @@ abstract class AppIcons {
   /// Close X icon path
   String get close;
 
+  /// Eye visibility icon path
+  String get eye;
+
+  /// Eye visibility off icon path
+  String get eyeOff;
+
   // Status Icons
   /// Success checkmark icon path
   String get success;
@@ -44,6 +50,13 @@ abstract class AppIcons {
 
   /// Filter funnel icon path
   String get filter;
+
+  // User Account Icons
+  /// Account user profile icon path
+  String get account;
+
+  /// Password security icon path
+  String get password;
 
   // Brand Assets
   /// Company logo icon path

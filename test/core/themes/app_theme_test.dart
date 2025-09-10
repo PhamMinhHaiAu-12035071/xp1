@@ -59,6 +59,9 @@ class TestAppColors implements AppColors {
   @override
   Color get textSecondaryDark => const Color(0xFFCBD5E1);
 
+  @override
+  Color get placeholderText => const Color(0xFF8B95A7);
+
   // Other properties (not used in this test)
   @override
   MaterialColor get black => throw UnimplementedError();

@@ -1,11 +1,15 @@
 import 'package:get_it/get_it.dart';
 import 'package:mocktail/mocktail.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:xp1/core/assets/app_icons.dart';
+import 'package:xp1/core/assets/app_icons_impl.dart';
 import 'package:xp1/core/assets/app_images.dart';
 import 'package:xp1/core/assets/app_images_impl.dart';
 import 'package:xp1/core/infrastructure/logging/i_logger_service.dart';
 import 'package:xp1/core/services/asset_image_service.dart';
 import 'package:xp1/core/services/asset_image_service_impl.dart';
+import 'package:xp1/core/services/svg_icon_service.dart';
+import 'package:xp1/core/services/svg_icon_service_impl.dart';
 import 'package:xp1/core/sizes/app_sizes.dart';
 import 'package:xp1/core/sizes/app_sizes_impl.dart';
 import 'package:xp1/core/styles/app_text_styles.dart';
@@ -41,10 +45,14 @@ class TestDependencyContainer {
       ..registerLazySingleton<AppColors>(() => const AppColorsImpl())
       ..registerLazySingleton<AppSizes>(() => const AppSizesImpl())
       ..registerLazySingleton<AppTextStyles>(() => const AppTextStylesImpl())
-      // Register asset services required by SplashContent
+      // Register asset services required by SplashContent and LoginForm
+      ..registerLazySingleton<AppIcons>(() => const AppIconsImpl())
       ..registerLazySingleton<AppImages>(() => const AppImagesImpl())
       ..registerLazySingleton<AssetImageService>(
         () => const AssetImageServiceImpl(),
+      )
+      ..registerLazySingleton<SvgIconService>(
+        () => const SvgIconServiceImpl(),
       )
       // Register SplashCubit for splash screen functionality
       ..registerFactory<SplashCubit>(SplashCubit.new);

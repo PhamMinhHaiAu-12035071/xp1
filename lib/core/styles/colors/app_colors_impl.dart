@@ -146,6 +146,8 @@ class AppColorsImpl implements AppColors {
   @override
   Color get slateBlue => const Color(0xFF607395);
   @override
+  Color get placeholderText => const Color(0xFF8B95A7);
+  @override
   Color get onboardingBackground => const Color(0xFFE9F0F2);
   @override
   Color get onboardingGradientStart => const Color(0xFF00B3C6);
@@ -980,18 +982,18 @@ class AppColorsImpl implements AppColors {
 
   @override
   MaterialColor get blueNormal => const MaterialColor(
-    0xFF357DFF,
+    0xFF8B95A7,
     <int, Color>{
-      50: Color(0xFFEBF3FF), // Very light
-      100: Color(0xFFD7E7FF), // Light
-      200: Color(0xFFAFCFFF), // Medium light
-      300: Color(0xFF87BFFF), // Medium
-      400: Color(0xFF5F9FFF), // Medium dark
-      500: Color(0xFF357DFF), // Normal base (main blue)
-      600: Color(0xFF2E70E6), // Darker
-      700: Color(0xFF2763CC), // Much darker
-      800: Color(0xFF2056B3), // Deep
-      900: Color(0xFF194999), // Darkest
+      50: Color(0xFFF4F5F7), // Very light
+      100: Color(0xFFE8EAED), // Light
+      200: Color(0xFFD1D5DB), // Medium light
+      300: Color(0xFFBAC0C9), // Medium
+      400: Color(0xFFA3ABB7), // Medium dark
+      500: Color(0xFF8B95A7), // Normal base (main blue-gray)
+      600: Color(0xFF7D8696), // Darker
+      700: Color(0xFF6F7785), // Much darker
+      800: Color(0xFF616874), // Deep
+      900: Color(0xFF535963), // Darkest
     },
   );
 
@@ -1109,7 +1111,7 @@ class AppColorsImpl implements AppColors {
   Color get blueLightActiveColor => const Color(0xFFAFCFFF);
 
   /// Direct access to blue normal color value
-  Color get blueNormalColor => const Color(0xFF357DFF);
+  Color get blueNormalColor => const Color(0xFF8B95A7);
 
   /// Direct access to blue normal hover color value
   Color get blueNormalHoverColor => const Color(0xFF2366E6);

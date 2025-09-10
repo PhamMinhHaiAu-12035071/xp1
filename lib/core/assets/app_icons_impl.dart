@@ -26,6 +26,12 @@ class AppIconsImpl implements AppIcons {
   String get close => 'assets/icons/ui/close.svg';
 
   @override
+  String get eye => 'assets/icons/ui/eye.svg';
+
+  @override
+  String get eyeOff => 'assets/icons/ui/eye_off.svg';
+
+  @override
   String get success => 'assets/icons/status/success.svg';
 
   @override
@@ -48,6 +54,12 @@ class AppIconsImpl implements AppIcons {
 
   @override
   String get filter => 'assets/icons/action/filter.svg';
+
+  @override
+  String get account => 'assets/icons/account.svg';
+
+  @override
+  String get password => 'assets/icons/password.svg';
 
   @override
   String get logo => 'assets/icons/brand/logo.svg';
