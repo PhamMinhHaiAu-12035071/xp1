@@ -46,7 +46,7 @@ All design system services are automatically registered in the DI container:
 @LazySingleton(as: AppColors)
 class AppColorsImpl implements AppColors { ... }
 
-@LazySingleton(as: AppTextStyles)  
+@LazySingleton(as: AppTextStyles)
 class AppTextStylesImpl implements AppTextStyles { ... }
 
 @LazySingleton(as: AppSizes)
@@ -64,7 +64,7 @@ class MyWidget extends StatelessWidget {
     final appColors = GetIt.instance<AppColors>();
     final appTextStyles = GetIt.instance<AppTextStyles>();
     final appSizes = GetIt.instance<AppSizes>();
-    
+
     return Container(
       width: appSizes.r120,                     // 120px responsive
       padding: EdgeInsets.all(appSizes.r16),   // 16px responsive padding
@@ -90,6 +90,7 @@ class MyWidget extends StatelessWidget {
 The color system provides **8 complete color palettes** with comprehensive variations:
 
 #### Brand Colors
+
 - **Amber Palette**: Primary brand colors with 5 variants each
   - `amberLight` (#FF9575) - Light backgrounds, subtle highlights
   - `amberNormal` (#FF6B35) - Main brand color, primary CTAs
@@ -98,18 +99,21 @@ The color system provides **8 complete color palettes** with comprehensive varia
   - **Interactive States**: Each color has hover/active variants
 
 #### Semantic Colors
+
 - **Green Palette**: Success states, positive indicators
-- **Red Palette**: Error states, danger alerts, critical actions  
+- **Red Palette**: Error states, danger alerts, critical actions
 - **Blue Palette**: Information states, links, secondary actions
 - **Orange Palette**: Accent elements, highlights, warnings
 
 #### Neutral Colors
+
 - **Grey Palette**: Text, backgrounds, borders with comprehensive variations
 - **Charcoal** (#2D3436): Primary text color
 - **Warm Gray** (#8B7355): Secondary text, placeholders
 - **Light Gray** (#F8F9FA): Page backgrounds, card backgrounds
 
 #### Specialty Colors
+
 - **Pink Palette**: Accent elements, feminine design
 - **Slate Palette**: Dark themes, professional UI elements
 
@@ -124,14 +128,14 @@ Widget buildInteractiveButton({
   required VoidCallback onPressed,
 }) {
   final appColors = GetIt.instance<AppColors>();
-  
+
   final buttonColor = switch (state) {
     ButtonState.normal => appColors.amberNormal,
     ButtonState.hover => appColors.amberNormalHover,
     ButtonState.active => appColors.amberNormalActive,
     ButtonState.disabled => appColors.greyLight,
   };
-  
+
   return ElevatedButton(
     style: ElevatedButton.styleFrom(backgroundColor: buttonColor),
     onPressed: state == ButtonState.disabled ? null : onPressed,
@@ -146,7 +150,7 @@ Widget buildInteractiveButton({
 // Status indicators with semantic colors
 Widget buildStatusIndicators() {
   final appColors = GetIt.instance<AppColors>();
-  
+
   return Row(
     children: [
       StatusIcon(color: appColors.greenNormal, status: 'Success'),
@@ -174,6 +178,7 @@ final darkShade = primaryShades[800];   // Darker variant
 ### Typography Scale
 
 **8-level typography system** based on Public Sans font with consistent properties:
+
 - **Font Family**: Public Sans
 - **Font Weight**: 400 (Regular) for all styles
 - **Line Height**: 120% for optimal readability
@@ -208,7 +213,7 @@ Text('Legal text', style: appTextStyles.caption());           // 10px
 Widget buildTypographyExample() {
   final appTextStyles = GetIt.instance<AppTextStyles>();
   final appColors = GetIt.instance<AppColors>();
-  
+
   return Column(
     crossAxisAlignment: CrossAxisAlignment.start,
     children: [
@@ -246,7 +251,8 @@ Text(
 ### Sizing Architecture
 
 The sizing system provides **three variants for every dimension**:
-- **r** (responsive): Both width and height - `appSizes.r16` → `16.r` 
+
+- **r** (responsive): Both width and height - `appSizes.r16` → `16.r`
 - **v** (vertical): Height only - `appSizes.v16` → `16.h`
 - **h** (horizontal): Width only - `appSizes.h16` → `16.w`
 
@@ -261,7 +267,7 @@ appSizes.r2, appSizes.r4, appSizes.r5, appSizes.r6, appSizes.r8
 // Standard spacing
 appSizes.r10, appSizes.r12, appSizes.r16, appSizes.r20, appSizes.r24
 
-// Layout spacing  
+// Layout spacing
 appSizes.r32, appSizes.r40, appSizes.r48, appSizes.r64, appSizes.r80
 
 // Large layout elements
@@ -292,7 +298,7 @@ decoration: BoxDecoration(
 ```dart
 Widget buildResponsiveLayout() {
   final appSizes = GetIt.instance<AppSizes>();
-  
+
   return Container(
     width: appSizes.r120,      // 120px responsive (both dimensions)
     height: appSizes.v80,      // 80px responsive height only
@@ -313,7 +319,7 @@ Widget buildResponsiveLayout() {
 ```dart
 Widget buildResponsiveGrid() {
   final appSizes = GetIt.instance<AppSizes>();
-  
+
   return GridView.builder(
     padding: EdgeInsets.all(appSizes.r16),
     gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
@@ -346,7 +352,7 @@ The theme system provides **automatic light/dark mode support** with custom exte
 // Light theme with custom extensions
 final lightTheme = AppTheme.lightTheme();
 
-// Dark theme with custom extensions  
+// Dark theme with custom extensions
 final darkTheme = AppTheme.darkTheme();
 
 // Apply to MaterialApp
@@ -364,7 +370,7 @@ MaterialApp(
 Widget buildThemedWidget(BuildContext context) {
   final appTextStyles = GetIt.instance<AppTextStyles>();
   final colorExtension = context.theme.extension<AppColorExtension>()!;
-  
+
   return Container(
     color: colorExtension.primary,      // Automatically switches with theme
     child: Text(
@@ -382,11 +388,11 @@ Widget buildThemedWidget(BuildContext context) {
 ```dart
 class AppColorExtension extends ThemeExtension<AppColorExtension> {
   final Color primary;       // Theme-appropriate primary color
-  final Color secondary;     // Theme-appropriate secondary color  
+  final Color secondary;     // Theme-appropriate secondary color
   final Color accent;        // Theme-appropriate accent color
   final Color textPrimary;   // Theme-appropriate primary text
   final Color textSecondary; // Theme-appropriate secondary text
-  
+
   // Automatic light/dark variants via factory constructors
   factory AppColorExtension.light() { ... }
   factory AppColorExtension.dark() { ... }
@@ -407,18 +413,18 @@ class DesignSystemCard extends StatelessWidget {
     required this.content,
     this.onTap,
   });
-  
+
   final String title;
   final String content;
   final VoidCallback? onTap;
-  
+
   @override
   Widget build(BuildContext context) {
     final appColors = GetIt.instance<AppColors>();
     final appTextStyles = GetIt.instance<AppTextStyles>();
     final appSizes = GetIt.instance<AppSizes>();
     final colorExtension = context.theme.extension<AppColorExtension>()!;
-    
+
     return GestureDetector(
       onTap: onTap,
       child: Container(
@@ -461,7 +467,7 @@ class DesignSystemCard extends StatelessWidget {
 ```dart
 class StatefulDesignButton extends StatefulWidget {
   const StatefulDesignButton({super.key});
-  
+
   @override
   State<StatefulDesignButton> createState() => _StatefulDesignButtonState();
 }
@@ -469,26 +475,26 @@ class StatefulDesignButton extends StatefulWidget {
 class _StatefulDesignButtonState extends State<StatefulDesignButton> {
   bool _isHovered = false;
   bool _isPressed = false;
-  
+
   @override
   Widget build(BuildContext context) {
     final appColors = GetIt.instance<AppColors>();
     final appTextStyles = GetIt.instance<AppTextStyles>();
     final appSizes = GetIt.instance<AppSizes>();
-    
+
     // Use design system state colors
     final buttonColor = switch ((_isPressed, _isHovered)) {
       (true, _) => appColors.amberNormalActive,
       (false, true) => appColors.amberNormalHover,
       (false, false) => appColors.amberNormal,
     };
-    
+
     final textColor = switch ((_isPressed, _isHovered)) {
       (true, _) => appColors.charcoal,
       (false, true) => appColors.charcoal,
       (false, false) => appColors.charcoal,
     };
-    
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -527,7 +533,7 @@ The design system includes comprehensive testing patterns:
 ```dart
 testWidgets('should use design system colors consistently', (tester) async {
   final appColors = const AppColorsImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -543,10 +549,10 @@ testWidgets('should use design system colors consistently', (tester) async {
   );
 
   expect(find.byType(ElevatedButton), findsOneWidget);
-  
+
   final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
   final buttonStyle = button.style!;
-  
+
   // Verify design system color is applied correctly
   expect(
     buttonStyle.backgroundColor!.resolve({}),
@@ -560,7 +566,7 @@ testWidgets('should use design system colors consistently', (tester) async {
 ```dart
 testWidgets('should apply responsive sizing correctly', (tester) async {
   final appSizes = AppSizesImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(
@@ -585,8 +591,8 @@ testWidgets('should apply responsive sizing correctly', (tester) async {
 
 ```dart
 testWidgets('should apply typography styles correctly', (tester) async {
-  final appTextStyles = const AppTextStylesImpl();
-  
+  final appTextStyles = AppTextStylesImpl();
+
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -599,10 +605,10 @@ testWidgets('should apply typography styles correctly', (tester) async {
   );
 
   expect(find.text('Test Typography'), findsOneWidget);
-  
+
   final textWidget = tester.widget<Text>(find.text('Test Typography'));
   final textStyle = textWidget.style!;
-  
+
   // Verify typography properties
   expect(textStyle.fontSize, equals(24.0));  // headingLarge size
   expect(textStyle.fontFamily, equals('Public Sans'));
@@ -616,7 +622,7 @@ testWidgets('should apply typography styles correctly', (tester) async {
 testWidgets('should switch colors with theme changes', (tester) async {
   final lightTheme = AppTheme.lightTheme();
   final darkTheme = AppTheme.darkTheme();
-  
+
   Widget buildThemedWidget(ThemeData theme) {
     return MaterialApp(
       theme: theme,
@@ -631,12 +637,12 @@ testWidgets('should switch colors with theme changes', (tester) async {
       ),
     );
   }
-  
+
   // Test light theme
   await tester.pumpWidget(buildThemedWidget(lightTheme));
   expect(find.text('Themed Widget'), findsOneWidget);
-  
-  // Test dark theme  
+
+  // Test dark theme
   await tester.pumpWidget(buildThemedWidget(darkTheme));
   expect(find.text('Themed Widget'), findsOneWidget);
 });
@@ -673,9 +679,9 @@ Widget buildOldStyleButton() {
 ```dart
 Widget buildDesignSystemButton() {
   final appColors = GetIt.instance<AppColors>();
-  final appTextStyles = GetIt.instance<AppTextStyles>();  
+  final appTextStyles = GetIt.instance<AppTextStyles>();
   final appSizes = GetIt.instance<AppSizes>();
-  
+
   return ElevatedButton(
     style: ElevatedButton.styleFrom(
       backgroundColor: appColors.amberNormal,        // Semantic color
@@ -714,11 +720,11 @@ Widget buildThemedWidget(BuildContext context) {
 Widget buildDesignSystemThemedWidget(BuildContext context) {
   final appTextStyles = GetIt.instance<AppTextStyles>();
   final colorExtension = context.theme.extension<AppColorExtension>()!;
-  
+
   return Container(
     color: colorExtension.primary,                  // Rich theme colors
     child: Text(
-      'Design System Themed Content', 
+      'Design System Themed Content',
       style: appTextStyles.bodyLarge(              // Consistent typography
         color: colorExtension.textPrimary,         // Theme-aware text
       ),
@@ -730,31 +736,38 @@ Widget buildDesignSystemThemedWidget(BuildContext context) {
 ## Best Practices
 
 ### 1. Always Use Design System Services
+
 - Never use hard-coded colors, sizes, or text styles
 - Always inject services via `GetIt.instance<T>()`
 
 ### 2. Use Semantic Color Names
+
 - Use `amberNormal` instead of `orangeColor`
 - Use `greenNormal` for success states
 - Use `redNormal` for error states
 
 ### 3. Leverage Interactive States
+
 - Use hover/active color variants for better UX
 - Implement proper state management for interactive elements
 
 ### 4. Maintain Responsive Design
+
 - Use `r`/`v`/`h` sizing variants appropriately
 - Test on different screen sizes
 
 ### 5. Follow Typography Hierarchy
+
 - Use appropriate text styles for content hierarchy
 - Maintain consistent line height and spacing
 
 ### 6. Theme-Aware Development
+
 - Use theme extensions for automatic light/dark switching
 - Test both theme modes
 
 ### 7. Test Design System Integration
+
 - Write tests for color consistency
 - Test responsive behavior
 - Verify theme switching
@@ -764,16 +777,19 @@ Widget buildDesignSystemThemedWidget(BuildContext context) {
 ### Common Issues
 
 1. **Colors not showing correctly**
+
    - Verify `AppColors` is registered in DI
    - Check color usage (use `appColors.amberNormal` not `appColors.amber`)
    - Ensure Material 3 is enabled
 
 2. **Responsive sizing not working**
+
    - Check `ScreenUtil` initialization in app startup
    - Verify `AppSizes` is registered in DI
    - Use correct sizing variants (`r`/`v`/`h`)
 
 3. **Typography not applying**
+
    - Verify `AppTextStyles` is registered in DI
    - Check font family installation (Public Sans)
    - Ensure text styles are applied correctly
@@ -803,21 +819,25 @@ flutter run --dart-define=ENVIRONMENT=development
 ## Performance Considerations
 
 ### Service Registration
+
 - All design system services are registered as `@LazySingleton`
 - Services are created only once and reused
 - Minimal memory footprint
 
 ### Color Performance
+
 - `MaterialColor` objects are const and cached
 - Color calculations are performed at build time
 - No runtime color generation overhead
 
 ### Responsive Calculations
+
 - `ScreenUtil` calculations are cached
 - Responsive values are computed once per screen size change
 - Minimal performance impact
 
 ### Theme Switching
+
 - Theme extensions use Flutter's built-in theme interpolation
 - Smooth theme transitions with `lerp` methods
 - No custom animation overhead

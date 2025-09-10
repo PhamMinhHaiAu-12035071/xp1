@@ -12,16 +12,27 @@ import 'package:xp1/core/styles/app_text_styles.dart';
 /// Provides typography styles according to design system specifications
 /// with consistent font weight (400), line height (120%), and letter
 /// spacing (0%). All font sizes are responsive using flutter_screenutil.
+///
+/// This implementation prioritizes bundled fonts in assets/fonts/google_fonts/
+/// over HTTP fetching for better performance and offline support.
 @LazySingleton(as: AppTextStyles)
 class AppTextStylesImpl implements AppTextStyles {
-  /// Creates an instance of AppTextStylesImpl.
-  const AppTextStylesImpl();
+  /// Creates an instance of AppTextStylesImpl and configures Google Fonts.
+  AppTextStylesImpl() {
+    // Configure Google Fonts to allow runtime fetching as fallback
+    // but prioritize bundled fonts in assets
+    GoogleFonts.config.allowRuntimeFetching = true;
+  }
 
   /// Base text style factory with design system specifications.
   ///
   /// Creates text styles using Public Sans font family with consistent
   /// typography properties as defined in the design specifications.
-  /// Falls back to system fonts when Google Fonts network loading fails.
+  ///
+  /// Font loading priority:
+  /// 1. Bundled fonts from assets/fonts/google_fonts/ (preferred)
+  /// 2. Runtime HTTP fetching (fallback)
+  /// 3. System fonts (emergency fallback)
   ///
   /// [fontSize] The font size in pixels.
   /// [color] Optional text color to override the default.
@@ -33,7 +44,8 @@ class AppTextStylesImpl implements AppTextStyles {
     double? letterSpacing,
   }) {
     try {
-      // Attempt to load Google Fonts
+      // Google Fonts automatically prioritizes bundled fonts from assets
+      // before attempting HTTP fetching
       return GoogleFonts.publicSans(
         fontSize: fontSize.sp,
         color: color,
@@ -42,8 +54,8 @@ class AppTextStylesImpl implements AppTextStyles {
         letterSpacing: letterSpacing,
       );
     } on Exception catch (_) {
-      // Network error: Fall back to system fonts immediately
-      // This prevents the app from crashing when Google Fonts can't load
+      // Emergency fallback: Use system fonts if both bundled and network
+      // loading fail. This prevents app crashes in extreme scenarios.
       return TextStyle(
         fontFamily: _getFallbackFontFamily(),
         fontSize: fontSize.sp,

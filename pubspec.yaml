@@ -115,3 +115,6 @@ flutter:
     - assets/icons/action/
     - assets/icons/brand/
     - assets/icons/navigation/
+
+    # Google Fonts for offline bundling (Public Sans)
+    - assets/fonts/google_fonts/

@@ -44,7 +44,7 @@ class TestDependencyContainer {
       // Register theme services required by AppTheme
       ..registerLazySingleton<AppColors>(() => const AppColorsImpl())
       ..registerLazySingleton<AppSizes>(() => const AppSizesImpl())
-      ..registerLazySingleton<AppTextStyles>(() => const AppTextStylesImpl())
+      ..registerLazySingleton<AppTextStyles>(AppTextStylesImpl.new)
       // Register asset services required by SplashContent and LoginForm
       ..registerLazySingleton<AppIcons>(() => const AppIconsImpl())
       ..registerLazySingleton<AppImages>(() => const AppImagesImpl())

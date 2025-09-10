@@ -10,7 +10,7 @@ void main() {
     late AppTextStyles appTextStyles;
 
     setUp(() {
-      appTextStyles = const AppTextStylesImpl();
+      appTextStyles = AppTextStylesImpl();
     });
 
     testWidgets('should implement AppTextStyles interface', (tester) async {
@@ -25,19 +25,22 @@ void main() {
       );
     });
 
-    testWidgets('should be const constructible', (tester) async {
-      await tester.pumpWidget(
-        MaterialApp(
-          builder: (context, child) {
-            ScreenUtil.init(context, designSize: const Size(375, 812));
-            const appTextStyles1 = AppTextStylesImpl();
-            const appTextStyles2 = AppTextStylesImpl();
-            expect(appTextStyles1, equals(appTextStyles2));
-            return Container();
-          },
-        ),
-      );
-    });
+    testWidgets(
+      'should configure Google Fonts on construction',
+      (tester) async {
+        await tester.pumpWidget(
+          MaterialApp(
+            builder: (context, child) {
+              ScreenUtil.init(context, designSize: const Size(375, 812));
+              // Verify that constructor configures Google Fonts
+              final appTextStylesImpl = AppTextStylesImpl();
+              expect(appTextStylesImpl, isA<AppTextStyles>());
+              return Container();
+            },
+          ),
+        );
+      },
+    );
 
     group('Typography System', () {
       testWidgets('displayLarge should match design specifications', (

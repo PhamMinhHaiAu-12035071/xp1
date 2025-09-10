@@ -1,8 +1,9 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
 import 'package:xp1/core/bootstrap/orchestrator/bootstrap_orchestrator.dart';
 import 'package:xp1/core/bootstrap/phases/dependency_injection_phase.dart';
@@ -144,6 +145,28 @@ class AppBootstrap {
       ..info('📍 API URL: ${EnvConfigFactory.apiUrl}')
       ..info('🔧 Debug mode: ${EnvConfigFactory.isDebugMode}');
   }
+
+  /// Registers Google Fonts licenses for bundled font files.
+  ///
+  /// This method loads the OFL license file for Public Sans fonts and
+  /// registers it with Flutter's LicenseRegistry for proper attribution
+  /// in the licenses page of the app.
+  static Future<void> _registerFontLicenses() async {
+    LicenseRegistry.addLicense(() async* {
+      try {
+        final license = await rootBundle.loadString(
+          'assets/fonts/google_fonts/OFL.txt',
+        );
+        yield LicenseEntryWithLineBreaks(
+          <String>['Google Fonts - Public Sans'],
+          license,
+        );
+      } on Exception catch (e) {
+        // Log error but don't fail bootstrap for missing license
+        debugPrint('Failed to load Google Fonts license: $e');
+      }
+    });
+  }
 }
 
 /// Simplified bootstrap function for backward compatibility.
@@ -157,12 +180,8 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   // need Flutter's platform channels to be available
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Configure Google Fonts with enhanced error handling for network issues
-  // Platform permissions are configured for network access:
-  // - Android: INTERNET permission in AndroidManifest.xml
-  // - macOS: network.client entitlement in both Debug and Release
-  // - iOS: Network access available by default
-  await _configureGoogleFontsWithFallback();
+  // Register Google Fonts licenses for bundled fonts
+  await AppBootstrap._registerFontLicenses();
 
   const appBootstrap = AppBootstrap();
 
@@ -171,56 +190,4 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
 
   // Start the Flutter application
   runApp(await builder());
-}
-
-/// Configures Google Fonts with enhanced error handling and fallbacks.
-///
-/// This function attempts to enable Google Fonts runtime fetching with
-/// proper error handling for network connectivity issues. If Google Fonts
-/// fail to load, the app will gracefully fall back to system fonts.
-Future<void> _configureGoogleFontsWithFallback() async {
-  final logger = LoggerService();
-
-  try {
-    // Enable runtime font fetching
-    GoogleFonts.config.allowRuntimeFetching = true;
-
-    // Test Google Fonts connectivity by attempting to load a basic font
-    // This helps detect network issues early in the bootstrap process
-    await _testGoogleFontsConnectivity();
-
-    // Google Fonts automatically caches fonts locally for performance
-
-    logger.info('✅ Google Fonts configured successfully with network access');
-  } on Exception catch (e) {
-    // Log the error but don't crash the app
-    logger
-      ..warning('⚠️ Google Fonts network unavailable: $e')
-      ..info('📱 Falling back to system fonts for offline functionality');
-
-    // Disable runtime fetching to prevent repeated failed attempts
-    GoogleFonts.config.allowRuntimeFetching = false;
-  }
-}
-
-/// Tests Google Fonts connectivity by attempting to load a lightweight font.
-///
-/// This method attempts to verify that Google Fonts can be reached before
-/// the app tries to load heavier font assets during normal operation.
-Future<void> _testGoogleFontsConnectivity() async {
-  final logger = LoggerService();
-
-  try {
-    // Test with a minimal font request to verify connectivity
-    // This doesn't actually load the font, just tests the network path
-    final _ = GoogleFonts.roboto(fontSize: 12);
-
-    // If this succeeds, Google Fonts network access is working
-    logger.info('🌐 Google Fonts connectivity verified');
-  } on Exception catch (e) {
-    logger
-      ..error('🚫 Google Fonts connectivity test failed: $e')
-      ..info('💡 Tip: Check network connection or try on physical device');
-    rethrow;
-  }
 }

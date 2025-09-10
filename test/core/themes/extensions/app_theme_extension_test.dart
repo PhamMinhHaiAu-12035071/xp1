@@ -21,7 +21,7 @@ void main() {
     setUp(() {
       testAppSizes = const AppSizesImpl();
       testAppColors = const AppColorsImpl();
-      testAppTextStyles = const AppTextStylesImpl();
+      testAppTextStyles = AppTextStylesImpl();
       testAppImages = const AppImagesImpl();
     });
 

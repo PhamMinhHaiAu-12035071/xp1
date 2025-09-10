@@ -24,7 +24,7 @@ import 'widgetbook_text_styles.dart';
 Future<void> configureWidgetbookDependencies() async {
   GetIt.instance
     ..registerLazySingleton<AppTextStyles>(
-      () => kIsWeb ? const WidgetbookTextStyles() : const AppTextStylesImpl(),
+      () => kIsWeb ? const WidgetbookTextStyles() : AppTextStylesImpl(),
     )
     ..registerLazySingleton<AppColors>(() => const AppColorsImpl())
     ..registerLazySingleton<AppSizes>(() => const AppSizesImpl())
