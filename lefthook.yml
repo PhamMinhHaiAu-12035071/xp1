@@ -63,4 +63,9 @@ pre-push:
 commit-msg:
   commands:
     conventional-commit:
-      run: fvm dart run tool/validate_commit.dart {1}
+      run: |
+        if command -v fvm >/dev/null 2>&1; then
+          fvm dart run tool/validate_commit.dart {1}
+        else
+          dart run tool/validate_commit.dart {1}
+        fi

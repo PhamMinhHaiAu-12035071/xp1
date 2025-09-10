@@ -2,6 +2,7 @@ import 'dart:async';
 
 import 'package:bloc/bloc.dart';
 import 'package:flutter/widgets.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
 import 'package:xp1/core/bootstrap/orchestrator/bootstrap_orchestrator.dart';
 import 'package:xp1/core/bootstrap/phases/dependency_injection_phase.dart';
@@ -155,6 +156,9 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   // This is required because SharedPreferences and other platform services
   // need Flutter's platform channels to be available
   WidgetsFlutterBinding.ensureInitialized();
+
+  // Configure Google Fonts to handle network errors gracefully
+  GoogleFonts.config.allowRuntimeFetching = false;
 
   const appBootstrap = AppBootstrap();
 

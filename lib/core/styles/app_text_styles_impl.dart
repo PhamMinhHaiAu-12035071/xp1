@@ -1,3 +1,6 @@
+import 'dart:io' show Platform;
+
+import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:google_fonts/google_fonts.dart';
@@ -18,6 +21,7 @@ class AppTextStylesImpl implements AppTextStyles {
   ///
   /// Creates text styles using Public Sans font family with consistent
   /// typography properties as defined in the design specifications.
+  /// Falls back to system fonts when Google Fonts network loading fails.
   ///
   /// [fontSize] The font size in pixels.
   /// [color] Optional text color to override the default.
@@ -27,13 +31,54 @@ class AppTextStylesImpl implements AppTextStyles {
     FontWeight? fontWeight,
     double? height,
     double? letterSpacing,
-  }) => GoogleFonts.publicSans(
-    fontSize: fontSize.sp,
-    color: color,
-    fontWeight: fontWeight,
-    height: height,
-    letterSpacing: letterSpacing,
-  );
+  }) {
+    try {
+      // Attempt to load Google Fonts
+      return GoogleFonts.publicSans(
+        fontSize: fontSize.sp,
+        color: color,
+        fontWeight: fontWeight,
+        height: height,
+        letterSpacing: letterSpacing,
+      );
+    } on Exception catch (_) {
+      // Network error: Fall back to system fonts immediately
+      // This prevents the app from crashing when Google Fonts can't load
+      return TextStyle(
+        fontFamily: _getFallbackFontFamily(),
+        fontSize: fontSize.sp,
+        color: color,
+        fontWeight: fontWeight,
+        height: height,
+        letterSpacing: letterSpacing,
+      );
+    }
+  }
+
+  /// Provides system-appropriate fallback fonts for offline scenarios.
+  ///
+  /// Returns platform-specific system fonts that closely match Public Sans
+  /// characteristics when Google Fonts cannot be loaded from the network.
+  String _getFallbackFontFamily() {
+    // Platform-specific system fonts that provide good alternatives to
+    // Public Sans
+    if (kIsWeb) {
+      return 'system-ui'; // Web: Use system UI font
+    } else if (Platform.isIOS) {
+      return '.SF UI Text'; // iOS: Use San Francisco font
+    } else if (Platform.isAndroid) {
+      return 'Roboto'; // Android: Use Roboto (default system font)
+    } else if (Platform.isMacOS) {
+      return '.SF NS Text'; // macOS: Use San Francisco font
+    } else if (Platform.isWindows) {
+      return 'Segoe UI'; // Windows: Use Segoe UI
+    } else if (Platform.isLinux) {
+      return 'Ubuntu'; // Linux: Use Ubuntu font
+    }
+
+    // Fallback for unsupported platforms
+    return 'sans-serif';
+  }
 
   @override
   TextStyle displayLarge({Color? color}) => _base(
