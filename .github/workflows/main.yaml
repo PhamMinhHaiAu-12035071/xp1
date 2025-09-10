@@ -53,8 +53,19 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      - name: 🔧 Setup build environment
+        run: |
+          # Install make if not available
+          if ! command -v make &> /dev/null; then
+            echo "Installing make..."
+            sudo apt-get update
+            sudo apt-get install -y make
+          fi
+          # Make scripts executable
+          chmod +x scripts/*.sh || true
+
       - name: 📦 Install dependencies
-        run: flutter pub get
+        run: make deps
 
       - name: 🏗️ Setup environment files
         run: |
@@ -62,16 +73,14 @@ jobs:
           cp lib/features/env/staging.env.example lib/features/env/staging.env
           cp lib/features/env/production.env.example lib/features/env/production.env
 
-      - name: 🏗️ Generate code
-        run: |
-          dart run build_runner clean
-          dart run build_runner build --delete-conflicting-outputs
+      - name: 🏗️ Generate development environment
+        run: make generate-env-dev
 
       - name: 🎨 Format generated code
-        run: dart format lib test
+        run: make format
 
       - name: 🔍 Validate dependencies
-        run: dart run dependency_validator
+        run: make validate-deps
 
   license-compliance:
     runs-on: ubuntu-latest
@@ -85,11 +94,19 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
-      - name: 🔧 Setup Very Good CLI
-        run: dart pub global activate very_good_cli
+      - name: 🔧 Setup build environment
+        run: |
+          # Install make if not available
+          if ! command -v make &> /dev/null; then
+            echo "Installing make..."
+            sudo apt-get update
+            sudo apt-get install -y make
+          fi
+          # Make scripts executable
+          chmod +x scripts/*.sh || true
 
       - name: 📦 Install dependencies
-        run: flutter pub get
+        run: make deps
 
       - name: 🏗️ Setup environment files
         run: |
@@ -97,13 +114,11 @@ jobs:
           cp lib/features/env/staging.env.example lib/features/env/staging.env
           cp lib/features/env/production.env.example lib/features/env/production.env
 
-      - name: 🏗️ Generate code
-        run: |
-          dart run build_runner clean
-          dart run build_runner build --delete-conflicting-outputs
+      - name: 🏗️ Generate development environment
+        run: make generate-env-dev
 
       - name: 🎨 Format generated code
-        run: dart format lib test
+        run: make format
 
       - name: 🔐 Check license compliance
         run: make license-ci
@@ -120,8 +135,19 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      - name: 🔧 Setup build environment
+        run: |
+          # Install make if not available
+          if ! command -v make &> /dev/null; then
+            echo "Installing make..."
+            sudo apt-get update
+            sudo apt-get install -y make
+          fi
+          # Make scripts executable
+          chmod +x scripts/*.sh || true
+
       - name: 📦 Install dependencies
-        run: flutter pub get
+        run: make deps
 
       - name: 🏗️ Setup environment files
         run: |
@@ -144,8 +170,19 @@ jobs:
           flutter-version: ${{ env.FLUTTER_VERSION }}
           cache: true
 
+      - name: 🔧 Setup build environment
+        run: |
+          # Install make if not available
+          if ! command -v make &> /dev/null; then
+            echo "Installing make..."
+            sudo apt-get update
+            sudo apt-get install -y make
+          fi
+          # Make scripts executable
+          chmod +x scripts/*.sh || true
+
       - name: 📦 Install dependencies
-        run: flutter pub get
+        run: make deps
 
       - name: 🏗️ Setup environment files
         run: |
@@ -153,13 +190,8 @@ jobs:
           cp lib/features/env/staging.env.example lib/features/env/staging.env
           cp lib/features/env/production.env.example lib/features/env/production.env
 
-      - name: 🏗️ Generate code
-        run: |
-          dart run build_runner clean
-          dart run build_runner build --delete-conflicting-outputs
-
-      - name: 🎨 Format generated code
-        run: dart format lib test
+      - name: 🏗️ Generate development environment
+        run: make generate-env-dev
 
       - name: 🔍 Verify generated files
         run: |
@@ -171,34 +203,20 @@ jobs:
           echo "Checking last build_runner step specifically..."
           find . -name "*env*.g.dart" -type f 2>/dev/null || echo "No env .g.dart files"
 
-      - name: 🔍 Format check
-        run: dart format --set-exit-if-changed lib test
+      - name: 🎨 Format check
+        run: make format-check
 
       - name: 🌐 Generate i18n files
-        run: dart run slang
+        run: make i18n-generate
 
       - name: 🕵️ Analyze
-        run: flutter analyze lib test
+        run: make analyze
 
-      # Enable Very Good CLI (for other commands)
-      - name: Activate Very Good CLI
-        run: dart pub global activate very_good_cli
-
-      # Install make (if not available) and setup scripts
-      - name: Setup build environment
-        run: |
-          # Install make if not available
-          if ! command -v make &> /dev/null; then
-            echo "Installing make..."
-            sudo apt-get update
-            sudo apt-get install -y make
-          fi
-          # Make scripts executable
-          chmod +x scripts/*.sh || true
-
-      # Run tests using Makefile
-      - name: Run tests
+      - name: 🧪 Run tests
         run: make test
+
+      - name: 📊 Generate test coverage
+        run: make coverage
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1

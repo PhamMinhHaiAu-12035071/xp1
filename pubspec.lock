@@ -73,21 +73,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "10.2.4"
-  bdd_steps:
-    dependency: "direct dev"
-    description:
-      path: "packages/bdd_steps"
-      relative: true
-    source: path
-    version: "0.1.0+1"
-  bdd_widget_test:
-    dependency: "direct dev"
-    description:
-      name: bdd_widget_test
-      sha256: "2bf0923a53bd1d02a228967c1e660d92c671cecf311d8adaf16e12cbc7b013b6"
-      url: "https://pub.dev"
-    source: hosted
-    version: "2.0.1"
   bloc:
     dependency: "direct main"
     description:
@@ -296,14 +281,6 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "1.5.0"
-  diacritic:
-    dependency: transitive
-    description:
-      name: diacritic
-      sha256: "12981945ec38931748836cd76f2b38773118d0baef3c68404bdfde9566147876"
-      url: "https://pub.dev"
-    source: hosted
-    version: "0.1.6"
   diff_match_patch:
     dependency: transitive
     description:
@@ -488,10 +465,10 @@ packages:
     dependency: transitive
     description:
       name: hive_ce
-      sha256: "5620f634fb51c760144de69b55199419360f2aadba56bbcd5c7c2f1fe4bbfdd6"
+      sha256: "74461ee89e97fe347dd894fd6ea1dbdc8c745ea6fe0d6e0b1746530abd02eb95"
       url: "https://pub.dev"
     source: hosted
-    version: "2.11.4"
+    version: "2.12.0"
   hotreloader:
     dependency: transitive
     description:
@@ -1017,6 +994,14 @@ packages:
       url: "https://pub.dev"
     source: hosted
     version: "4.8.0"
+  smooth_page_indicator:
+    dependency: "direct main"
+    description:
+      name: smooth_page_indicator
+      sha256: b21ebb8bc39cf72d11c7cfd809162a48c3800668ced1c9da3aade13a32cf6c1c
+      url: "https://pub.dev"
+    source: hosted
+    version: "1.2.1"
   source_gen:
     dependency: transitive
     description:
@@ -1165,10 +1150,10 @@ packages:
     dependency: transitive
     description:
       name: url_launcher_android
-      sha256: "69ee86740f2847b9a4ba6cffa74ed12ce500bbe2b07f3dc1e643439da60637b7"
+      sha256: dbdd48a5b6a6fe9c7d75099bd2d03f9da9393f8d51a0d250301debbcecd552d2
       url: "https://pub.dev"
     source: hosted
-    version: "6.3.18"
+    version: "6.3.19"
   url_launcher_ios:
     dependency: transitive
     description:

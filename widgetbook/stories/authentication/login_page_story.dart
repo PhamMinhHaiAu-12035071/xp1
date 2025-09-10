@@ -42,6 +42,14 @@ Widget _buildLoginPageWithMocks(BuildContext context) {
   const backgroundImagePath = 'assets/images/login/background.png';
   when(() => mockAppImages.loginBackground).thenReturn(backgroundImagePath);
 
+  // Stubbing the AppImages service for login carousel slides
+  const slide1ImagePath = 'assets/images/login/slide_1.png';
+  const slide2ImagePath = 'assets/images/login/slide_2.png';
+  const slide3ImagePath = 'assets/images/login/slide_3.png';
+  when(() => mockAppImages.loginCarouselSlide1).thenReturn(slide1ImagePath);
+  when(() => mockAppImages.loginCarouselSlide2).thenReturn(slide2ImagePath);
+  when(() => mockAppImages.loginCarouselSlide3).thenReturn(slide3ImagePath);
+
   // Mock background image service call with fit support
   when(
     () => mockAssetImageService.assetImage(

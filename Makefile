@@ -11,7 +11,7 @@ else
   FLUTTER_CMD = flutter
 endif
 
-.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report bdd-coverage build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod i18n-generate i18n-watch i18n-analyze i18n-validate i18n-clean i18n-help deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
+.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod i18n-generate i18n-watch i18n-analyze i18n-validate i18n-clean i18n-help deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
 
 # GitHub Actions equivalent commands
 semantic-check:
@@ -109,29 +109,15 @@ validate-deps:
 	@fvm dart run dependency_validator
 
 test:
-	@echo "🧪 Running tests (excluding generated files from coverage)..."
-	@echo "⚡ Coverage excludes: *.g.dart, *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
-	@very_good test --no-optimization \
-		--exclude-coverage="**/*.g.dart" \
-		--exclude-coverage="**/*.freezed.dart" \
-		--exclude-coverage="**/*.config.dart" \
-		--exclude-coverage="**/env_*.dart" \
-		--exclude-coverage="**/strings*.g.dart"
+	@echo "🧪 Running unit tests..."
+	@fvm flutter test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/
 
 # Test coverage commands using flutter test (more reliable than very_good test --coverage)
-# NOTE: very_good test --coverage doesn't generate lcov.info file and fails with BDD tests
 coverage:
-	@echo "🧪📊 Running complete coverage workflow (excluding generated files)..."
-	@echo "1️⃣ Running all tests with coverage (including BDD tests)..."
-	@echo "⚡ Coverage excludes: *.g.dart, *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
+	@echo "🧪📊 Running complete coverage workflow..."
+	@echo "1️⃣ Running unit tests with coverage..."
 	@echo "⚠️  Note: Using flutter test --coverage for reliable coverage generation"
-	@echo "💡 very_good test --coverage doesn't work properly with BDD tests"
-	@very_good test --coverage --no-optimization \
-		--exclude-coverage="**/*.g.dart" \
-		--exclude-coverage="**/*.freezed.dart" \
-		--exclude-coverage="**/*.config.dart" \
-		--exclude-coverage="**/env_*.dart" \
-		--exclude-coverage="**/strings*.g.dart"
+	@fvm flutter test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/ --coverage
 	@echo "2️⃣ Generating HTML coverage report..."
 	@if command -v genhtml >/dev/null 2>&1; then \
 		genhtml coverage/lcov.info -o coverage/html --title "xp1 Test Coverage"; \
@@ -161,53 +147,12 @@ coverage:
 		exit 1; \
 	fi
 	@echo "🎉 Coverage workflow completed!"
-	@echo "💡 Run 'make bdd-coverage' for BDD-only test coverage"
 	@echo "💡 Run 'make coverage-clean' to remove coverage files"
 
 coverage-clean:
 	@echo "🧹 Cleaning coverage files..."
 	@rm -rf coverage/
 
-# BDD-specific coverage (BDD tests only)
-bdd-coverage:
-	@echo "🎭 Running BDD tests with coverage (excluding generated files)..."
-	@echo "⚡ Coverage excludes: *.g.dart, *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
-	@echo "✅ BDD tests run in isolation - 100% reliable"
-	@very_good test --coverage test/bdd/ --min-coverage 100 \
-		--exclude-coverage="**/*.g.dart" \
-		--exclude-coverage="**/*.freezed.dart" \
-		--exclude-coverage="**/*.config.dart" \
-		--exclude-coverage="**/env_*.dart" \
-		--exclude-coverage="**/strings*.g.dart"
-	@echo "2️⃣ Generating HTML coverage report..."
-	@if command -v genhtml >/dev/null 2>&1; then \
-		genhtml coverage/lcov.info -o coverage/html --title "xp1 BDD Test Coverage"; \
-		echo "✅ HTML coverage report generated at: coverage/html/index.html"; \
-	else \
-		echo "❌ genhtml not found. Install lcov package:"; \
-		echo "  macOS: brew install lcov"; \
-		echo "  Ubuntu/Debian: sudo apt-get install lcov"; \
-		echo "  CentOS/RHEL: sudo yum install lcov"; \
-		echo "  Or download from: https://github.com/linux-test-project/lcov"; \
-		exit 1; \
-	fi
-	@echo "3️⃣ Opening coverage report in browser..."
-	@if [ -f coverage/html/index.html ]; then \
-		if command -v open >/dev/null 2>&1; then \
-			open coverage/html/index.html; \
-		elif command -v xdg-open >/dev/null 2>&1; then \
-			xdg-open coverage/html/index.html; \
-		elif command -v start >/dev/null 2>&1; then \
-			start coverage/html/index.html; \
-		else \
-			echo "❌ No browser launcher found. Open manually:"; \
-			echo "   file://$(pwd)/coverage/html/index.html"; \
-		fi \
-	else \
-		echo "❌ HTML coverage report not found."; \
-		exit 1; \
-	fi
-	@echo "🎉 BDD Coverage workflow completed!"
 
 
 # Build commands
@@ -600,16 +545,12 @@ help:
 	@echo "  make i18n-help            - Show detailed i18n help"
 	@echo ""
 	@echo "📊 Test Coverage (using very_good CLI + lcov, excludes generated files):"
-	@echo "  make test           - Run all tests (excludes *.g.dart, *.freezed.dart, etc.)"
-	@echo "  make coverage       - Run ALL tests with coverage (excludes generated files)"
-	@echo "  make bdd-coverage   - Run BDD tests only with coverage (100% reliable, isolated)"
+	@echo "  make test           - Run unit tests only (excludes generated files)"
+	@echo "  make coverage       - Run unit tests with coverage (excludes generated files)"
 	@echo "  make coverage-clean - Clean all coverage files"
 	@echo ""
-	@echo "⚡ Generated Files Excluded:"
-	@echo "  *.g.dart (json_serializable), *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
-	@echo ""
-	@echo "🎭 BDD Test Coverage:"
-	@echo "  make bdd-coverage     - Run BDD tests + generate HTML report + auto-open"
+	@echo "⚡ Excluded from test/coverage commands:"
+	@echo "  *.g.dart, *.freezed.dart, *.config.dart, env_*.dart, strings*.g.dart"
 	@echo ""
 	@echo "🔧 LCOV & genhtml Usage Examples:"
 	@echo "  # Install lcov (includes genhtml):"

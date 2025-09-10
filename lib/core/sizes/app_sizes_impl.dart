@@ -2,8 +2,10 @@ import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:injectable/injectable.dart';
 import 'package:xp1/core/sizes/app_sizes.dart';
 
-/// Implementation of application sizes
-/// that can be injected and mocked for testing
+/// Implementation of application sizes that follows UI/UX design
+/// system principles with 4px/8px grid system and powers of 2 progression.
+///
+/// This implementation can be injected and mocked for testing.
 @LazySingleton(as: AppSizes)
 class AppSizesImpl implements AppSizes {
   /// Creates an instance of AppSizesImpl
@@ -25,22 +27,6 @@ class AppSizesImpl implements AppSizes {
   @override
   double get h4 => 4.w;
 
-  // 5 pixel variations
-  @override
-  double get r5 => 5.r;
-  @override
-  double get v5 => 5.h;
-  @override
-  double get h5 => 5.w;
-
-  // 6 pixel variations
-  @override
-  double get r6 => 6.r;
-  @override
-  double get v6 => 6.h;
-  @override
-  double get h6 => 6.w;
-
   // 8 pixel variations
   @override
   double get r8 => 8.r;
@@ -49,14 +35,6 @@ class AppSizesImpl implements AppSizes {
   @override
   double get h8 => 8.w;
 
-  // 10 pixel variations
-  @override
-  double get r10 => 10.r;
-  @override
-  double get v10 => 10.h;
-  @override
-  double get h10 => 10.w;
-
   // 12 pixel variations
   @override
   double get r12 => 12.r;
@@ -64,14 +42,6 @@ class AppSizesImpl implements AppSizes {
   double get v12 => 12.h;
   @override
   double get h12 => 12.w;
-
-  // 14 pixel variations
-  @override
-  double get r14 => 14.r;
-  @override
-  double get v14 => 14.h;
-  @override
-  double get h14 => 14.w;
 
   // 16 pixel variations
   @override
@@ -88,22 +58,6 @@ class AppSizesImpl implements AppSizes {
   double get v20 => 20.h;
   @override
   double get h20 => 20.w;
-
-  // 22 pixel variations
-  @override
-  double get r22 => 22.r;
-  @override
-  double get v22 => 22.h;
-  @override
-  double get h22 => 22.w;
-
-  // 23 pixel variations
-  @override
-  double get r23 => 23.r;
-  @override
-  double get v23 => 23.h;
-  @override
-  double get h23 => 23.w;
 
   // 24 pixel variations
   @override
@@ -129,14 +83,6 @@ class AppSizesImpl implements AppSizes {
   @override
   double get h40 => 40.w;
 
-  // 42 pixel variations
-  @override
-  double get r42 => 42.r;
-  @override
-  double get v42 => 42.h;
-  @override
-  double get h42 => 42.w;
-
   // 48 pixel variations
   @override
   double get r48 => 48.r;
@@ -145,14 +91,6 @@ class AppSizesImpl implements AppSizes {
   @override
   double get h48 => 48.w;
 
-  // 54 pixel variations
-  @override
-  double get r54 => 54.r;
-  @override
-  double get v54 => 54.h;
-  @override
-  double get h54 => 54.w;
-
   // 56 pixel variations
   @override
   double get r56 => 56.r;
@@ -160,22 +98,6 @@ class AppSizesImpl implements AppSizes {
   double get v56 => 56.h;
   @override
   double get h56 => 56.w;
-
-  // 58 pixel variations
-  @override
-  double get r58 => 58.r;
-  @override
-  double get v58 => 58.h;
-  @override
-  double get h58 => 58.w;
-
-  // 60 pixel variations
-  @override
-  double get r60 => 60.r;
-  @override
-  double get v60 => 60.h;
-  @override
-  double get h60 => 60.w;
 
   // 64 pixel variations
   @override
@@ -193,14 +115,6 @@ class AppSizesImpl implements AppSizes {
   @override
   double get h72 => 72.w;
 
-  // 78 pixel variations
-  @override
-  double get r78 => 78.r;
-  @override
-  double get v78 => 78.h;
-  @override
-  double get h78 => 78.w;
-
   // 80 pixel variations
   @override
   double get r80 => 80.r;
@@ -208,14 +122,6 @@ class AppSizesImpl implements AppSizes {
   double get v80 => 80.h;
   @override
   double get h80 => 80.w;
-
-  // 90 pixel variations
-  @override
-  double get r90 => 90.r;
-  @override
-  double get v90 => 90.h;
-  @override
-  double get h90 => 90.w;
 
   // 120 pixel variations
   @override
@@ -232,22 +138,6 @@ class AppSizesImpl implements AppSizes {
   double get v128 => 128.h;
   @override
   double get h128 => 128.w;
-
-  // 130 pixel variations
-  @override
-  double get r130 => 130.r;
-  @override
-  double get v130 => 130.h;
-  @override
-  double get h130 => 130.w;
-
-  // 156 pixel variations
-  @override
-  double get r156 => 156.r;
-  @override
-  double get v156 => 156.h;
-  @override
-  double get h156 => 156.w;
 
   // 160 pixel variations
   @override
@@ -266,7 +156,6 @@ class AppSizesImpl implements AppSizes {
   double get h192 => 192.w;
 
   // 224 pixel variations
-
   @override
   double get r224 => 224.r;
   @override
@@ -282,14 +171,6 @@ class AppSizesImpl implements AppSizes {
   @override
   double get h256 => 256.w;
 
-  // 260 pixel variations (specific for onboarding image size)
-  @override
-  double get r260 => 260.r;
-  @override
-  double get v260 => 260.h;
-  @override
-  double get h260 => 260.w;
-
   // 360 pixel variations
   @override
   double get r360 => 360.r;
@@ -297,39 +178,6 @@ class AppSizesImpl implements AppSizes {
   double get v360 => 360.h;
   @override
   double get h360 => 360.w;
-
-  // 372 pixel variations
-
-  @override
-  double get r372 => 372.r;
-  @override
-  double get v372 => 372.h;
-  @override
-  double get h372 => 372.w;
-
-  // 500 pixel variations
-  @override
-  double get r500 => 500.r;
-  @override
-  double get v500 => 500.h;
-  @override
-  double get h500 => 500.w;
-
-  // 570 pixel variations
-  @override
-  double get r570 => 570.r;
-  @override
-  double get v570 => 570.h;
-  @override
-  double get h570 => 570.w;
-
-  // 680 pixel variations
-  @override
-  double get r680 => 680.r;
-  @override
-  double get v680 => 680.h;
-  @override
-  double get h680 => 680.w;
 
   // Border radius dimensions
   @override

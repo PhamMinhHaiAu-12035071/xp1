@@ -17,6 +17,16 @@ abstract class AppImages {
   /// Login screen background image path
   String get loginBackground;
 
+  // Login Carousel Assets - REQUIRED for type-safe access
+  /// Login carousel slide 1 image path
+  String get loginCarouselSlide1;
+
+  /// Login carousel slide 2 image path
+  String get loginCarouselSlide2;
+
+  /// Login carousel slide 3 image path
+  String get loginCarouselSlide3;
+
   // Employee Assets
   /// Default employee avatar image path
   String get employeeAvatar;
