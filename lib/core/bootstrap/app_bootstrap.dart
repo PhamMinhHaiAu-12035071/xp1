@@ -157,8 +157,12 @@ Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
   // need Flutter's platform channels to be available
   WidgetsFlutterBinding.ensureInitialized();
 
-  // Configure Google Fonts to handle network errors gracefully
-  GoogleFonts.config.allowRuntimeFetching = false;
+  // Configure Google Fonts with runtime fetching enabled for dynamic font
+  // loading. Platform permissions are configured for network access:
+  // - Android: INTERNET permission in AndroidManifest.xml
+  // - macOS: network.client entitlement in both Debug and Release
+  // - iOS: Network access available by default
+  GoogleFonts.config.allowRuntimeFetching = true;
 
   const appBootstrap = AppBootstrap();
 
