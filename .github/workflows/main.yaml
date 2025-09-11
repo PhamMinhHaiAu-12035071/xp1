@@ -220,12 +220,6 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y make
           fi
-          # Install lcov for coverage HTML generation
-          if ! command -v genhtml &> /dev/null; then
-            echo "Installing lcov..."
-            sudo apt-get update
-            sudo apt-get install -y lcov
-          fi
           # Install lefthook for git hooks
           if ! command -v lefthook &> /dev/null; then
             echo "Installing lefthook..."
@@ -267,9 +261,6 @@ jobs:
 
       - name: 🧪 Run tests
         run: make test
-
-      - name: 📊 Generate test coverage
-        run: make coverage
 
   spell-check:
     uses: VeryGoodOpenSource/very_good_workflows/.github/workflows/spell_check.yml@v1
