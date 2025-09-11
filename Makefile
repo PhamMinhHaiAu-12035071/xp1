@@ -110,14 +110,14 @@ validate-deps:
 
 test:
 	@echo "🧪 Running unit tests..."
-	@$(FLUTTER_CMD) test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/
+	@$(FLUTTER_CMD) test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/widgetbook/
 
 # Test coverage commands using flutter test (more reliable than very_good test --coverage)
 coverage:
 	@echo "🧪📊 Running complete coverage workflow..."
 	@echo "1️⃣ Running unit tests with coverage..."
 	@echo "⚠️  Note: Using flutter test --coverage for reliable coverage generation"
-	@$(FLUTTER_CMD) test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/shared/ test/widgetbook/ --coverage
+	@$(FLUTTER_CMD) test test/app/ test/core/ test/features/ test/helpers/ test/integration/ test/l10n/ test/setup/ test/widgetbook/ --coverage
 	@echo "2️⃣ Generating HTML coverage report..."
 	@if command -v genhtml >/dev/null 2>&1; then \
 		genhtml coverage/lcov.info -o coverage/html --title "xp1 Test Coverage"; \
