@@ -68,7 +68,7 @@ dev_dependencies:
   auto_route_generator: ^10.2.4 # Code generator for auto_route package
   build_runner: ^2.7.1 # Build system for code generation
   envied_generator: ^1.2.0 # Code generator for envied package
-  freezed: ^3.2.0 # Code generator for immutable data classes
+  freezed: ^3.2.3 # Code generator for immutable data classes
   injectable_generator: ^2.6.1 # Code generator for injectable package
   json_serializable: ^6.7.1 # Code generator for JSON serialization
   slang_build_runner: ^4.8.0 # Generator for slang (if using build_runner)
