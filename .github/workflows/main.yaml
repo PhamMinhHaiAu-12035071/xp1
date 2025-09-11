@@ -142,6 +142,9 @@ jobs:
       - name: 🎨 Format generated code
         run: make format
 
+      - name: 🛠️ Install Very Good CLI
+        run: dart pub global activate very_good_cli
+
       - name: 🔐 Check license compliance
         run: make license-ci
 
