@@ -46,43 +46,50 @@ find lib/features/authentication -name "*.dart" -exec wc -l {} +
 
 ### Package Dependencies Analysis
 
-Based on KSK reference project analysis:
+**Required dependencies**:
 
 ```yaml
 dependencies:
-  # HTTP CLIENT - Use Chopper (it's what KSK uses, it works)
-  chopper: ^8.1.0
+  # HTTP CLIENT
+  chopper: <latest_version>
 
-  # EITHER MONAD - Don't reinvent error handling
-  fpdart: ^1.1.1
+  # ERROR HANDLING
+  fpdart: <latest_version>
 
-  # DEPENDENCY INJECTION - Get_it + Injectable pattern
-  get_it: ^8.0.3
-  injectable: ^2.5.0
+  # DEPENDENCY INJECTION
+  get_it: <latest_version>
+  injectable: <latest_version>
 
-  # JSON SERIALIZATION - Build system integration
-  json_annotation: ^4.9.0
+  # JSON SERIALIZATION
+  json_annotation: <latest_version>
 
-  # LOGGING - Use logger, not print statements
-  logger: ^2.5.0
+  # LOGGING
+  logger: <latest_version>
 
-  # NETWORKING INTERCEPTORS - For auth and logging
-  pretty_chopper_logger: ^1.2.2
+  # NETWORKING
+  pretty_chopper_logger: <latest_version>
+  equatable: <latest_version>
+
+  # ANNOTATIONS
+  freezed_annotation: <latest_version>
+  json_annotation: <latest_version>
+
+  # SECURITY
+  flutter_secure_storage: <latest_version>
 
 dev_dependencies:
   # CODE GENERATION
-  chopper_generator: ^8.1.0
-  injectable_generator: ^2.7.0
-  json_serializable: ^6.7.0
-  build_runner: ^2.5.4
+  chopper_generator: <latest_version>
+  injectable_generator: <latest_version>
+  json_serializable: <latest_version>
+  build_runner: <latest_version>
+
+  # 🧪 TESTING INFRASTRUCTURE
+  mocktail: <latest_version> # Behavior testing
+  bloc_test: <latest_version> # BLoC testing utilities
 ```
 
-**Why these choices?**
-
-- **Chopper**: Reference project uses it. It works. It generates clean service code.
-- **Not Dio**: We could use Dio, but Chopper has cleaner code generation. Less boilerplate = less bugs.
-- **fpdart**: Either monad for error handling. Stop using exceptions for control flow.
-- **Environment System**: You already have a **perfect** env config system. Use it, don't ignore it.
+**Core principles**: Chopper for API, Either for errors, Injectable for DI, FlutterSecureStorage for JWT tokens.
 
 ---
 
@@ -107,10 +114,14 @@ lib/features/authentication/
 │   ├── datasources/
 │   │   ├── auth_remote_datasource.dart
 │   │   └── auth_local_datasource.dart
-│   ├── models/                 # JSON <-> Entity mapping
+│   ├── models/                 # JSON <-> API mapping
 │   │   ├── login_request.dart
 │   │   ├── login_response.dart
 │   │   └── token_model.dart
+│   ├── mappers/                # Model <-> Entity conversion
+│   │   ├── auth_mapper.dart
+│   │   ├── user_mapper.dart
+│   │   └── token_mapper.dart
 │   ├── repositories/
 │   │   └── auth_repository_impl.dart
 │   └── services/
@@ -133,19 +144,164 @@ lib/features/authentication/
 lib/core/
 ├── network/                    # Networking foundation
 │   ├── api_client.dart        # Chopper client + env integration
-│   ├── auth_interceptor.dart  # Token injection
+│   ├── auth_interceptor.dart  # JWT token injection
 │   ├── logging_interceptor.dart
 │   └── error_handler.dart
+├── security/                  # 🔐 SECURITY LAYER (NEW)
+│   ├── secure_storage_service.dart   # Encrypted JWT token storage
+│   ├── token_manager.dart            # JWT management & refresh
+│   ├── jwt_service.dart              # JWT encoding/decoding/validation
+│   └── security_keys.dart            # Security constants
+├── mappers/                   # 🔄 BASE MAPPER ABSTRACTIONS (NEW)
+│   └── base_mapper.dart              # Abstract mapper contract
 ├── storage/                   # Local persistence
-│   ├── secure_storage.dart    # Token storage
-│   └── storage_keys.dart
+│   └── secure_storage_service.dart # JWT token storage
 ├── di/                        # Dependency injection
 │   ├── network_module.dart    # HTTP clients
-│   └── auth_module.dart       # Auth services
+│   ├── auth_module.dart       # Auth services
+│   └── security_module.dart   # Security services
 └── errors/
     ├── api_error.dart         # Network errors
-    └── storage_error.dart     # Storage errors
+    ├── storage_error.dart     # Storage errors
+    └── security_error.dart    # Security/auth errors
 ```
+
+---
+
+## 🔐 SECURITY ARCHITECTURE
+
+### JWT-First Security Approach
+
+**🚨 CRITICAL**: JWT security is not an afterthought. Build proper token handling from day 1.
+
+#### JWT Token Management Strategy
+
+```dart
+// Secure JWT token storage with encryption
+@LazySingleton()
+class TokenManager {
+  final SecureStorageService _secureStorage;
+  final JwtService _jwtService;
+
+  // Never store JWT tokens in plain text
+  Future<void> storeTokens(TokenEntity tokens) async {
+    await _secureStorage.store(
+      SecurityKeys.accessToken,
+      tokens.accessToken,
+    );
+    await _secureStorage.store(
+      SecurityKeys.refreshToken,
+      tokens.refreshToken,
+    );
+  }
+
+  // Automatic JWT token refresh before expiry
+  Future<Either<SecurityFailure, TokenEntity>> getValidToken() async {
+    final token = await getStoredToken();
+
+    // Check JWT expiration
+    if (_jwtService.isTokenExpired(token.accessToken)) {
+      return await refreshToken();
+    }
+
+    return Right(token);
+  }
+
+  // Validate JWT token structure and signature
+  bool isTokenValid(String token) {
+    return _jwtService.validateToken(token);
+  }
+}
+```
+
+#### JWT Service Implementation
+
+```dart
+@LazySingleton()
+class JwtService {
+  // Decode JWT payload (dart:convert only)
+  Map<String, dynamic>? decodeToken(String token) {
+    try {
+      final parts = token.split('.');
+      if (parts.length != 3) return null;
+
+      final payload = parts[1];
+      final normalized = base64Url.normalize(payload);
+      final decoded = utf8.decode(base64Url.decode(normalized));
+
+      return jsonDecode(decoded) as Map<String, dynamic>;
+    } catch (e) {
+      return null;
+    }
+  }
+
+  // Check if JWT token is expired
+  bool isTokenExpired(String token) {
+    final decoded = decodeToken(token);
+    if (decoded == null) return true;
+
+    final exp = decoded['exp'] as int?;
+    if (exp == null) return true;
+
+    final expiryDate = DateTime.fromMillisecondsSinceEpoch(exp * 1000);
+    return DateTime.now().isAfter(expiryDate);
+  }
+
+  // Extract user info from JWT
+  Map<String, dynamic>? getUserInfo(String token) {
+    return decodeToken(token);
+  }
+}
+```
+
+#### API Security Interceptors
+
+```dart
+@Injectable()
+class SecurityInterceptor implements Interceptor {
+  final TokenManager _tokenManager;
+
+  @override
+  Future<Response<BodyType>> intercept<BodyType>(Chain<BodyType> chain) async {
+    final request = chain.request;
+
+    // Add security headers
+    final secureRequest = request.copyWith(
+      headers: {
+        ...request.headers,
+        'X-API-Version': '1.0',
+        'X-Client-Platform': Platform.operatingSystem,
+        'Content-Type': 'application/json',
+      },
+    );
+
+    // Add JWT token if available
+    final tokenResult = await _tokenManager.getValidToken();
+    return tokenResult.fold(
+      (failure) => chain.proceed(secureRequest),
+      (token) => chain.proceed(
+        secureRequest.copyWith(
+          headers: {
+            ...secureRequest.headers,
+            'Authorization': 'Bearer ${token.accessToken}',
+          },
+        ),
+      ),
+    );
+  }
+}
+```
+
+#### JWT Security Best Practices
+
+**🔒 JWT Security Checklist**:
+
+- [ ] **Secure storage** - JWT tokens in FlutterSecureStorage only
+- [ ] **Token validation** - Check JWT structure and expiry
+- [ ] **Automatic refresh** - Refresh tokens before expiry
+- [ ] **HTTPS only** - Never send JWT over HTTP
+- [ ] **Token cleanup** - Clear tokens on logout
+- [ ] **No logging** - Never log JWT tokens (even in debug)
 
 ---
 
@@ -195,7 +351,37 @@ class ApiClient {
 
 2. **`lib/core/errors/api_error.dart`** (Copy from KSK reference)
 
-3. **`lib/core/storage/secure_storage.dart`** (Token management)
+3. **`lib/core/storage/secure_storage_service.dart`** (JWT token management)
+
+```dart
+@LazySingleton()
+class SecureStorageService {
+  static const FlutterSecureStorage _storage = FlutterSecureStorage();
+
+  // Store JWT tokens
+  Future<void> storeAccessToken(String token) async {
+    await _storage.write(key: 'access_token', value: token);
+  }
+
+  Future<void> storeRefreshToken(String token) async {
+    await _storage.write(key: 'refresh_token', value: token);
+  }
+
+  // Retrieve tokens
+  Future<String?> getAccessToken() async {
+    return await _storage.read(key: 'access_token');
+  }
+
+  Future<String?> getRefreshToken() async {
+    return await _storage.read(key: 'refresh_token');
+  }
+
+  // Clear tokens (logout)
+  Future<void> clearTokens() async {
+    await _storage.deleteAll();
+  }
+}
+```
 
 4. **`lib/core/di/network_module.dart`** (Proper DI setup)
 
@@ -222,64 +408,134 @@ abstract class NetworkModule {
 }
 ```
 
+5. **`lib/core/di/auth_module.dart`** (Register mappers)
+
+```dart
+@module
+abstract class AuthModule {
+  // Mappers are automatically registered with @injectable
+  // No manual registration needed for TokenMapper, UserMapper
+
+  @injectable
+  AuthRepository provideAuthRepository(
+    AuthApiService apiService,
+    TokenStorageService tokenStorage,
+    TokenMapper tokenMapper,     // 🔥 Auto-injected
+    UserMapper userMapper,       // 🔥 Auto-injected
+  ) {
+    return AuthRepositoryImpl(
+      apiService,
+      tokenStorage,
+      tokenMapper,
+      userMapper,
+    );
+  }
+}
+```
+
 ### Step 2: Domain Layer - The Truth
 
 **Priority**: CRITICAL  
 **Time**: 0.5 days
 
-**Why domain first?** Because domain defines what your app actually does. Everything else is just implementation details.
+**Create business logic first**.
 
 **Files to create**:
 
 1. **`lib/features/authentication/domain/entities/user_entity.dart`**
 
 ```dart
-class UserEntity extends Equatable {
-  const UserEntity({
-    required this.id,
-    required this.username,
-    required this.email,
-  });
-
-  final String id;
-  final String username;
-  final String email;
-
-  @override
-  List<Object> get props => [id, username, email];
+@freezed
+class UserEntity with _$UserEntity {
+  const factory UserEntity({
+    required String id,
+    required String username,
+    required String email,
+  }) = _UserEntity;
 }
 ```
 
 2. **`lib/features/authentication/domain/entities/token_entity.dart`**
 
 ```dart
-class TokenEntity extends Equatable {
-  const TokenEntity({
-    required this.accessToken,
-    required this.refreshToken,
-    required this.expiresIn,
-  });
+@freezed
+class TokenEntity with _$TokenEntity {
+  const factory TokenEntity({
+    required String accessToken,
+    required String refreshToken,
+    required int expiresIn,
+    required DateTime issuedAt,
+  }) = _TokenEntity;
 
-  final String accessToken;
-  final String refreshToken;
-  final int expiresIn;
+  const TokenEntity._();
 
-  @override
-  List<Object> get props => [accessToken, refreshToken, expiresIn];
+  bool get isExpired {
+    final expiryTime = issuedAt.add(Duration(seconds: expiresIn));
+    return DateTime.now().isAfter(expiryTime);
+  }
+
+  bool get willExpireSoon {
+    final expiryTime = issuedAt.add(Duration(seconds: expiresIn));
+    final timeUntilExpiry = expiryTime.difference(DateTime.now());
+    return timeUntilExpiry.inMinutes < 5; // Refresh if < 5 minutes left
+  }
 }
 ```
 
-3. **`lib/features/authentication/domain/repositories/auth_repository.dart`**
+3. **`lib/features/authentication/domain/failures/auth_failure.dart`**
+
+```dart
+@freezed
+sealed class AuthFailure with _$AuthFailure {
+  const factory AuthFailure.invalidCredentials() = InvalidCredentialsFailure;
+  const factory AuthFailure.networkError(String message) = NetworkFailure;
+  const factory AuthFailure.serverError(int statusCode) = ServerFailure;
+  const factory AuthFailure.tokenExpired() = TokenExpiredFailure;
+  const factory AuthFailure.unauthorized() = UnauthorizedFailure;
+  const factory AuthFailure.unknown(String message) = UnknownFailure;
+}
+```
+
+4. **`lib/features/authentication/domain/usecases/login_usecase.dart`**
+
+```dart
+@freezed
+class LoginInput with _$LoginInput {
+  const factory LoginInput({
+    required String username,
+    required String password,
+    @Default(false) bool rememberMe,
+    String? deviceId,
+  }) = _LoginInput;
+}
+
+@freezed
+class LoginResult with _$LoginResult {
+  const factory LoginResult({
+    required TokenEntity token,
+    required UserEntity user,
+    @Default(false) bool isFirstLogin,
+  }) = _LoginResult;
+}
+
+@injectable
+class LoginUseCase {
+  const LoginUseCase(this._authRepository);
+
+  final AuthRepository _authRepository;
+
+  Future<Either<AuthFailure, LoginResult>> call(LoginInput input) async {
+    return await _authRepository.login(input);
+  }
+}
+```
+
+5. **`lib/features/authentication/domain/repositories/auth_repository.dart`**
 
 ```dart
 abstract class AuthRepository {
-  Future<Either<AuthFailure, TokenEntity>> login({
-    required String username,
-    required String password,
-  });
-
+  Future<Either<AuthFailure, LoginResult>> login(LoginInput input);
   Future<Either<AuthFailure, TokenEntity>> refreshToken();
-
   Future<Either<AuthFailure, void>> logout();
 }
 ```
@@ -287,11 +543,63 @@ abstract class AuthRepository {
 ### Step 3: Infrastructure Layer - The Real Work
 
 **Priority**: CRITICAL  
-**Time**: 2 days
+**Time**: 2.5 days
+
+**🔥 CRITICAL**: Create mappers FIRST - they're required for repository implementation.
 
 **Files to create**:
 
-1. **`lib/features/authentication/infrastructure/services/auth_api_service.dart`**
+1. **`lib/core/mappers/base_mapper.dart` (CREATE FIRST - Foundation)**
+
+```dart
+/// Abstract base class for all mappers
+///
+/// Provides type-safe conversion contract between Models and Entities
+/// Enforces consistency across all feature mappers
+abstract class BaseMapper<TModel, TEntity> {
+  /// Converts a model from infrastructure layer to domain entity
+  ///
+  /// This is the core method that every mapper MUST implement
+  /// [model] - The infrastructure model (API response, DB model, etc.)
+  /// Returns domain entity for use in business logic
+  TEntity fromModelToEntity(TModel model);
+
+  /// Converts a domain entity back to infrastructure model
+  ///
+  /// Optional method - override only if reverse conversion is needed
+  /// [entity] - The domain entity
+  /// Returns model for storage/API calls
+  TModel fromEntityToModel(TEntity entity) {
+    throw UnimplementedError(
+      'Override fromEntityToModel() if reverse conversion is needed'
+    );
+  }
+
+  /// Converts a list of models to entities
+  ///
+  /// Default implementation using fromModelToEntity()
+  /// Override for custom list handling if needed
+  List<TEntity> fromModelListToEntityList(List<TModel> models) {
+    return models.map(fromModelToEntity).toList();
+  }
+
+  /// Converts a list of entities to models
+  ///
+  /// Default implementation using fromEntityToModel()
+  /// Override for custom list handling if needed
+  List<TModel> fromEntityListToModelList(List<TEntity> entities) {
+    return entities.map(fromEntityToModel).toList();
+  }
+}
+```
+
+2. **`lib/features/authentication/infrastructure/mappers/` (CREATE SECOND)**
+
+```bash
+mkdir -p lib/features/authentication/infrastructure/mappers
+```
+
+3. **`lib/features/authentication/infrastructure/services/auth_api_service.dart`**
 
 ```dart
 @ChopperApi(baseUrl: '/auth')
@@ -314,26 +622,220 @@ abstract class AuthApiService extends ChopperService {
 2. **`lib/features/authentication/infrastructure/models/login_request.dart`**
 
 ```dart
-@JsonSerializable()
-class LoginRequest {
-  const LoginRequest({
-    required this.username,
-    required this.password,
-  });
+@freezed
+class LoginRequest with _$LoginRequest {
+  const factory LoginRequest({
+    required String username,
+    required String password,
+    String? deviceId,
+    @Default(false) bool rememberMe,
+  }) = _LoginRequest;
 
-  final String username;
-  final String password;
-
-  Map<String, dynamic> toJson() => _$LoginRequestToJson(this);
+  factory LoginRequest.fromJson(Map<String, dynamic> json) =>
+      _$LoginRequestFromJson(json);
 }
 ```
 
-3. **`lib/features/authentication/infrastructure/repositories/auth_repository_impl.dart`**
+3. **`lib/features/authentication/infrastructure/models/login_response.dart`**
+
+```dart
+@freezed
+class LoginResponse with _$LoginResponse {
+  const factory LoginResponse({
+    required String accessToken,
+    required String refreshToken,
+    required int expiresIn,
+    required UserModel user,
+    @Default(false) bool isFirstLogin,
+  }) = _LoginResponse;
+
+  factory LoginResponse.fromJson(Map<String, dynamic> json) =>
+      _$LoginResponseFromJson(json);
+}
+```
+
+4. **`lib/features/authentication/infrastructure/models/user_model.dart`**
+
+```dart
+@freezed
+class UserModel with _$UserModel {
+  const factory UserModel({
+    required String id,
+    required String username,
+    required String email,
+    String? fullName,
+    String? avatarUrl,
+  }) = _UserModel;
+
+  factory UserModel.fromJson(Map<String, dynamic> json) =>
+      _$UserModelFromJson(json);
+}
+```
+
+5. **`lib/features/authentication/infrastructure/mappers/auth_mapper.dart`**
+
+```dart
+@injectable
+class AuthMapper extends BaseMapper<LoginResponse, LoginResult> {
+  const AuthMapper(this._userMapper);
+
+  final UserMapper _userMapper;
+
+  @override
+  LoginResult fromModelToEntity(LoginResponse model) {
+    return LoginResult(
+      token: TokenEntity(
+        accessToken: model.accessToken,
+        refreshToken: model.refreshToken,
+        expiresIn: model.expiresIn,
+        issuedAt: DateTime.now(),
+      ),
+      user: _userMapper.fromModelToEntity(model.user),
+      isFirstLogin: model.isFirstLogin,
+    );
+  }
+
+  LoginRequest fromInputToModel(LoginInput input) {
+    return LoginRequest(
+      username: input.username,
+      password: input.password,
+      deviceId: input.deviceId,
+      rememberMe: input.rememberMe,
+    );
+  }
+}
+```
+
+6. **`lib/features/authentication/infrastructure/mappers/user_mapper.dart`**
+
+```dart
+@injectable
+class UserMapper extends BaseMapper<UserModel, UserEntity> {
+  @override
+  UserEntity fromModelToEntity(UserModel model) {
+    return UserEntity(
+      id: model.id,
+      username: model.username,
+      email: model.email,
+    );
+  }
+
+  @override
+  UserModel fromEntityToModel(UserEntity entity) {
+    return UserModel(
+      id: entity.id,
+      username: entity.username,
+      email: entity.email,
+    );
+  }
+}
+```
+
+7. **`lib/features/authentication/infrastructure/repositories/auth_repository_impl.dart`**
 
 ```dart
 @LazySingleton(as: AuthRepository)
 class AuthRepositoryImpl implements AuthRepository {
-  // Implementation following KSK pattern exactly
+  const AuthRepositoryImpl(
+    this._authApiService,
+    this._secureStorage,
+    this._authMapper,
+  );
+
+  final AuthApiService _authApiService;
+  final SecureStorageService _secureStorage;
+  final AuthMapper _authMapper;
+
+  @override
+  Future<Either<AuthFailure, LoginResult>> login(LoginInput input) async {
+    try {
+      final loginRequest = _authMapper.fromInputToModel(input);
+      final response = await _authApiService.login(loginRequest.toJson());
+
+      // Handle HTTP status codes
+      if (response.statusCode == 401) {
+        return const Left(AuthFailure.invalidCredentials());
+      }
+
+      if (response.statusCode == 422) {
+        return const Left(AuthFailure.invalidCredentials());
+      }
+
+      if (response.statusCode >= 500) {
+        return Left(AuthFailure.serverError(response.statusCode ?? 500));
+      }
+
+      if (response.statusCode != 200 || response.body == null) {
+        return Left(AuthFailure.unknown('Unexpected response: ${response.statusCode}'));
+      }
+
+      // Parse and convert response
+      final loginResponse = LoginResponse.fromJson(response.body!);
+      final result = _authMapper.fromModelToEntity(loginResponse);
+
+      // Store tokens if remember me is enabled
+      if (input.rememberMe) {
+        await _secureStorage.storeAccessToken(result.token.accessToken);
+        await _secureStorage.storeRefreshToken(result.token.refreshToken);
+      }
+
+      return Right(result);
+    } on SocketException {
+      return const Left(AuthFailure.networkError('No internet connection'));
+    } on FormatException catch (e) {
+      return Left(AuthFailure.unknown('Invalid response format: ${e.message}'));
+    } catch (e) {
+      return Left(AuthFailure.unknown(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<AuthFailure, TokenEntity>> refreshToken() async {
+    try {
+      final refreshToken = await _secureStorage.getRefreshToken();
+      if (refreshToken == null) {
+        return const Left(AuthFailure.tokenExpired());
+      }
+
+      final response = await _authApiService.refreshToken({
+        'refresh_token': refreshToken,
+      });
+
+      if (response.statusCode == 401) {
+        await _secureStorage.clearTokens();
+        return const Left(AuthFailure.tokenExpired());
+      }
+
+      if (response.statusCode != 200 || response.body == null) {
+        return Left(AuthFailure.serverError(response.statusCode ?? 500));
+      }
+
+      final tokenResponse = LoginResponse.fromJson(response.body!);
+      final tokenEntity = TokenEntity(
+        accessToken: tokenResponse.accessToken,
+        refreshToken: tokenResponse.refreshToken,
+        expiresIn: tokenResponse.expiresIn,
+        issuedAt: DateTime.now(),
+      );
+
+      await _secureStorage.storeAccessToken(tokenEntity.accessToken);
+      await _secureStorage.storeRefreshToken(tokenEntity.refreshToken);
+
+      return Right(tokenEntity);
+    } catch (e) {
+      return Left(AuthFailure.unknown(e.toString()));
+    }
+  }
+
+  @override
+  Future<Either<AuthFailure, void>> logout() async {
+    try {
+      await _secureStorage.clearTokens();
+      return const Right(null);
+    } catch (e) {
+      return Left(AuthFailure.unknown(e.toString()));
+    }
+  }
 }
 ```
 
@@ -351,18 +853,106 @@ class AuthRepositoryImpl implements AuthRepository {
 2. **Create BLoC integration**
 3. **Add proper error handling**
 
-### Step 5: Testing - Prove It Works
+### Step 5: JWT Security Implementation - Lock It Down
 
-**Priority**: HIGH  
+**Priority**: CRITICAL  
 **Time**: 1 day
 
 ```bash
-# Unit tests for each layer
-mkdir -p test/features/authentication/{domain,infrastructure,application}
+# 5.1 Create security infrastructure
+mkdir -p lib/core/security
 
-# Integration tests for API
-mkdir -p test/integration/authentication
+# 5.2 Implement JWT secure storage
+# 5.3 Create JWT token management system
+# 5.4 Add JWT validation service
+# 5.5 Add security interceptors
 ```
+
+### Step 6: Comprehensive Testing - Prove It Works
+
+**Priority**: CRITICAL  
+**Time**: 2 days
+
+```bash
+# Unit tests for each layer
+mkdir -p test/features/authentication/{domain,infrastructure,application,security}
+mkdir -p test/features/authentication/infrastructure/mappers  # 🔥 Mapper tests
+
+# Integration tests
+mkdir -p test/integration/{authentication,security,network}
+
+# E2E tests
+mkdir -p test/e2e/authentication_flows
+```
+
+**🧪 Testing Strategy**:
+
+- **Unit Tests**: 95%+ coverage for business logic
+  - **Mapper Tests**: Model ↔ Entity conversion accuracy
+  - **Use Case Tests**: Domain logic validation
+  - **Repository Tests**: Data flow and error handling
+- **Integration Tests**: API contracts, JWT security flows
+- **Widget Tests**: Authentication UI components
+- **E2E Tests**: Complete authentication journeys
+- **Security Tests**: JWT token management and validation
+- **Performance Tests**: Login response times, memory usage
+
+---
+
+## 🔄 MAPPER PATTERN - DATA CONVERSION LAYER
+
+### **🔥 LINUS JUDGMENT: ESSENTIAL ARCHITECTURE LAYER**
+
+**MISSING**: Mapper layer required for Clean Architecture.
+
+#### **Implementation**
+
+```dart
+// Repository with mapper injection
+class AuthRepositoryImpl {
+  AuthRepositoryImpl(this._api, this._tokenMapper);
+
+  final TokenMapper _tokenMapper;
+
+  Future<Either<AuthFailure, TokenEntity>> login() async {
+    final response = await _api.login();
+    final loginResponse = LoginResponse.fromJson(response.data);
+    final tokenEntity = _tokenMapper.fromLoginResponseToEntity(loginResponse);
+    return Right(tokenEntity);
+  }
+}
+```
+
+#### **Requirements**
+
+Mappers handle Model ↔ Entity conversion only.
+
+#### **Standard Pattern**
+
+```dart
+@injectable
+class TokenMapper {
+  // API Response → Domain Entity
+  TokenEntity fromLoginResponseToEntity(LoginResponse response);
+
+  // Storage Model → Domain Entity
+  TokenEntity fromModelToEntity(TokenModel model);
+
+  // Domain Entity → Storage Model
+  TokenModel fromEntityToModel(TokenEntity entity);
+}
+```
+
+#### **Data Flow Architecture**
+
+```
+API JSON → Model (fromJson) → Mapper → Entity → Use Case
+Entity → Mapper → Model (toJson) → API JSON
+```
+
+#### **BaseMapper Benefits**
+
+Type safety, consistent API, compile-time checks.
 
 ---
 
@@ -391,72 +981,99 @@ mkdir -p test/integration/authentication
 ## 📦 PACKAGE INSTALLATION COMMANDS
 
 ```bash
-# Core dependencies (skip envied - you already have it ✅)
-flutter pub add chopper:^8.1.0
-flutter pub add fpdart:^1.1.1
-flutter pub add get_it:^8.0.3
-flutter pub add injectable:^2.5.0
-flutter pub add json_annotation:^4.9.0
-flutter pub add logger:^2.5.0
-flutter pub add pretty_chopper_logger:^1.2.2
-flutter pub add equatable:^2.0.7
+# 🎯 STEP 1: Core dependencies (using existing packages when possible)
+flutter pub add chopper
+flutter pub add fpdart
+flutter pub add get_it
+flutter pub add injectable
+flutter pub add json_annotation
+flutter pub add freezed_annotation
+flutter pub add logger
+flutter pub add pretty_chopper_logger
+flutter pub add equatable
 
-# Dev dependencies
-flutter pub add -d chopper_generator:^8.1.0
-flutter pub add -d injectable_generator:^2.7.0
-flutter pub add -d json_serializable:^6.7.0
-flutter pub add -d build_runner:^2.5.4
+# 🔐 STEP 2: JWT Security layer (CRITICAL)
+flutter pub add flutter_secure_storage
 
-# Generate code
+# 🧪 STEP 3: Dev dependencies
+flutter pub add -d chopper_generator
+flutter pub add -d injectable_generator
+flutter pub add -d json_serializable
+flutter pub add -d freezed
+flutter pub add -d build_runner
+
+# Testing infrastructure
+flutter pub add -d mocktail
+flutter pub add -d bloc_test
+
+# 🚀 STEP 4: Generate code & setup
 flutter pub get
 dart run build_runner build --delete-conflicting-outputs
 ```
+
+### 🛡️ Platform-Specific Setup
+
+**No additional platform setup required** - JWT authentication and secure storage work out of the box on all platforms.
 
 ---
 
 ## 🎯 SUCCESS CRITERIA
 
-### Definition of Done
+### **Security**
 
-1. **User can login with real credentials** ✅
-2. **Token refresh happens automatically** ✅
-3. **Network errors are handled gracefully** ✅
-4. **All tests pass** ✅
-5. **Code follows KSK reference patterns** ✅
-6. **Zero linter errors** ✅
+- JWT tokens in FlutterSecureStorage only
+- Token validation and auto-refresh
+- HTTPS only, no sensitive data in logs
 
-### Performance Targets
+### **Testing**
 
-- **Login response**: < 3 seconds on 3G
-- **Token refresh**: < 1 second
-- **Error feedback**: Immediate UI feedback
+- 95%+ test coverage (unit, integration, widget, E2E)
+- All API endpoints and security flows covered
 
----
+### **Performance**
 
-## 🔥 LINUS FINAL WORDS
+- Login < 2 seconds, token refresh < 500ms
+- JWT validation < 50ms, immediate error feedback
 
-**"This isn't rocket science. It's authentication. Every app needs it. Stop overthinking and start implementing."**
+### **UX**
 
-The KSK reference project shows you exactly how to structure this. Follow their patterns:
+- Auto-login, loading states, error messages
+- Accessibility and form validation
 
-- Use Chopper for API services
-- Use Either for error handling
-- Use Injectable for dependency injection
-- Use the exact same folder structure
-- **Use your existing environment system** - it's already perfect, don't hardcode URLs
+### **Code Quality**
 
-**Don't try to be clever. Be correct. Be fast. Ship it.**
+- Clean Architecture compliance
+- Zero linter errors, 100% API documentation
 
 ---
 
-## 📚 REFERENCE MATERIALS
+---
 
-- **KSK Project Structure**: `/Users/phamau/Desktop/projects/ksk/ksk_app/lib/features/auth/`
-- **Clean Architecture**: Uncle Bob's patterns (entities → use cases → interfaces → frameworks)
-- **Chopper Documentation**: Type-safe HTTP client code generation
-- **fpdart Documentation**: Functional programming patterns for Dart
+## 🔥 IMPLEMENTATION SUMMARY
 
-**Next Steps**: Start with Step 1 (Foundation). Don't skip steps. Each phase builds on the previous one.
+**Stack**: Chopper + Either + Injectable + FlutterSecureStorage + Freezed
+
+**Architecture**: Domain → Use Cases → Infrastructure → Presentation
+
+**Code Generation**: Freezed for immutable classes, json_serializable for API models
+
+**Error Handling**: Sealed classes with specific failure types
+
+**Security**: JWT tokens in FlutterSecureStorage only (no crypto needed)
+
+**Testing**: 95%+ coverage required
+
+---
+
+## 📚 REFERENCES
+
+- **Clean Architecture**: Domain → Use Cases → Infrastructure → Presentation
+- **Chopper**: HTTP client with code generation
+- **fpdart**: Either monad for error handling
+- **Freezed**: Immutable classes and sealed unions for Dart
+- **json_serializable**: JSON serialization code generation
+- **Flutter Secure Storage**: Encrypted JWT token storage
+- **JWT**: Token decoding with dart:convert
 
 ---
 
