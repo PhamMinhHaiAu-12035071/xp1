@@ -220,6 +220,12 @@ jobs:
             sudo apt-get update
             sudo apt-get install -y make
           fi
+          # Install lcov for coverage HTML generation
+          if ! command -v genhtml &> /dev/null; then
+            echo "Installing lcov..."
+            sudo apt-get update
+            sudo apt-get install -y lcov
+          fi
           # Install lefthook for git hooks
           if ! command -v lefthook &> /dev/null; then
             echo "Installing lefthook..."
