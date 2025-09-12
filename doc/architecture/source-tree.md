@@ -251,7 +251,7 @@ xp1/
 │           ├── domain/               # Domain layer tests
 │           └── infrastructure/       # Infrastructure layer tests
 │
-├── docs/                             # Project documentation
+├── doc/                              # Project documentation
 │   ├── architecture/                 # Architecture documentation
 │   │   ├── coding-standards.md       # Development standards
 │   │   ├── tech-stack.md             # Technology stack documentation
