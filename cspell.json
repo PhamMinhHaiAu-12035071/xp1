@@ -27,6 +27,7 @@
     "choco",
     "lefthook",
     "cspell",
+    "dartdoc",
     "publishability",
     "Contador",
     "localizable",
@@ -148,12 +149,15 @@
     "imageset",
     "tappable",
     "precaching",
+    "snackbars",
     
     "overcomplicate",
     "usecases",
     "usecase",
     "datasource",
-    "phamau"
+    "phamau",
+    "bmad",
+    "BMAD"
   ],
   "ignorePaths": [
     "build/**",
