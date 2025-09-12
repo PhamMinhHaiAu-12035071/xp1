@@ -65,6 +65,19 @@ abstract class AppIcons {
   /// Company logo with text path
   String get logoText;
 
+  // Decorative Login Assets
+  /// Login top-left accent decorative element
+  String get loginTopLeftAccent;
+
+  /// Login top-right accent decorative element
+  String get loginTopRightAccent;
+
+  /// Login center-left accent decorative element
+  String get loginCenterLeftAccent;
+
+  /// Login center logo decorative element
+  String get loginCenterLogo;
+
   // Critical icons for preloading
   /// List of critical SVG icon paths for preloading
   List<String> get criticalIcons;

@@ -2,17 +2,13 @@ import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
 import 'package:xp1/core/di/injection_container.dart';
 import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 import 'package:xp1/features/locale/application/locale_application_service.dart';
-import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
 
-/// Bootstrap phase responsible for locale system initialization.
+/// Bootstrap phase responsible for Vietnamese-first locale initialization.
 ///
-/// This phase implements SRP by focusing solely on locale configuration
-/// and provides proper error handling and rollback capabilities.
-///
-/// The locale system determines the appropriate language based on:
-/// 1. Saved user preferences (if available)
-/// 2. System-detected locale (if supported)
-/// 3. Default fallback locale (Vietnamese as project default)
+/// This simplified phase implements fast locale initialization:
+/// - Always starts with Vietnamese default
+/// - Synchronous operations for fast startup
+/// - No persistence or complex resolution logic
 class LocaleBootstrapPhase implements BootstrapPhase {
   /// Creates locale bootstrap phase with logger.
   const LocaleBootstrapPhase({
@@ -32,14 +28,13 @@ class LocaleBootstrapPhase implements BootstrapPhase {
 
   @override
   Future<void> validatePreconditions() async {
-    // No preconditions to validate - DI registration will be checked during
-    // execution since the DependencyInjectionPhase runs before this phase
+    // No preconditions needed - fast Vietnamese initialization
   }
 
   @override
   Future<BootstrapResult> execute() async {
     try {
-      _logger.info('🌐 Initializing locale system...');
+      _logger.info('🌐 Initializing Vietnamese locale system...');
 
       // Validate that dependency injection is configured
       if (!getIt.isRegistered<LocaleApplicationService>()) {
@@ -52,30 +47,25 @@ class LocaleBootstrapPhase implements BootstrapPhase {
       // Get locale application service from DI container
       final localeService = getIt<LocaleApplicationService>();
 
-      // Initialize locale system using existing application service
-      final localeConfiguration = await localeService.initializeLocaleSystem();
+      // Initialize locale system synchronously to Vietnamese
+      final localeConfiguration = localeService.initializeLocaleSystem();
 
-      _logger.info(
-        '✅ Locale system initialized: ${localeConfiguration.languageCode} '
-        '(source: ${localeConfiguration.source})',
-      );
+      _logger.info('✅ Vietnamese locale system initialized');
 
       return BootstrapResult.success(
         data: {
           'locale_configuration': localeConfiguration,
-          'language_code': localeConfiguration.languageCode,
-          'locale_source': localeConfiguration.source.name,
-          'full_locale_id': localeConfiguration.fullLocaleId,
+          'language_code': 'vi',
+          'locale_source': 'defaultFallback',
+          'full_locale_id': 'vi_VN',
         },
-        message:
-            'Locale system initialized with '
-            '${localeConfiguration.languageCode}',
+        message: 'Vietnamese locale system initialized',
       );
     } on BootstrapException {
       rethrow; // Re-throw bootstrap exceptions as-is
     } on Exception catch (e) {
       throw BootstrapException(
-        'Failed to initialize locale system',
+        'Failed to initialize Vietnamese locale system',
         phase: phaseName,
         originalError: e,
         canRetry: true,
@@ -86,19 +76,17 @@ class LocaleBootstrapPhase implements BootstrapPhase {
   @override
   Future<void> rollback() async {
     try {
-      _logger.info('🔄 Rolling back locale system...');
+      _logger.info('🔄 Rolling back to Vietnamese locale...');
 
       // Get locale service for rollback
       if (getIt.isRegistered<LocaleApplicationService>()) {
-        final localeService = getIt<LocaleApplicationService>();
-
-        // Reset to system default as rollback strategy
-        await localeService.resetToSystemDefault();
+        // Reset to Vietnamese default as rollback strategy
+        getIt<LocaleApplicationService>().resetToSystemDefault();
       }
 
-      _logger.info('✅ Locale system rollback completed');
+      _logger.info('✅ Vietnamese locale rollback completed');
     } on Exception catch (e) {
-      _logger.error('Failed to rollback locale system', e);
+      _logger.error('Failed to rollback Vietnamese locale system', e);
       // Don't throw - rollback should be resilient
     }
   }

@@ -41,6 +41,10 @@
         "hidePassword": "Ẩn mật khẩu",
         "usernameIcon": "Biểu tượng tài khoản",
         "passwordIcon": "Biểu tượng bảo mật"
+      },
+      "error": {
+        "title": "Lỗi xác thực",
+        "okButton": "Đồng ý"
       }
     },
     "attendance": {

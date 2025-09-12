@@ -41,6 +41,10 @@
         "hidePassword": "Hide password",
         "usernameIcon": "Username account icon",
         "passwordIcon": "Password security icon"
+      },
+      "error": {
+        "title": "Authentication Error",
+        "okButton": "OK"
       }
     },
     "attendance": {

@@ -1,11 +1,17 @@
 import 'dart:ui' as ui;
 
+import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
+import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:get_it/get_it.dart';
 import 'package:xp1/core/assets/app_icons.dart';
+import 'package:xp1/core/routing/app_router.dart';
 import 'package:xp1/core/services/svg_icon_service.dart';
 import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
+import 'package:xp1/features/authentication/application/blocs/auth_bloc.dart';
+import 'package:xp1/features/authentication/application/blocs/auth_event.dart';
+import 'package:xp1/features/authentication/application/blocs/auth_state.dart';
 import 'package:xp1/l10n/gen/strings.g.dart';
 
 /// Utility class for creating animated paths.
@@ -173,6 +179,7 @@ class _FieldConfig {
     this.suffixIcon,
     this.textInputAction = TextInputAction.next,
     this.onFieldSubmitted,
+    this.onChanged,
   });
 
   final TextEditingController controller;
@@ -186,6 +193,7 @@ class _FieldConfig {
   final TextInputType keyboardType;
   final TextInputAction textInputAction;
   final void Function(String)? onFieldSubmitted;
+  final void Function(String)? onChanged;
 }
 
 class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
@@ -198,12 +206,15 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   bool _obscurePassword = true;
   bool _isLoading = false;
   bool _hasSubmitted = false;
-  String? _usernameError;
-  String? _passwordError;
+  bool _hasShownErrorDialog = false;
   late AnimationController _usernameBorderAnimationController;
   late AnimationController _passwordBorderAnimationController;
   late Animation<double> _usernameBorderAnimation;
   late Animation<double> _passwordBorderAnimation;
+
+  late AnimationController _eyeIconAnimationController;
+  late Animation<double> _eyeIconFadeAnimation;
+  late Animation<double> _eyeIconScaleAnimation;
 
   @override
   void initState() {
@@ -220,6 +231,35 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     _passwordBorderAnimation = _createBorderAnimation(
       _passwordBorderAnimationController,
     );
+
+    // Initialize eye icon animation controller
+    _eyeIconAnimationController = AnimationController(
+      duration: const Duration(milliseconds: 80),
+      vsync: this,
+    );
+
+    // Create eye icon animations
+    _eyeIconFadeAnimation =
+        Tween<double>(
+          begin: 1,
+          end: 0, // Fade out then fade in
+        ).animate(
+          CurvedAnimation(
+            parent: _eyeIconAnimationController,
+            curve: Curves.easeInCubic,
+          ),
+        );
+
+    _eyeIconScaleAnimation =
+        Tween<double>(
+          begin: 1,
+          end: 0.8,
+        ).animate(
+          CurvedAnimation(
+            parent: _eyeIconAnimationController,
+            curve: Curves.easeInCubic,
+          ),
+        );
 
     // Add listeners
     _usernameFocusNode.addListener(
@@ -262,33 +302,20 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     _passwordFocusNode.dispose();
     _usernameBorderAnimationController.dispose();
     _passwordBorderAnimationController.dispose();
+    _eyeIconAnimationController.dispose();
     super.dispose();
   }
 
   /// Handles login form submission.
-  Future<void> _handleLogin() async {
-    // Set submitted state to show errors
-    setState(() => _hasSubmitted = true);
+  void _handleLogin() {
+    setState(() {
+      _hasSubmitted = true;
+      // Reset error dialog flag to allow new errors to be shown on submit
+      _hasShownErrorDialog = false;
+    });
 
-    // Validate all fields
-    _validateUsername(_usernameController.text);
-    _validatePassword(_passwordController.text);
-
-    // Check if there are any errors
-    if (_usernameError != null || _passwordError != null) {
-      return;
-    }
-
-    setState(() => _isLoading = true);
-
-    // Simulate login process
-    await Future<void>.delayed(const Duration(seconds: 2));
-
-    if (mounted) {
-      setState(() => _isLoading = false);
-      // Navigate to main app on success
-      // context.router.replaceAll([const MainWrapperRoute()]);
-    }
+    // Dispatch form submission event to AuthBloc for validation and login
+    context.read<AuthBloc>().add(const AuthEvent.formSubmitted());
   }
 
   /// Handles focus changes for border animation.
@@ -305,61 +332,49 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     setState(() {
       // Clear submit state when user types to hide errors
       _hasSubmitted = false;
+      // Reset error dialog flag to allow new errors to be shown
+      _hasShownErrorDialog = false;
     });
   }
 
-  /// Validates username field and updates error state.
-  void _validateUsername(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        _usernameError = t.pages.login.validation.usernameRequired;
-      } else if (value.length < 3) {
-        _usernameError = t.pages.login.validation.usernameMinLength;
-      } else {
-        _usernameError = null;
-      }
-    });
+  /// Handles username field changes and dispatches to BLoC
+  void _onUsernameChanged(String value) {
+    context.read<AuthBloc>().add(AuthEvent.usernameChanged(username: value));
+    _onTextChange();
   }
 
-  /// Validates password field and updates error state.
-  void _validatePassword(String value) {
-    setState(() {
-      if (value.isEmpty) {
-        _passwordError = t.pages.login.validation.passwordRequired;
-      } else if (value.length < 6) {
-        _passwordError = t.pages.login.validation.passwordMinLength;
-      } else {
-        _passwordError = null;
-      }
-    });
+  /// Handles password field changes and dispatches to BLoC
+  void _onPasswordChanged(String value) {
+    context.read<AuthBloc>().add(AuthEvent.passwordChanged(password: value));
+    _onTextChange();
   }
 
-  /// Calculates responsive spacing based on screen height.
+  /// Calculates responsive spacing based on design ratio.
   ///
   /// [baseSpacing] The base spacing value to scale.
-  /// Returns a spacing value that adapts to different screen heights.
+  /// Returns a spacing value that adapts proportionally to screen size
+  /// based on the 393x852 Figma design dimensions.
   double _getResponsiveSpacing(double baseSpacing) {
-    final screenHeight = MediaQuery.of(context).size.height;
+    final screenSize = MediaQuery.of(context).size;
 
-    // Apply scaling factor with constraints
-    // - Large screens (>= 800px): 100% spacing
-    // - Medium screens (600-800px): 80-95% spacing
-    // - Small screens (< 600px): 70-85% spacing
-    double scaleFactor;
-    if (screenHeight >= 800) {
-      scaleFactor = 1.0;
-    } else if (screenHeight >= 600) {
-      // Linear interpolation between 0.8 and 1.0
-      scaleFactor = 0.8 + (0.2 * (screenHeight - 600) / 200);
-    } else {
-      // Linear interpolation between 0.7 and 0.8
-      scaleFactor = 0.7 + (0.1 * (screenHeight - 400) / 200);
-    }
+    // Design base dimensions from Figma (393x852)
+    const designWidth = 393.0;
+    const designHeight = 852.0;
 
-    // Ensure minimum and maximum bounds
-    scaleFactor = scaleFactor.clamp(0.7, 1.0);
+    // Calculate scale factors for both dimensions
+    final widthScale = screenSize.width / designWidth;
+    final heightScale = screenSize.height / designHeight;
 
-    return baseSpacing * scaleFactor;
+    // Use the smaller scale factor to maintain proportions
+    // This ensures content doesn't become too large on wide screens
+    final scale = (widthScale < heightScale) ? widthScale : heightScale;
+
+    // Apply reasonable bounds for extreme screen sizes
+    // - Minimum 0.8 for very small screens (maintain usability)
+    // - Maximum 1.3 for very large screens (prevent oversized spacing)
+    final boundedScale = scale.clamp(0.8, 1.3);
+
+    return baseSpacing * boundedScale;
   }
 
   /// Calculates precise left position for label alignment using LayoutBuilder.
@@ -437,28 +452,73 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     );
   }
 
-  /// Builds custom error text widget with consistent styling.
-  /// Only shows error when form has been submitted.
-  Widget _buildErrorText(String? error) {
-    if (error == null || !_hasSubmitted) {
-      return SizedBox(height: context.sizes.v20); // Maintain spacing
-    }
-
-    return AnimatedContainer(
-      duration: const Duration(milliseconds: 200),
-      curve: Curves.easeInOut,
-      height: context.sizes.v20,
-      child: Align(
-        alignment: Alignment.centerLeft,
-        child: Text(
-          error,
-          style: context.textStyles.bodySmall().copyWith(
-            color: Colors.red,
-            fontWeight: FontWeight.w400,
+  /// Shows error dialog with consistent styling and actions.
+  /// Displays authentication errors in a modal dialog instead of inline text.
+  Future<void> _showErrorDialog(String errorMessage) async {
+    return showDialog<void>(
+      context: context,
+      builder: (BuildContext context) {
+        return AlertDialog(
+          shape: RoundedRectangleBorder(
+            borderRadius: BorderRadius.circular(context.sizes.r12),
           ),
-        ),
-      ),
+          title: Row(
+            children: [
+              Icon(
+                Icons.error_outline,
+                color: Colors.red,
+                size: context.sizes.r24,
+              ),
+              SizedBox(width: context.sizes.r8),
+              Text(
+                t.pages.login.error.title,
+                style: context.textStyles.headingMedium().copyWith(
+                  color: context.colors.greyNormal,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ],
+          ),
+          content: Text(
+            errorMessage,
+            style: context.textStyles.bodyMedium().copyWith(
+              color: context.colors.greyNormal,
+            ),
+          ),
+          actions: [
+            TextButton(
+              onPressed: () => Navigator.of(context).pop(),
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.sizes.r16,
+                  vertical: context.sizes.r8,
+                ),
+              ),
+              child: Text(
+                t.pages.login.error.okButton,
+                style: context.textStyles.bodyMedium().copyWith(
+                  color: context.colors.amberNormal,
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
+            ),
+          ],
+        );
+      },
     );
+  }
+
+  /// Handles password visibility toggle with smooth fade animation.
+  void _togglePasswordVisibility() {
+    // Start fade out animation
+    _eyeIconAnimationController.forward().then((_) {
+      // Change icon state at the middle of animation (fully faded out)
+      setState(() {
+        _obscurePassword = !_obscurePassword;
+      });
+      // Fade back in with new icon
+      _eyeIconAnimationController.reverse();
+    });
   }
 
   /// Builds the eye visibility toggle icon using SVG service with ripple
@@ -473,22 +533,29 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       borderRadius: BorderRadius.circular(context.sizes.r32),
       child: InkWell(
         borderRadius: BorderRadius.circular(context.sizes.r32),
-        onTap: () {
-          setState(() {
-            _obscurePassword = !_obscurePassword;
-          });
-        },
+        onTap: _togglePasswordVisibility,
         child: SizedBox(
           width: context.sizes.r32,
           height: context.sizes.r32,
           child: Center(
-            child: iconService.svgIcon(
-              _obscurePassword ? appIcons.eye : appIcons.eyeOff,
-              size: context.sizes.r24,
-              color: context.colors.blueNormal,
-              semanticLabel: _obscurePassword
-                  ? t.pages.login.semantic.showPassword
-                  : t.pages.login.semantic.hidePassword,
+            child: AnimatedBuilder(
+              animation: _eyeIconAnimationController,
+              builder: (context, child) {
+                return Transform.scale(
+                  scale: _eyeIconScaleAnimation.value,
+                  child: Opacity(
+                    opacity: _eyeIconFadeAnimation.value,
+                    child: iconService.svgIcon(
+                      _obscurePassword ? appIcons.eye : appIcons.eyeOff,
+                      size: context.sizes.r24,
+                      color: context.colors.blueNormal,
+                      semanticLabel: _obscurePassword
+                          ? t.pages.login.semantic.showPassword
+                          : t.pages.login.semantic.hidePassword,
+                    ),
+                  ),
+                );
+              },
             ),
           ),
         ),
@@ -542,9 +609,11 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       ),
       filled: true,
       fillColor: const Color(0xFFFFFFFF),
-      contentPadding: EdgeInsets.symmetric(
-        horizontal: context.sizes.r16,
-        vertical: context.sizes.r16,
+      contentPadding: EdgeInsets.fromLTRB(
+        context.sizes.r16, // left
+        context.sizes.r24, // top - more space for label
+        context.sizes.r16, // right
+        context.sizes.r12, // bottom - less space to push text further down
       ),
     );
   }
@@ -573,15 +642,19 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
               TextFormField(
                 controller: config.controller,
                 focusNode: config.focusNode,
+                enabled: !_isLoading,
                 obscureText: config.obscureText,
                 keyboardType: config.keyboardType,
                 textInputAction: config.textInputAction,
+                textAlignVertical: TextAlignVertical.bottom,
                 onFieldSubmitted: config.onFieldSubmitted,
                 onChanged: (value) {
                   // Clear submit state when user types to hide errors
                   if (_hasSubmitted) {
                     setState(() => _hasSubmitted = false);
                   }
+                  // Call the specific field's onChanged callback
+                  config.onChanged?.call(value);
                 },
                 decoration: _createInputDecoration(
                   config.prefixIcon,
@@ -630,7 +703,54 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
   @override
   Widget build(BuildContext context) {
+    return BlocListener<AuthBloc, AuthState>(
+      listener: (context, state) {
+        switch (state.authStatus) {
+          case AuthenticationStatus.initial:
+            // No action needed for initial state
+            break;
+          case AuthenticationStatus.loading:
+            break;
+          // No action needed, handled by BlocBuilder
+          case AuthenticationStatus.authenticated:
+            // Navigate to main app area on successful authentication
+            context.router.replaceAll([const MainWrapperRoute()]);
+          case AuthenticationStatus.unauthenticated:
+            // No action needed for unauthenticated state
+            break;
+          // No action needed for unauthenticated state
+          case AuthenticationStatus.error:
+            // Only show error dialog if it hasn't been shown yet for this error
+            // and only when form has been submitted (not during field input)
+            if (!_hasShownErrorDialog && _hasSubmitted) {
+              setState(() {
+                _hasShownErrorDialog = true;
+              });
+              final message =
+                  state.errorMessage ??
+                  'An unexpected error occurred. Please try again.';
+              _showErrorDialog(message);
+            }
+        }
+      },
+      child: BlocBuilder<AuthBloc, AuthState>(
+        builder: (context, state) {
+          // Update loading state based on AuthBloc state
+          final isLoading =
+              state.authStatus == AuthenticationStatus.loading ||
+              state.isSubmitting;
+
+          return _buildLoginForm(isLoading);
+        },
+      ),
+    );
+  }
+
+  Widget _buildLoginForm(bool isLoading) {
     final appIcons = GetIt.instance<AppIcons>();
+
+    // Update local loading state to match AuthBloc state
+    _isLoading = isLoading;
 
     // Create field configurations to eliminate duplication
     final usernameConfig = _FieldConfig(
@@ -644,6 +764,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
         t.pages.login.semantic.usernameIcon,
       ),
       label: t.pages.login.form.username,
+      onChanged: _onUsernameChanged,
     );
 
     final passwordConfig = _FieldConfig(
@@ -661,130 +782,140 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       obscureText: _obscurePassword,
       textInputAction: TextInputAction.done,
       onFieldSubmitted: (_) => _handleLogin(),
+      onChanged: _onPasswordChanged,
     );
 
-    return Padding(
-      padding: EdgeInsets.only(
-        left: context.sizes.r24,
-        right: context.sizes.r24,
-        top: context.sizes.r16,
-      ),
-      child: Form(
-        key: _formKey,
-        child: Column(
-          mainAxisSize: MainAxisSize.min,
-          crossAxisAlignment: CrossAxisAlignment.stretch,
-          children: [
-            // Welcome header section
-            const _LoginWelcomeHeader(),
+    return Form(
+      key: _formKey,
+      child: Column(
+        mainAxisSize: MainAxisSize.min,
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          // Welcome header section
+          const _LoginWelcomeHeader(),
 
-            SizedBox(height: _getResponsiveSpacing(context.sizes.v16)),
+          SizedBox(height: _getResponsiveSpacing(context.sizes.v40)),
 
-            // Username field with error message
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildAnimatedField(usernameConfig),
-                _buildErrorText(_usernameError),
-              ],
-            ),
+          // Username field
+          _buildAnimatedField(usernameConfig),
 
-            SizedBox(height: _getResponsiveSpacing(context.sizes.v20)),
+          SizedBox(height: _getResponsiveSpacing(context.sizes.v20)),
 
-            // Password field with error message
-            Column(
-              crossAxisAlignment: CrossAxisAlignment.start,
-              children: [
-                _buildAnimatedField(passwordConfig),
-                _buildErrorText(_passwordError),
-              ],
-            ),
+          // Password field
+          _buildAnimatedField(passwordConfig),
 
-            SizedBox(height: _getResponsiveSpacing(context.sizes.v12)),
+          SizedBox(height: _getResponsiveSpacing(context.sizes.v12)),
 
-            // Forgot password link
-            Align(
-              alignment: Alignment.centerRight,
-              child: TextButton(
-                onPressed: () {
-                  // Handle forgot password
-                },
-                style: TextButton.styleFrom(
-                  padding: EdgeInsets.symmetric(
-                    horizontal: context.sizes.r8,
-                    vertical: context.sizes.r4,
-                  ),
+          // Forgot password link
+          Align(
+            alignment: Alignment.centerRight,
+            child: TextButton(
+              onPressed: () {
+                // Handle forgot password
+              },
+              style: TextButton.styleFrom(
+                padding: EdgeInsets.symmetric(
+                  horizontal: context.sizes.r8,
+                  vertical: context.sizes.r4,
                 ),
-                child: Text(
-                  t.pages.login.forgotPassword,
-                  style: context.textStyles.bodySmall().copyWith(
-                    color: context.colors.blueNormal,
-                    fontWeight: FontWeight.w400,
-                  ),
+              ),
+              child: Text(
+                t.pages.login.forgotPassword,
+                style: context.textStyles.bodySmall().copyWith(
+                  color: context.colors.blueNormal,
+                  fontWeight: FontWeight.w400,
                 ),
               ),
             ),
+          ),
 
-            SizedBox(height: _getResponsiveSpacing(context.sizes.v32)),
+          SizedBox(height: _getResponsiveSpacing(context.sizes.v24)),
 
-            // Login button
-            _buildLoginButton(),
+          // Login button
+          _buildLoginButton(),
 
-            SizedBox(height: _getResponsiveSpacing(context.sizes.v24)),
-          ],
-        ),
+          SizedBox(height: _getResponsiveSpacing(context.sizes.v20)),
+        ],
       ),
     );
   }
 
-  /// Builds the login button with loading state.
+  /// Builds the login button with loading state and validation-based enable/disable.
   Widget _buildLoginButton() {
-    return Container(
-      width: double.infinity,
-      height: context.sizes.r48,
-      decoration: BoxDecoration(
-        gradient: const LinearGradient(
-          begin: Alignment.topCenter,
-          end: Alignment.bottomCenter,
-          colors: [
-            Color.fromRGBO(255, 255, 255, 0.72),
-            Color.fromRGBO(255, 255, 255, 0.8),
-          ],
-          stops: [0.0, 0.4],
-        ),
-        borderRadius: BorderRadius.circular(context.sizes.r8),
-      ),
-      child: ElevatedButton(
-        onPressed: _isLoading ? null : _handleLogin,
-        style: ElevatedButton.styleFrom(
-          backgroundColor: context.colors.amberNormal,
-          foregroundColor: Colors.white,
-          disabledBackgroundColor: context.colors.greyLight,
-          elevation: 0,
-          shadowColor: Colors.transparent,
-          shape: RoundedRectangleBorder(
+    return BlocBuilder<AuthBloc, AuthState>(
+      builder: (context, state) {
+        // Button is disabled if either field is empty or if loading
+        final isButtonDisabled =
+            _isLoading ||
+            state.username.value.isEmpty ||
+            state.password.value.isEmpty;
+
+        return Container(
+          width: double.infinity,
+          height: context.sizes.r48,
+          decoration: BoxDecoration(
+            gradient: const LinearGradient(
+              begin: Alignment.topCenter,
+              end: Alignment.bottomCenter,
+              colors: [
+                Color.fromRGBO(255, 255, 255, 0.72),
+                Color.fromRGBO(255, 255, 255, 0.8),
+              ],
+              stops: [0.0, 0.4],
+            ),
             borderRadius: BorderRadius.circular(context.sizes.r8),
           ),
-          padding: EdgeInsets.symmetric(
-            vertical: context.sizes.r16,
-            horizontal: context.sizes.r12,
-          ),
-          minimumSize: Size(double.infinity, context.sizes.r48),
-        ),
-        child: _isLoading
-            ? SizedBox(
-                height: context.sizes.r20,
-                width: context.sizes.r20,
-                child: const CircularProgressIndicator(
-                  strokeWidth: 2,
-                  valueColor: AlwaysStoppedAnimation<Color>(Colors.white),
+          child: AnimatedContainer(
+            duration: const Duration(milliseconds: 300),
+            curve: Curves.easeInOut,
+            decoration: BoxDecoration(
+              color: isButtonDisabled
+                  ? context.colors.blueNormal
+                  : context.colors.amberNormal,
+              borderRadius: BorderRadius.circular(context.sizes.r8),
+            ),
+            child: Material(
+              color: Colors.transparent,
+              borderRadius: BorderRadius.circular(context.sizes.r8),
+              child: InkWell(
+                borderRadius: BorderRadius.circular(context.sizes.r8),
+                onTap: isButtonDisabled ? null : _handleLogin,
+                child: Container(
+                  width: double.infinity,
+                  height: context.sizes.r48,
+                  padding: EdgeInsets.symmetric(
+                    vertical: context.sizes.r16,
+                    horizontal: context.sizes.r12,
+                  ),
+                  child: Center(
+                    child: _isLoading
+                        ? SizedBox(
+                            height: context.sizes.r20,
+                            width: context.sizes.r20,
+                            child: const CircularProgressIndicator(
+                              strokeWidth: 2,
+                              valueColor: AlwaysStoppedAnimation<Color>(
+                                Colors.white,
+                              ),
+                            ),
+                          )
+                        : AnimatedDefaultTextStyle(
+                            duration: const Duration(milliseconds: 300),
+                            curve: Curves.easeInOut,
+                            style: context.textStyles.buttonText().copyWith(
+                              color: isButtonDisabled
+                                  ? Colors.white.withValues(alpha: 0.6)
+                                  : Colors.white,
+                            ),
+                            child: Text(t.pages.login.signInButton),
+                          ),
+                  ),
                 ),
-              )
-            : Text(
-                t.pages.login.signInButton,
-                style: context.textStyles.buttonText(),
               ),
-      ),
+            ),
+          ),
+        );
+      },
     );
   }
 }

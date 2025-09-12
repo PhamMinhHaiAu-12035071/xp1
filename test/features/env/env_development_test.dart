@@ -17,7 +17,7 @@ void main() {
       test('should provide development-specific API URL', () {
         expect(EnvDev.apiUrl, contains('dev'));
         expect(EnvDev.apiUrl, contains('api'));
-        expect(EnvDev.apiUrl, contains('xp1.com'));
+        expect(EnvDev.apiUrl, contains('px1.vn'));
       });
 
       test('should provide valid app name', () {

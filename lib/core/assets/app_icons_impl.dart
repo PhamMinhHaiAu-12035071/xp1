@@ -68,6 +68,22 @@ class AppIconsImpl implements AppIcons {
   String get logoText => 'assets/icons/brand/logo_text.svg';
 
   @override
+  String get loginTopLeftAccent =>
+      'assets/icons/decorative/login/login_top_left_accent.svg';
+
+  @override
+  String get loginTopRightAccent =>
+      'assets/icons/decorative/login/login_top_right_accent.svg';
+
+  @override
+  String get loginCenterLeftAccent =>
+      'assets/icons/decorative/login/login_center_left_accent.svg';
+
+  @override
+  String get loginCenterLogo =>
+      'assets/icons/decorative/login/login_center_logo.svg';
+
+  @override
   List<String> get criticalIcons => [
     logo,
     arrowBack,

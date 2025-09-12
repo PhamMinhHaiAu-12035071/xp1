@@ -40,6 +40,9 @@ analyzer:
     cascade_invocations: error
     avoid_single_cascade_in_expression_statements: error
 
+    # Ignore invalid_annotation_target errors
+    invalid_annotation_target: ignore
+
 # Custom linter rule overrides (only non-default settings)
 linter:
   rules:

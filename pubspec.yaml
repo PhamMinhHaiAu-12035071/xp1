@@ -10,86 +10,141 @@ environment:
   flutter: ">=3.24.0" # Minimum Flutter version
 
 dependencies:
-  # === CORE FRAMEWORK ===
-  flutter:
-    sdk: flutter
-  flutter_localizations:
-    sdk: flutter
-
-  # === STATE MANAGEMENT ===
-  bloc: ^9.0.0 # Business Logic Component pattern
-  flutter_bloc: ^9.1.1 # Flutter integration for BLoC
-  hydrated_bloc: ^10.1.1 # Persistent BLoC state management
-  replay_bloc: ^0.3.0 # Undo/Redo functionality for BLoC
-
-  # === FUNCTIONAL PROGRAMMING ===
-  equatable: ^2.0.5 # Value equality for immutable objects
-  fpdart: ^1.1.0 # Functional programming for Dart
-
-  # === DEPENDENCY INJECTION ===
-  get_it: ^8.0.2 # Service locator for dependency injection
-  injectable: ^2.5.1 # Code generation for dependency injection
-
   # === NAVIGATION ===
   auto_route: ^10.1.2 # Declarative routing solution
 
-  # === ANNOTATIONS & CODEGEN ===
-  freezed_annotation: ^3.1.0 # Annotations for Freezed code generation
-  json_annotation: ^4.8.1 # Annotations for JSON serialization
-  meta: ^1.16.0 # Metadata annotations for Dart
+  # === STATE MANAGEMENT ===
+  bloc: ^9.0.0 # Business Logic Component pattern
+
+  # === HTTP CLIENT ===
+  chopper: ^8.0.3 # HTTP client with code generation
 
   # === ENVIRONMENT MANAGEMENT ===
   envied: ^1.2.0 # Secure environment variable management
+
+  # === FUNCTIONAL PROGRAMMING ===
+  equatable: ^2.0.5 # Value equality for immutable objects
+
+  # === CORE FRAMEWORK ===
+  flutter:
+    sdk: flutter
+  flutter_bloc: ^9.1.1 # Flutter integration for BLoC
+  flutter_keyboard_visibility: ^6.0.0 # Keyboard visibility detection
+  flutter_localizations:
+    sdk: flutter
+  flutter_screenutil: ^5.9.3 # Responsive design utilities
+  flutter_secure_storage: ^9.2.2 # Encrypted JWT token storage
+  flutter_svg: ^2.0.10+1 # SVG rendering (no built-in Flutter support)
+
+  # === FORM VALIDATION ===
+  formz: ^0.8.0 # Type-safe form validation with state management
+
+  # === FUNCTIONAL PROGRAMMING ===
+  fpdart: ^1.1.0 # Functional programming for Dart
+
+  # === ANNOTATIONS & CODEGEN ===
+  freezed_annotation: ^3.1.0 # Annotations for Freezed code generation
+
+  # === DEPENDENCY INJECTION ===
+  get_it: ^8.0.2 # Service locator for dependency injection
+
+  # === UI & THEMING ===
+  google_fonts: ^6.2.1 # Google Fonts integration
+
+  # === STATE MANAGEMENT ===
+  hydrated_bloc: ^10.1.1 # Persistent BLoC state management
+
+  # === DEPENDENCY INJECTION ===
+  injectable: ^2.5.1 # Code generation for dependency injection
+
+  # === UTILITIES ===
+  intl: ^0.20.2 # Internationalization utilities
+
+  # === ANNOTATIONS & CODEGEN ===
+  json_annotation: ^4.8.1 # Annotations for JSON serialization
+
+  # === UTILITIES ===
+  logger: ^2.6.1 # Beautiful and extensible logging
+
+  # === ANNOTATIONS & CODEGEN ===
+  meta: ^1.16.0 # Metadata annotations for Dart
+
+  # === UI & THEMING ===
+  nil: ^1.1.1 # Lightweight null widget for conditional rendering
+
+  # === HTTP CLIENT ===
+  pretty_chopper_logger: ^1.3.0 # HTTP logging interceptor
+
+  # === STATE MANAGEMENT ===
+  replay_bloc: ^0.3.0 # Undo/Redo functionality for BLoC
+
+  # === PERSISTENCE ===
+  shared_preferences: ^2.3.3 # Simple persistent key-value storage
 
   # === INTERNATIONALIZATION ===
   slang: ^4.8.1 # Type-safe i18n solution
   slang_flutter: ^4.8.0 # Flutter integration for slang
 
-  # === PERSISTENCE ===
-  shared_preferences: ^2.3.3 # For locale persistence
-
   # === UI & THEMING ===
-  flutter_keyboard_visibility: ^6.0.0 # Keyboard visibility detection for better UX
-  flutter_screenutil: ^5.9.3 # Responsive design utilities
-  flutter_svg: ^2.0.10+1 # SVG rendering support (ESSENTIAL - no built-in Flutter support)
-  google_fonts: ^6.2.1 # Google Fonts integration
-  nil: ^1.1.1 # Lightweight null widget for conditional rendering
-  smooth_page_indicator: ^1.2.1 # Professional page indicators with smooth animations
-
-  # === UTILITIES ===
-  intl: ^0.20.2 # Internationalization utilities
-  logger: ^2.6.1 # Beautiful and extensible logging
+  smooth_page_indicator: ^1.2.1 # Page indicators with smooth animations
 
 dev_dependencies:
-  # === CORE TESTING ===
-  flutter_test:
-    sdk: flutter
-  test: ^1.26.2 # Dart testing framework
-
   # === CODE GENERATION ===
-  auto_route_generator: ^10.2.4 # Code generator for auto_route package
-  build_runner: ^2.7.1 # Build system for code generation
-  envied_generator: ^1.2.0 # Code generator for envied package
-  freezed: ^3.2.0 # Code generator for immutable data classes
-  injectable_generator: ^2.6.1 # Code generator for injectable package
-  json_serializable: ^6.7.1 # Code generator for JSON serialization
-  slang_build_runner: ^4.8.0 # Generator for slang (if using build_runner)
+  auto_route_generator: ^10.2.4 # Code generator for auto_route
 
   # === TESTING FRAMEWORKS ===
   bloc_test: ^10.0.0 # Testing utilities for BLoC
-  fake_async: ^1.3.1 # Fake async for timing control in tests
-  mocktail: ^1.0.4 # Modern mocking framework
 
-  # === WIDGETBOOK INTEGRATION ===
-  widgetbook: ^3.16.0 # Core widgetbook package
-  widgetbook_annotation: ^3.0.0 # Annotations for code generation
-  widgetbook_generator: ^3.7.0 # Code generator for widgetbook
+  # === CODE GENERATION ===
+  build_runner: ^2.7.1 # Build system for code generation
+
+  # === CODE GENERATION ===
+  chopper_generator: ^8.0.1 # Code generator for chopper HTTP client
 
   # === DEVELOPMENT TOOLS ===
   conventional_commit: ^0.6.1+1 # Git commit message linting
+
+  # === DEVELOPMENT TOOLS ===
   dependency_validator: ^5.0.2 # Check unused/missing dependencies
+
+  # === CODE GENERATION ===
+  envied_generator: ^1.2.0 # Code generator for envied environment vars
+
+  # === TESTING FRAMEWORKS ===
+  fake_async: ^1.3.1 # Fake async for timing control in tests
+
+  # === DEVELOPMENT TOOLS ===
   flutter_native_splash: ^2.4.6 # Native splash screen generation
+
+  # === CORE TESTING ===
+  flutter_test:
+    sdk: flutter
+
+  # === CODE GENERATION ===
+  freezed: ^3.2.0 # Code generator for immutable data classes
+
+  # === CODE GENERATION ===
+  injectable_generator: ^2.6.1 # Code generator for dependency injection
+
+  # === CODE GENERATION ===
+  json_serializable: ^6.7.1 # Code generator for JSON serialization
+
+  # === TESTING FRAMEWORKS ===
+  mocktail: ^1.0.4 # Modern mocking framework for testing
+
+  # === CODE GENERATION ===
+  slang_build_runner: ^4.8.0 # Build runner for slang i18n
+
+  # === CORE TESTING ===
+  test: ^1.26.2 # Dart testing framework
+
+  # === DEVELOPMENT TOOLS ===
   very_good_analysis: ^9.0.0 # Very Good Ventures linting rules
+
+  # === WIDGETBOOK INTEGRATION ===
+  widgetbook: ^3.16.0 # Core widgetbook package for UI components
+  widgetbook_annotation: ^3.0.0 # Annotations for widgetbook generation
+  widgetbook_generator: ^3.7.0 # Code generator for widgetbook
 
 flutter:
   generate: true # Enable code generation
@@ -116,6 +171,7 @@ flutter:
     - assets/icons/action/
     - assets/icons/brand/
     - assets/icons/navigation/
+    - assets/icons/decorative/login/ # Login page decorative SVG elements
 
     # Google Fonts for offline bundling (Public Sans)
     - assets/fonts/google_fonts/

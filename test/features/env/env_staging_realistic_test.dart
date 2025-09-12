@@ -17,7 +17,7 @@ void main() {
           reason: 'API URL should be a valid HTTP/HTTPS URL',
         );
         expect(EnvStaging.apiUrl, contains('api'));
-        expect(EnvStaging.apiUrl, contains('xp1.com'));
+        expect(EnvStaging.apiUrl, contains('px1.vn'));
       });
 
       test('should provide valid app name structure', () {

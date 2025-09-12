@@ -269,8 +269,6 @@ class SecurityInterceptor implements Interceptor {
     final secureRequest = request.copyWith(
       headers: {
         ...request.headers,
-        'X-API-Version': '1.0',
-        'X-Client-Platform': Platform.operatingSystem,
         'Content-Type': 'application/json',
       },
     );

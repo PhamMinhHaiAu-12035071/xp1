@@ -12,10 +12,14 @@ import 'package:xp1/core/routing/app_router.dart';
 import 'package:xp1/core/services/asset_image_service.dart';
 import 'package:xp1/core/styles/colors/app_colors.dart';
 import 'package:xp1/core/styles/colors/app_colors_impl.dart';
+import 'package:xp1/features/authentication/application/blocs/auth_bloc.dart';
+import 'package:xp1/features/authentication/application/blocs/auth_state.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_cubit.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_state.dart';
 import 'package:xp1/features/splash/presentation/pages/splash_page.dart';
 import 'package:xp1/features/splash/presentation/widgets/splash_content.dart';
+
+import '../../../../helpers/test_injection_container.dart';
 
 class MockSplashCubit extends Mock implements SplashCubit {}
 
@@ -100,6 +104,9 @@ void main() {
     testWidgets('should build with design system orange background', (
       tester,
     ) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
@@ -119,6 +126,9 @@ void main() {
     });
 
     testWidgets('should contain simplified dependencies', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
@@ -140,6 +150,13 @@ void main() {
     });
 
     testWidgets('should start splash on cubit creation', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
@@ -154,6 +171,13 @@ void main() {
     });
 
     testWidgets('should stay on splash when loading', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
       when(() => mockSplashCubit.stream).thenAnswer(
         (_) => Stream.fromIterable([const SplashState.loading()]),
@@ -179,6 +203,25 @@ void main() {
     });
 
     testWidgets('should navigate when ready', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
+      // Set up AuthBloc to emit unauthenticated state for navigation
+      final mockAuthBloc = GetIt.instance<AuthBloc>() as MockAuthBloc;
+      when(() => mockAuthBloc.state).thenReturn(
+        const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+      );
+      when(() => mockAuthBloc.stream).thenAnswer(
+        (_) => Stream.fromIterable([
+          const AuthState(),
+          const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+        ]),
+      );
+
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
       when(() => mockSplashCubit.stream).thenAnswer(
         (_) => Stream.fromIterable([
@@ -208,6 +251,25 @@ void main() {
     });
 
     testWidgets('should handle state changes correctly', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
+      // Set up AuthBloc to emit unauthenticated state for navigation
+      final mockAuthBloc = GetIt.instance<AuthBloc>() as MockAuthBloc;
+      when(() => mockAuthBloc.state).thenReturn(
+        const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+      );
+      when(() => mockAuthBloc.stream).thenAnswer(
+        (_) => Stream.fromIterable([
+          const AuthState(),
+          const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+        ]),
+      );
+
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
       when(() => mockSplashCubit.stream).thenAnswer(
         (_) => Stream.fromIterable([
@@ -239,6 +301,9 @@ void main() {
 
     testWidgets('should complete quickly for user experience', (tester) async {
       final stopwatch = Stopwatch()..start();
+
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
 
       await tester.pumpWidget(
         const ScreenUtilInit(

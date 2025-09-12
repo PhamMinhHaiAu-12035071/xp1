@@ -8,17 +8,25 @@ import 'package:xp1/core/di/injection_container.dart';
 class MockGetIt extends Mock implements GetIt {}
 
 void main() {
-  // Initialize Flutter test bindings and mock platform storage before any
-  // DI work
-  TestWidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences.setMockInitialValues({});
-
   group('Dependency Injection Container', () {
+    setUpAll(() async {
+      // Initialize Flutter test bindings and mock platform storage before any
+      // DI work
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    setUp(() async {
+      // Reset GetIt to clean state before each test
+      await GetIt.instance.reset();
+    });
+
+    tearDown(() async {
+      // Clean up GetIt after each test
+      await GetIt.instance.reset();
+    });
     group('configureDependencies', () {
       test('should initialize dependencies successfully', () async {
-        // Reset GetIt to clean state
-        await GetIt.instance.reset();
-
         // Should complete without throwing
         expect(
           configureDependencies,
@@ -32,7 +40,6 @@ void main() {
 
       test('should handle duplicate configuration gracefully', () async {
         // First, initialize dependencies successfully
-        await GetIt.instance.reset();
         await configureDependencies();
 
         // Try to initialize again - this should return early without error
@@ -46,9 +53,6 @@ void main() {
       test(
         'should maintain dependency configuration state correctly',
         () async {
-          // Reset GetIt state
-          await GetIt.instance.reset();
-
           // First initialization should work
           await configureDependencies();
 
@@ -118,7 +122,6 @@ void main() {
   group('GetIt state management', () {
     test('should reset GetIt state correctly', () async {
       // Initialize dependencies first
-      await GetIt.instance.reset();
       await configureDependencies();
 
       // Reset the state
@@ -131,7 +134,6 @@ void main() {
 
     test('should allow reinitialization after reset', () async {
       // First initialization
-      await GetIt.instance.reset();
       await configureDependencies();
 
       // Reset everything
