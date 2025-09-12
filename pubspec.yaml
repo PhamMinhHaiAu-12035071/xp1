@@ -155,6 +155,9 @@ flutter:
     # Common shared images
     - assets/images/common/
 
+    # Splash screen assets (transparent PNG for native splash)
+    - assets/splash/
+
     # Feature-specific directories
     - assets/images/splash/
     - assets/images/login/
