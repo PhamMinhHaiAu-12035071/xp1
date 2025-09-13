@@ -20,8 +20,6 @@ class SplashContent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const ImmersiveSystemContainer(
-      child: SplashLayout(),
-    );
+    return const ImmersiveSystemContainer(child: SplashLayout());
   }
 }

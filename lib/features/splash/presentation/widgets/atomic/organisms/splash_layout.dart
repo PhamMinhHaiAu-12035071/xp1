@@ -1,6 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:get_it/get_it.dart';
-import 'package:xp1/core/assets/app_images.dart';
+import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 import 'package:xp1/features/splash/presentation/widgets/atomic/atoms/fullscreen_container.dart';
 import 'package:xp1/features/splash/presentation/widgets/atomic/atoms/orange_background.dart';
 import 'package:xp1/features/splash/presentation/widgets/atomic/molecules/positioned_splash_image.dart';
@@ -17,8 +16,6 @@ class SplashLayout extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final appImages = GetIt.instance<AppImages>();
-
     return FullScreenContainer(
       child: Stack(
         children: [
@@ -27,7 +24,7 @@ class SplashLayout extends StatelessWidget {
 
           // Background image positioned at 12.5% from top
           PositionedSplashImage(
-            imagePath: appImages.splashBackground,
+            imagePath: context.images.splashBackground,
             alignment: const Alignment(
               0,
               -0.75,

@@ -360,57 +360,46 @@ void main() {
         },
       );
 
-      test(
-        'should throw exception when real validation fails',
-        () async {
-          // Use the existing test phase that doesn't initialize real DI
-          // but calls the real _validateCriticalDependencies method
-          final phase = _NoCriticalDependenciesPhase(logger: logger);
+      test('should throw exception when real validation fails', () async {
+        // Use the existing test phase that doesn't initialize real DI
+        // but calls the real _validateCriticalDependencies method
+        final phase = _NoCriticalDependenciesPhase(logger: logger);
 
-          expect(
-            phase.execute,
-            throwsA(
-              predicate<BootstrapException>(
-                (e) =>
-                    e.message.contains(
-                      'Critical dependency not registered: ILoggerService',
-                    ) &&
-                    e.phase == 'Dependency Injection',
-              ),
+        expect(
+          phase.execute,
+          throwsA(
+            predicate<BootstrapException>(
+              (e) =>
+                  e.message.contains(
+                    'Critical dependency not registered: ILoggerService',
+                  ) &&
+                  e.phase == 'Dependency Injection',
             ),
-          );
-        },
-      );
+          ),
+        );
+      });
 
-      test(
-        'should handle generic exception in execute method',
-        () async {
-          // Create a phase that throws generic exception
-          final exceptionPhase = _GenericExceptionPhase(logger: logger);
+      test('should handle generic exception in execute method', () async {
+        // Create a phase that throws generic exception
+        final exceptionPhase = _GenericExceptionPhase(logger: logger);
 
-          expect(
-            exceptionPhase.execute,
-            throwsA(
-              predicate<BootstrapException>(
-                (e) =>
-                    e.message == 'Failed to configure dependency injection' &&
-                    e.phase == 'Dependency Injection' &&
-                    e.canRetry == true &&
-                    e.originalError.toString().contains(
-                      'Generic test exception',
-                    ),
-              ),
+        expect(
+          exceptionPhase.execute,
+          throwsA(
+            predicate<BootstrapException>(
+              (e) =>
+                  e.message == 'Failed to configure dependency injection' &&
+                  e.phase == 'Dependency Injection' &&
+                  e.canRetry == true &&
+                  e.originalError.toString().contains('Generic test exception'),
             ),
-          );
-        },
-      );
+          ),
+        );
+      });
 
       test('should handle rollback errors gracefully', () async {
         // Test that rollback completes successfully
-        await expectLater(
-          dependencyInjectionPhase.rollback(),
-          completes,
-        );
+        await expectLater(dependencyInjectionPhase.rollback(), completes);
 
         // Verify that rollback was logged
         expect(
@@ -451,10 +440,7 @@ void main() {
 
       test('should handle rollback errors gracefully', () async {
         // Test that rollback completes successfully
-        await expectLater(
-          dependencyInjectionPhase.rollback(),
-          completes,
-        );
+        await expectLater(dependencyInjectionPhase.rollback(), completes);
 
         // Verify that rollback was logged
         expect(
@@ -532,10 +518,7 @@ void main() {
         expect(() => dependencyInjectionPhase.rollback(), returnsNormally);
 
         // Test rollback completes successfully
-        await expectLater(
-          dependencyInjectionPhase.rollback(),
-          completes,
-        );
+        await expectLater(dependencyInjectionPhase.rollback(), completes);
       });
 
       test(
@@ -616,10 +599,7 @@ void main() {
           await getIt.reset();
 
           // Test that rollback completes successfully
-          await expectLater(
-            dependencyInjectionPhase.rollback(),
-            completes,
-          );
+          await expectLater(dependencyInjectionPhase.rollback(), completes);
 
           // Verify rollback was logged
           expect(
@@ -662,32 +642,29 @@ void main() {
         },
       );
 
-      test(
-        'should handle SocketException in execute (lines 69-76)',
-        () async {
-          final mockLogger = MockLoggerService();
-          when(() => mockLogger.info(any())).thenReturn(null);
+      test('should handle SocketException in execute (lines 69-76)', () async {
+        final mockLogger = MockLoggerService();
+        when(() => mockLogger.info(any())).thenReturn(null);
 
-          final phase = _ExceptionInConfigureDependenciesPhase(
-            logger: mockLogger,
-            exceptionToThrow: const SocketException('Network error'),
-          );
+        final phase = _ExceptionInConfigureDependenciesPhase(
+          logger: mockLogger,
+          exceptionToThrow: const SocketException('Network error'),
+        );
 
-          expect(
-            phase.execute,
-            throwsA(
-              allOf(
-                isA<BootstrapException>(),
-                predicate<BootstrapException>(
-                  (e) =>
-                      e.message == 'Failed to configure dependency injection' &&
-                      e.originalError is SocketException,
-                ),
+        expect(
+          phase.execute,
+          throwsA(
+            allOf(
+              isA<BootstrapException>(),
+              predicate<BootstrapException>(
+                (e) =>
+                    e.message == 'Failed to configure dependency injection' &&
+                    e.originalError is SocketException,
               ),
             ),
-          );
-        },
-      );
+          ),
+        );
+      });
 
       test(
         'should handle exception during rollback gracefully (lines 85-88)',
@@ -698,10 +675,7 @@ void main() {
           final phase = DependencyInjectionPhase(logger: mockLogger);
 
           // Should complete successfully
-          await expectLater(
-            phase.rollback(),
-            completes,
-          );
+          await expectLater(phase.rollback(), completes);
 
           // Verify rollback was logged
           verify(
@@ -719,10 +693,7 @@ void main() {
           final phase = DependencyInjectionPhase(logger: mockLogger);
 
           // Should complete successfully
-          await expectLater(
-            phase.rollback(),
-            completes,
-          );
+          await expectLater(phase.rollback(), completes);
 
           // Verify all logging calls
           verifyInOrder([

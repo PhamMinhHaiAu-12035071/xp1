@@ -15,52 +15,55 @@ void main() {
 
   setUp(() {
     logger = MockLoggerService();
-    // Các phương thức void cần stub thenReturn(null) để tránh TypeError
+    // Void methods need stub thenReturn(null) to avoid TypeError
     when(() => logger.info(any())).thenReturn(null);
     when(
       () => logger.error(any(), any<dynamic>(), any<StackTrace?>()),
     ).thenReturn(null);
 
     phase = ErrorHandlingPhase(logger: logger);
-    originalOnError = FlutterError.onError; // lưu lại handler hiện tại
+    originalOnError = FlutterError.onError; // save current handler
   });
 
   tearDown(() {
-    // Khôi phục handler ban đầu để không ảnh hưởng test khác
+    // Restore original handler to not affect other tests
     FlutterError.onError = originalOnError;
     reset(logger);
   });
 
-  test('properties và validatePreconditions hoạt động bình thường', () async {
+  test('properties and validatePreconditions work correctly', () async {
     expect(phase.phaseName, 'Error Handling');
     expect(phase.priority, 2);
     expect(phase.canSkip, false);
-    // không ném lỗi vì check dùng identical(_logger, _logger)
+    // no exception thrown because check uses identical(_logger, _logger)
     await phase.validatePreconditions();
   });
 
-  test('execute: thiết lập onError và ghi log info, trả về success', () async {
-    final result = await phase.execute();
+  test(
+    'execute: sets up onError handler and logs info, returns success',
+    () async {
+      final result = await phase.execute();
 
-    // onError đã được cấu hình
-    expect(FlutterError.onError, isNotNull);
-    // Kết quả thành công theo contract
-    expect(result.success, isTrue);
-    expect(result.data['error_handler'], 'configured');
-    expect(result.message, 'Global error handling is active');
+      // onError has been configured
+      expect(FlutterError.onError, isNotNull);
+      // Successful result according to contract
+      expect(result.success, isTrue);
+      expect(result.data['error_handler'], 'configured');
+      expect(result.message, 'Global error handling is active');
 
-    // Verify logger
-    verify(
-      () => logger.info('⚡ Configuring global error handling...'),
-    ).called(1);
-    verify(
-      () => logger.info('✅ Error handling configured successfully'),
-    ).called(1);
-    verifyNoMoreInteractions(logger);
-  });
+      // Verify logger
+      verify(
+        () => logger.info('⚡ Configuring global error handling...'),
+      ).called(1);
+      verify(
+        () => logger.info('✅ Error handling configured successfully'),
+      ).called(1);
+      verifyNoMoreInteractions(logger);
+    },
+  );
 
   test(
-    'execute: handler của FlutterError ghi logger.error khi có lỗi Flutter',
+    'execute: FlutterError handler logs error when Flutter error occurs',
     () async {
       await phase.execute();
 
@@ -71,10 +74,10 @@ void main() {
         context: ErrorDescription('trigger'),
       );
 
-      // Gọi handler đã set
+      // Call the set handler
       FlutterError.onError!.call(details);
 
-      // Verify logger.error được gọi với message và tham số phù hợp
+      // Verify logger.error is called with appropriate message and parameters
       verify(
         () => logger.error(
           any(that: contains('Flutter Error: Exception: boom')),
@@ -85,36 +88,29 @@ void main() {
     },
   );
 
-  test(
-    'execute: nếu xảy ra Exception (ví dụ logger.info ném), '
-    'phải bọc thành BootstrapException',
-    () async {
-      // Làm cho lần gọi info đầu tiên ném lỗi để nhảy vào catch
-      when(() => logger.info(any())).thenThrow(Exception('io-failed'));
+  test('execute: when Exception occurs (e.g. logger.info throws), '
+      'must wrap as BootstrapException', () async {
+    // Make first info call throw error to jump into catch
+    when(() => logger.info(any())).thenThrow(Exception('io-failed'));
 
-      expect(
-        () => phase.execute(),
-        throwsA(
-          isA<BootstrapException>()
-              .having(
-                (e) => e.message,
-                'message',
-                'Failed to configure error handling',
-              )
-              .having((e) => e.phase, 'phase', 'Error Handling')
-              .having((e) => e.canRetry, 'canRetry', true)
-              .having(
-                (e) => e.originalError,
-                'originalError',
-                isA<Exception>(),
-              ),
-        ),
-      );
-    },
-  );
+    expect(
+      () => phase.execute(),
+      throwsA(
+        isA<BootstrapException>()
+            .having(
+              (e) => e.message,
+              'message',
+              'Failed to configure error handling',
+            )
+            .having((e) => e.phase, 'phase', 'Error Handling')
+            .having((e) => e.canRetry, 'canRetry', true)
+            .having((e) => e.originalError, 'originalError', isA<Exception>()),
+      ),
+    );
+  });
 
-  test('rollback: bình thường reset onError về null và ghi log info', () async {
-    // Setup trước: đặt một handler bất kỳ
+  test('rollback: normally resets onError to null and logs info', () async {
+    // Setup first: set any handler
     FlutterError.onError = (details) {};
     await phase.rollback();
 
@@ -123,20 +119,17 @@ void main() {
     verify(() => logger.info('✅ Error handling rollback completed')).called(1);
   });
 
-  test(
-    'rollback: nếu logger.info ném lỗi, không được throw ra ngoài '
-    'và phải logger.error',
-    () async {
-      // Lần gọi info đầu trong rollback ném lỗi để vào catch
-      when(() => logger.info(any())).thenThrow(Exception('io-failed'));
+  test('rollback: when logger.info throws error, must not throw outside '
+      'and must call logger.error', () async {
+    // First info call in rollback throws error to enter catch
+    when(() => logger.info(any())).thenThrow(Exception('io-failed'));
 
-      // Không được ném ra ngoài
-      await expectLater(() => phase.rollback(), returnsNormally);
+    // Must not throw outside
+    await expectLater(() => phase.rollback(), returnsNormally);
 
-      // Phải ghi error
-      verify(
-        () => logger.error('Failed to rollback error handling', any<dynamic>()),
-      ).called(1);
-    },
-  );
+    // Must log error
+    verify(
+      () => logger.error('Failed to rollback error handling', any<dynamic>()),
+    ).called(1);
+  });
 }

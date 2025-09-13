@@ -19,6 +19,12 @@ abstract class AppIcons {
   /// Close X icon path
   String get close;
 
+  /// Eye visibility icon path
+  String get eye;
+
+  /// Eye visibility off icon path
+  String get eyeOff;
+
   // Status Icons
   /// Success checkmark icon path
   String get success;
@@ -45,12 +51,35 @@ abstract class AppIcons {
   /// Filter funnel icon path
   String get filter;
 
+  // User Account Icons
+  /// Account user profile icon path
+  String get account;
+
+  /// Password security icon path
+  String get password;
+
+  /// Email communication icon path
+  String get email;
+
   // Brand Assets
   /// Company logo icon path
   String get logo;
 
   /// Company logo with text path
   String get logoText;
+
+  // Decorative Login Assets
+  /// Login top-left accent decorative element
+  String get loginTopLeftAccent;
+
+  /// Login top-right accent decorative element
+  String get loginTopRightAccent;
+
+  /// Login center-left accent decorative element
+  String get loginCenterLeftAccent;
+
+  /// Login center logo decorative element
+  String get loginCenterLogo;
 
   // Critical icons for preloading
   /// List of critical SVG icon paths for preloading

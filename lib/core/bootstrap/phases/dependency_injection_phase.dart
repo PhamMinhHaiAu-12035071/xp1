@@ -10,9 +10,8 @@ import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 /// and provides proper error handling and rollback capabilities.
 class DependencyInjectionPhase implements BootstrapPhase {
   /// Creates dependency injection phase with logger.
-  const DependencyInjectionPhase({
-    required LoggerService logger,
-  }) : _logger = logger;
+  const DependencyInjectionPhase({required LoggerService logger})
+    : _logger = logger;
 
   final LoggerService _logger;
 

@@ -26,6 +26,12 @@ class AppIconsImpl implements AppIcons {
   String get close => 'assets/icons/ui/close.svg';
 
   @override
+  String get eye => 'assets/icons/ui/eye.svg';
+
+  @override
+  String get eyeOff => 'assets/icons/ui/eye_off.svg';
+
+  @override
   String get success => 'assets/icons/status/success.svg';
 
   @override
@@ -50,18 +56,38 @@ class AppIconsImpl implements AppIcons {
   String get filter => 'assets/icons/action/filter.svg';
 
   @override
+  String get account => 'assets/icons/account.svg';
+
+  @override
+  String get password => 'assets/icons/password.svg';
+
+  @override
+  String get email => 'assets/icons/email.svg';
+
+  @override
   String get logo => 'assets/icons/brand/logo.svg';
 
   @override
   String get logoText => 'assets/icons/brand/logo_text.svg';
 
   @override
-  List<String> get criticalIcons => [
-    logo,
-    arrowBack,
-    search,
-    menu,
-  ];
+  String get loginTopLeftAccent =>
+      'assets/icons/decorative/login/login_top_left_accent.svg';
+
+  @override
+  String get loginTopRightAccent =>
+      'assets/icons/decorative/login/login_top_right_accent.svg';
+
+  @override
+  String get loginCenterLeftAccent =>
+      'assets/icons/decorative/login/login_center_left_accent.svg';
+
+  @override
+  String get loginCenterLogo =>
+      'assets/icons/decorative/login/login_center_logo.svg';
+
+  @override
+  List<String> get criticalIcons => [logo, arrowBack, search, menu];
 
   @override
   IconSizeConstants get iconSizes => const IconSizeConstants();

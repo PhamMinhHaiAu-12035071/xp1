@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 
 import '../../features/attendance/presentation/pages/attendance_page.dart';
+import '../../features/authentication/presentation/pages/forgot_password_page.dart';
 import '../../features/authentication/presentation/pages/login_page.dart';
 import '../../features/features/presentation/pages/features_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -25,23 +26,24 @@ class AppRouter extends RootStackRouter {
   /// Implements Linus's principle: "Never break userspace" by ensuring
   /// smooth authentication flow without breaking existing navigation.
   @override
-  List<AutoRouteGuard> get guards => [
-    AuthGuard(),
-  ];
+  List<AutoRouteGuard> get guards => [AuthGuard()];
 
   @override
   List<AutoRoute> get routes => [
     /// Splash Route - NEW: Initial route for app startup
     AutoRoute(
       page: SplashRoute.page,
-      path: '/splash',
+      path: '/${RouteConstants.splash}',
       initial: true, // Make splash the initial route
     ),
 
     /// Login Route - No longer initial
+    AutoRoute(page: LoginRoute.page, path: '/${RouteConstants.login}'),
+
+    /// Forgot Password Route
     AutoRoute(
-      page: LoginRoute.page,
-      path: '/${RouteConstants.login}',
+      page: ForgotPasswordRoute.page,
+      path: '/${RouteConstants.forgotPassword}',
     ),
 
     /// Main App Routes with Bottom Navigation
@@ -49,26 +51,11 @@ class AppRouter extends RootStackRouter {
       page: MainWrapperRoute.page,
       path: '/${RouteConstants.mainWrapper}',
       children: [
-        AutoRoute(
-          page: HomeRoute.page,
-          path: RouteConstants.home,
-        ),
-        AutoRoute(
-          page: StatisticsRoute.page,
-          path: RouteConstants.statistics,
-        ),
-        AutoRoute(
-          page: AttendanceRoute.page,
-          path: RouteConstants.attendance,
-        ),
-        AutoRoute(
-          page: FeaturesRoute.page,
-          path: RouteConstants.features,
-        ),
-        AutoRoute(
-          page: ProfileRoute.page,
-          path: RouteConstants.profile,
-        ),
+        AutoRoute(page: HomeRoute.page, path: RouteConstants.home),
+        AutoRoute(page: StatisticsRoute.page, path: RouteConstants.statistics),
+        AutoRoute(page: AttendanceRoute.page, path: RouteConstants.attendance),
+        AutoRoute(page: FeaturesRoute.page, path: RouteConstants.features),
+        AutoRoute(page: ProfileRoute.page, path: RouteConstants.profile),
       ],
     ),
   ];

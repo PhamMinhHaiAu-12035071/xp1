@@ -9,9 +9,7 @@ import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 /// for global state flags by using proper lifecycle management.
 class DependencyBootstrap {
   /// Creates dependency bootstrap with logger dependency.
-  const DependencyBootstrap({
-    required LoggerService logger,
-  }) : _logger = logger;
+  const DependencyBootstrap({required LoggerService logger}) : _logger = logger;
 
   final LoggerService _logger;
 

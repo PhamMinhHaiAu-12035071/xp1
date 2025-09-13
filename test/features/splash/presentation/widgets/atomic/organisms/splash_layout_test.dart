@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:xp1/core/styles/colors/app_colors_impl.dart';
 import 'package:xp1/features/splash/presentation/widgets/atomic/organisms/splash_layout.dart';
 
 import '../../../../../../helpers/test_injection_container.dart';
@@ -33,9 +34,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -62,9 +61,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -79,12 +76,11 @@ void main() {
       expect(decoration!.color, isNotNull);
 
       // Should be orange color (from OrangeBackground atom)
-      expect(decoration.color, equals(const Color(0xFFFF8C00)));
+      const appColors = AppColorsImpl();
+      expect(decoration.color, equals(appColors.orangeNormal));
     });
 
-    testWidgets('should display background image', (
-      tester,
-    ) async {
+    testWidgets('should display background image', (tester) async {
       // Arrange: Create the organism
       const splashLayout = SplashLayout();
 
@@ -94,9 +90,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -122,9 +116,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -155,9 +147,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -189,9 +179,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -221,9 +209,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -264,13 +250,8 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) {
-              ScreenUtil.init(
-                context,
-                designSize: ipadSize,
-              );
-              return const Scaffold(
-                body: splashLayout,
-              );
+              ScreenUtil.init(context, designSize: ipadSize);
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -306,7 +287,8 @@ void main() {
 
       // Verify the container has the orange color
       final decoration = container.decoration! as BoxDecoration;
-      expect(decoration.color, equals(const Color(0xFFFF8C00)));
+      const appColors = AppColorsImpl();
+      expect(decoration.color, equals(appColors.orangeNormal));
 
       // Clean up: Reset surface size for other tests
       await tester.binding.setSurfaceSize(null);

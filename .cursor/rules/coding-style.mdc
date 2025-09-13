@@ -1195,7 +1195,7 @@ targets:
 4. 🔥 **avoid_catches_without_on_clauses** - Use `on` clause in catch blocks
 5. 🔥 **prefer_const_constructors** - Add `const` wherever possible
 6. 🔥 **avoid_print** - Replace with `Console.info()` or proper logging
-7. 🔥 **deprecated_member_use** - Replace deprecated Color.value and Color.alpha usage
+7. 🔥 **deprecated_member_use** - Replace deprecated Color.value, Color.alpha, and withOpacity() usage
 
 ### 1. Cascade Operators (`..`) - MANDATORY for Multiple Calls
 
@@ -1578,7 +1578,19 @@ int alphaValue = (color.a * 255.0).round() & 0xff;
 expect((color.a * 255.0).round() & 0xff, equals(255));
 ```
 
-#### **7.3. Use Component Accessors for Color Values**
+#### **7.3. Replace withOpacity() with withValues() - CRITICAL**
+
+```dart
+// ❌ DEPRECATED: withOpacity() (Flutter 3.27+)
+Color semiTransparent = Colors.blue.withOpacity(0.5);
+Color borderColor = Colors.white.withOpacity(0.7);
+
+// ✅ CORRECT: Use withValues() to avoid precision loss
+Color semiTransparent = Colors.blue.withValues(alpha: 0.5);
+Color borderColor = Colors.white.withValues(alpha: 0.7);
+```
+
+#### **7.4. Use Component Accessors for Color Values**
 
 ```dart
 // ❌ DEPRECATED: Old component accessors
@@ -2586,7 +2598,7 @@ These MUST be fixed immediately:
 3. **lines_longer_than_80_chars** errors
 4. **avoid_catches_without_on_clauses** - missing `on` clause in catch blocks
 5. **avoid_print** in production code
-6. **deprecated_member_use** warnings (Color.value, Color.alpha)
+6. **deprecated_member_use** warnings (Color.value, Color.alpha, withOpacity)
 7. **Missing const** constructors
 8. **Unused imports**
 9. **unused_field** warnings
@@ -2613,6 +2625,7 @@ These MUST be fixed immediately:
 | `avoid_print`                               | Use Console abstraction | `Console.info('message')`                                             |
 | `deprecated_member_use` (Color.value)       | Use toARGB32()          | `expect(color.toARGB32(), equals(0xFF2196F3))`                        |
 | `deprecated_member_use` (Color.alpha)       | Use component accessor  | `expect((color.a * 255.0).round() & 0xff, equals(255))`               |
+| `deprecated_member_use` (withOpacity)       | Use withValues()        | `Colors.blue.withValues(alpha: 0.5)`                                  |
 | `unnecessary_lambdas`                       | Use tear-off            | `items.map(Object.toString)`                                          |
 | `prefer_final_locals`                       | Change to `final`       | `final message = 'Hello';`                                            |
 | `unused_field`                              | Remove or use field     | Remove field or use in methods                                        |
@@ -3098,7 +3111,7 @@ class ProfileWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetService = GetIt.instance<AssetImageService>();
     final appImages = GetIt.instance<AppImages>();
-    
+
     return assetService.assetImage(
       appImages.employeeAvatar,
       width: 96,  // Automatically becomes 96.w (responsive)
@@ -3129,7 +3142,7 @@ class SplashPage extends StatelessWidget {
   Widget build(BuildContext context) {
     final assetService = GetIt.instance<AssetImageService>();
     final appImages = GetIt.instance<AppImages>();
-    
+
     return assetService.assetImage(
       appImages.splashLogo,  // Type-safe, centralized path
       width: appImages.imageSizes.large,  // Consistent sizing
@@ -3153,7 +3166,7 @@ Widget buildUserAvatar() {
 // ✅ CORRECT: Built-in error handling with graceful fallbacks
 Widget buildUserAvatar() {
   final assetService = GetIt.instance<AssetImageService>();
-  
+
   return assetService.assetImage(
     userAvatarPath,
     width: 50,  // Auto-responsive with .w
@@ -3191,7 +3204,7 @@ Widget buildIcon() {
 Widget buildIcon() {
   final assetService = GetIt.instance<AssetImageService>();
   final appImages = GetIt.instance<AppImages>();
-  
+
   return assetService.assetImage(
     appImages.commonIcon,
     width: 24,    // Automatically becomes 24.w (responsive)
@@ -3202,12 +3215,12 @@ Widget buildIcon() {
 // Use predefined sizes for consistency
 Widget buildStandardSizes() {
   final appImages = GetIt.instance<AppImages>();
-  
+
   return Column(
     children: [
       // Small: 48.0
       assetService.assetImage(icon, width: appImages.imageSizes.small),
-      // Medium: 96.0  
+      // Medium: 96.0
       assetService.assetImage(icon, width: appImages.imageSizes.medium),
       // Large: 144.0
       assetService.assetImage(icon, width: appImages.imageSizes.large),
@@ -3233,7 +3246,7 @@ Widget buildOptimizedImage() {
 // ✅ CORRECT: Service handles caching automatically
 Widget buildOptimizedImage() {
   final assetService = GetIt.instance<AssetImageService>();
-  
+
   return assetService.assetImage(
     imagePath,
     width: 100,   // Service automatically sets cacheWidth: 100
@@ -3251,7 +3264,7 @@ testWidgets('should handle error states with default fallback', (
   tester,
 ) async {
   final service = const AssetImageServiceImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(
@@ -3264,10 +3277,10 @@ testWidgets('should handle error states with default fallback', (
   );
 
   await tester.pumpAndSettle();
-  
+
   // Verify error fallback appears
   expect(find.byIcon(Icons.broken_image), findsOneWidget);
-  
+
   // Verify default size is applied
   final iconWidget = tester.widget<Icon>(find.byIcon(Icons.broken_image));
   expect(iconWidget.size, equals(24.w));
@@ -3300,7 +3313,7 @@ class SearchWidget extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconService = GetIt.instance<SvgIconService>();
     final appIcons = GetIt.instance<AppIcons>();
-    
+
     return iconService.svgIcon(
       appIcons.search,
       size: appIcons.iconSizes.medium,  // 24px, automatically responsive
@@ -3331,7 +3344,7 @@ class NavigationHeader extends StatelessWidget {
   Widget build(BuildContext context) {
     final iconService = GetIt.instance<SvgIconService>();
     final appIcons = GetIt.instance<AppIcons>();
-    
+
     return Row(
       children: [
         iconService.svgIcon(
@@ -3364,11 +3377,11 @@ Widget buildCloseIcon() {
   );
 }
 
-// ✅ CORRECT: Service handles interaction automatically  
+// ✅ CORRECT: Service handles interaction automatically
 Widget buildCloseIcon() {
   final iconService = GetIt.instance<SvgIconService>();
   final appIcons = GetIt.instance<AppIcons>();
-  
+
   return iconService.svgIcon(
     appIcons.close,
     size: appIcons.iconSizes.medium,
@@ -3393,14 +3406,14 @@ Widget buildStatusIcon() {
 Widget buildStatusIcon(AppStatus status) {
   final iconService = GetIt.instance<SvgIconService>();
   final appIcons = GetIt.instance<AppIcons>();
-  
+
   final (iconPath, color) = switch (status) {
     AppStatus.success => (appIcons.success, Colors.green),
     AppStatus.error => (appIcons.error, Colors.red),
     AppStatus.warning => (appIcons.warning, Colors.orange),
     AppStatus.info => (appIcons.info, Theme.of(context).primaryColor),
   };
-  
+
   return iconService.svgIcon(iconPath, color: color);
 }
 ```
@@ -3423,11 +3436,11 @@ Widget buildIconSet() {
 Widget buildIconSet() {
   final iconService = GetIt.instance<SvgIconService>();
   final appIcons = GetIt.instance<AppIcons>();
-  
+
   return Row(
     children: [
       iconService.svgIcon(appIcons.edit, size: appIcons.iconSizes.small),    // 16px
-      iconService.svgIcon(appIcons.delete, size: appIcons.iconSizes.medium), // 24px  
+      iconService.svgIcon(appIcons.delete, size: appIcons.iconSizes.medium), // 24px
       iconService.svgIcon(appIcons.filter, size: appIcons.iconSizes.large),  // 32px
     ],
   );
@@ -3441,7 +3454,7 @@ Widget buildIconSet() {
 testWidgets('should display themed SVG icon with tap handling', (tester) async {
   const service = SvgIconServiceImpl();
   var tapped = false;
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(
@@ -3460,7 +3473,7 @@ testWidgets('should display themed SVG icon with tap handling', (tester) async {
 
   expect(find.byType(SvgPicture), findsOneWidget);
   expect(find.byType(GestureDetector), findsOneWidget);
-  
+
   await tester.tap(find.byType(GestureDetector));
   expect(tapped, isTrue);
 });
@@ -3469,7 +3482,7 @@ testWidgets('should display themed SVG icon with tap handling', (tester) async {
 test('should provide consistent icon size constants', () {
   const icons = AppIconsImpl();
   expect(icons.iconSizes.small, equals(16));
-  expect(icons.iconSizes.medium, equals(24));  
+  expect(icons.iconSizes.medium, equals(24));
   expect(icons.iconSizes.large, equals(32));
   expect(icons.iconSizes.xLarge, equals(48));
 });
@@ -3503,7 +3516,7 @@ class BrandButton extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appColors = GetIt.instance<AppColors>();
-    
+
     return ElevatedButton(
       style: ElevatedButton.styleFrom(
         backgroundColor: appColors.amberNormal,    // Semantic brand color
@@ -3542,14 +3555,14 @@ class _InteractiveCardState extends State<InteractiveCard> {
   @override
   Widget build(BuildContext context) {
     final appColors = GetIt.instance<AppColors>();
-    
+
     // Use design system hover/active states
     final cardColor = switch ((_isPressed, _isHovered)) {
       (true, _) => appColors.amberLightActive,    // Active state
       (false, true) => appColors.amberLightHover, // Hover state
       (false, false) => appColors.amberLight,     // Default state
     };
-    
+
     return MouseRegion(
       onEnter: (_) => setState(() => _isHovered = true),
       onExit: (_) => setState(() => _isHovered = false),
@@ -3589,7 +3602,7 @@ class TextContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTextStyles = GetIt.instance<AppTextStyles>();
     final appColors = GetIt.instance<AppColors>();
-    
+
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -3598,7 +3611,7 @@ class TextContent extends StatelessWidget {
         Text('Primary content goes here', style: appTextStyles.bodyLarge()),
         Text('Secondary information', style: appTextStyles.bodyMedium()),
         Text(
-          'Fine print details', 
+          'Fine print details',
           style: appTextStyles.caption(color: appColors.greyNormal),
         ),
       ],
@@ -3627,7 +3640,7 @@ class ResponsiveLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final appSizes = GetIt.instance<AppSizes>();
-    
+
     return Container(
       width: appSizes.r120,     // Responsive both dimensions
       height: appSizes.v80,     // Responsive height only
@@ -3666,7 +3679,7 @@ class ThemedContent extends StatelessWidget {
   Widget build(BuildContext context) {
     final appTextStyles = GetIt.instance<AppTextStyles>();
     final colorExtension = context.theme.extension<AppColorExtension>()!;
-    
+
     return Container(
       color: colorExtension.primary,      // Automatically switches with theme
       child: Text(
@@ -3688,7 +3701,7 @@ Widget buildStatusIndicators() {
   return Row(
     children: [
       Container(color: Colors.green, width: 20, height: 20),    // Generic
-      Container(color: Colors.red, width: 20, height: 20),      // Generic  
+      Container(color: Colors.red, width: 20, height: 20),      // Generic
       Container(color: Colors.blue, width: 20, height: 20),     // Generic
     ],
   );
@@ -3702,7 +3715,7 @@ class StatusIndicators extends StatelessWidget {
   Widget build(BuildContext context) {
     final appColors = GetIt.instance<AppColors>();
     final appSizes = GetIt.instance<AppSizes>();
-    
+
     return Row(
       children: [
         // Success state - semantic color choice
@@ -3712,7 +3725,7 @@ class StatusIndicators extends StatelessWidget {
           height: appSizes.r20,
         ),
         SizedBox(width: appSizes.h8),
-        
+
         // Error state - semantic color choice
         Container(
           color: appColors.redNormal,
@@ -3720,7 +3733,7 @@ class StatusIndicators extends StatelessWidget {
           height: appSizes.r20,
         ),
         SizedBox(width: appSizes.h8),
-        
+
         // Information state - semantic color choice
         Container(
           color: appColors.blueNormal,
@@ -3739,7 +3752,7 @@ class StatusIndicators extends StatelessWidget {
 // Test design system consistency and integration
 testWidgets('should use design system colors consistently', (tester) async {
   final appColors = const AppColorsImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Scaffold(
@@ -3755,10 +3768,10 @@ testWidgets('should use design system colors consistently', (tester) async {
   );
 
   expect(find.byType(ElevatedButton), findsOneWidget);
-  
+
   final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
   final buttonStyle = button.style!;
-  
+
   // Verify design system color is applied correctly
   expect(
     buttonStyle.backgroundColor!.resolve({}),
@@ -3769,7 +3782,7 @@ testWidgets('should use design system colors consistently', (tester) async {
 // Test responsive sizing integration
 testWidgets('should apply responsive sizing correctly', (tester) async {
   final appSizes = AppSizesImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(

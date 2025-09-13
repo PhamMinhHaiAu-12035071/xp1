@@ -2,6 +2,10 @@ import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
 import 'package:get_it/get_it.dart';
+import 'package:xp1/core/assets/app_icons.dart';
+import 'package:xp1/core/assets/app_icons_impl.dart';
+import 'package:xp1/core/services/svg_icon_service.dart';
+import 'package:xp1/core/services/svg_icon_service_impl.dart';
 import 'package:xp1/core/sizes/app_sizes.dart';
 import 'package:xp1/core/sizes/app_sizes_impl.dart';
 import 'package:xp1/core/styles/app_text_styles.dart';
@@ -20,10 +24,12 @@ import 'widgetbook_text_styles.dart';
 Future<void> configureWidgetbookDependencies() async {
   GetIt.instance
     ..registerLazySingleton<AppTextStyles>(
-      () => kIsWeb ? const WidgetbookTextStyles() : const AppTextStylesImpl(),
+      () => kIsWeb ? const WidgetbookTextStyles() : AppTextStylesImpl(),
     )
     ..registerLazySingleton<AppColors>(() => const AppColorsImpl())
-    ..registerLazySingleton<AppSizes>(() => const AppSizesImpl());
+    ..registerLazySingleton<AppSizes>(() => const AppSizesImpl())
+    ..registerLazySingleton<AppIcons>(() => const AppIconsImpl())
+    ..registerLazySingleton<SvgIconService>(() => const SvgIconServiceImpl());
 }
 
 /// Initialize Widgetbook with proper setup

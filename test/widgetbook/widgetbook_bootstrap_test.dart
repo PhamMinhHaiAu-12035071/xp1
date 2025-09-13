@@ -20,45 +20,44 @@ void main() {
       await GetIt.instance.reset();
     });
 
-    testWidgets(
-      'should register design system services for Widgetbook',
-      (tester) async {
-        // Initialize ScreenUtil only for non-web platforms
-        if (!kIsWeb) {
-          await tester.binding.setSurfaceSize(const Size(375, 812));
+    testWidgets('should register design system services for Widgetbook', (
+      tester,
+    ) async {
+      // Initialize ScreenUtil only for non-web platforms
+      if (!kIsWeb) {
+        await tester.binding.setSurfaceSize(const Size(375, 812));
 
-          await tester.pumpWidget(
-            MaterialApp(
-              builder: (context, child) {
-                ScreenUtil.init(context, designSize: const Size(375, 812));
-                return const SizedBox.shrink();
-              },
-            ),
-          );
-        }
+        await tester.pumpWidget(
+          MaterialApp(
+            builder: (context, child) {
+              ScreenUtil.init(context, designSize: const Size(375, 812));
+              return const SizedBox.shrink();
+            },
+          ),
+        );
+      }
 
-        await configureWidgetbookDependencies();
+      await configureWidgetbookDependencies();
 
-        expect(() => GetIt.I<AppTextStyles>(), returnsNormally);
-        expect(() => GetIt.I<AppColors>(), returnsNormally);
-        expect(() => GetIt.I<AppSizes>(), returnsNormally);
+      expect(() => GetIt.I<AppTextStyles>(), returnsNormally);
+      expect(() => GetIt.I<AppColors>(), returnsNormally);
+      expect(() => GetIt.I<AppSizes>(), returnsNormally);
 
-        // Verify that appropriate text styles implementation is registered
-        final textStyles = GetIt.I<AppTextStyles>();
-        expect(textStyles, isNotNull);
-        expect(textStyles.displayLarge(), isA<TextStyle>());
-        expect(textStyles.bodyLarge().fontSize, isNotNull);
+      // Verify that appropriate text styles implementation is registered
+      final textStyles = GetIt.I<AppTextStyles>();
+      expect(textStyles, isNotNull);
+      expect(textStyles.displayLarge(), isA<TextStyle>());
+      expect(textStyles.bodyLarge().fontSize, isNotNull);
 
-        // Verify platform-specific implementation
-        if (kIsWeb) {
-          // On web, should use exact pixel sizes (no .sp scaling)
-          expect(textStyles.displayLarge().fontSize, equals(36));
-        } else {
-          // On mobile, should use responsive scaling (may vary)
-          expect(textStyles.displayLarge().fontSize, isPositive);
-        }
-      },
-    );
+      // Verify platform-specific implementation
+      if (kIsWeb) {
+        // On web, should use exact pixel sizes (no .sp scaling)
+        expect(textStyles.displayLarge().fontSize, equals(36));
+      } else {
+        // On mobile, should use responsive scaling (may vary)
+        expect(textStyles.displayLarge().fontSize, isPositive);
+      }
+    });
 
     test('should initialize Widgetbook without errors', () async {
       expect(() async => initWidgetbook(), returnsNormally);

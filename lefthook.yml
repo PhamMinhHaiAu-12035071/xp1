@@ -5,8 +5,8 @@
 pre-commit:
   parallel: true
   commands:
-    # Format and fix code first (staged files only)
-    rps-pre-commit:
+    # Main pre-commit check using Makefile
+    pre-commit-check:
       glob: "*.dart"
       run: make pre-commit
       stage_fixed: true
@@ -16,17 +16,8 @@ pre-commit:
       run: |
         npx cspell --config cspell.json {staged_files} --no-progress || \
         echo "⚠️ Fix spelling issues"
-    # Format code automatically (staged files only)
-    format-code:
-      glob: "*.dart"
-      run: make format
-      stage_fixed: true
-    # Quick analysis (staged files only)
-    analyze-quick:
-      glob: "*.dart"
-      run: make analyze-quick
-    # Quick license check cho staged changes
-    license-quick:
+    # License check when pubspec.yaml changes
+    license-check:
       glob: "pubspec.yaml"
       run: |
         if git diff --cached --name-only | grep -q "pubspec.yaml"; then
@@ -34,7 +25,7 @@ pre-commit:
           make license-check
         fi
     # Dependency validation when pubspec.yaml changes
-    deps-check-on-pubspec-change:
+    deps-validation:
       glob: "pubspec.yaml"
       run: |
         if git diff --cached --name-only | grep -q "pubspec.yaml"; then
@@ -49,28 +40,19 @@ pre-commit:
           echo "🌐 Translation files changed, validating i18n..."
           make i18n-validate
         fi
-    # Analyze staged files for linting and naming convention issues
-    staged-analysis:
-      glob: "*.dart"
-      run: |
-        FILES_TO_ANALYZE=$(git diff --cached --name-only --diff-filter=ACMR | grep -E '\.dart$')
-        if [ -n "$FILES_TO_ANALYZE" ]; then
-          echo "📝 Analyzing staged Dart files for linting and naming issues..."
-          make analyze-quick $FILES_TO_ANALYZE
-        fi
 
 pre-push:
   parallel: false
   commands:
+    # Optimize project size before push
+    optimize-project:
+      run: ./scripts/optimize-for-push.sh
     # Run bash script tests first (TDD validation)
     bash-script-tests:
       run: npm test
-    # Full license compliance check trước khi push
-    license-compliance:
-      run: make license-check
-    # Run complete CI pipeline via Makefile
-    full-ci-pipeline:
-      run: make local-ci
+    # Quick pre-push checks (optimized for speed)
+    quick-checks:
+      run: ./scripts/quick-analyze.sh && make test && make license-check
     # Full dependency validation before push
     validate-dependencies:
       run: make validate-deps
@@ -81,4 +63,9 @@ pre-push:
 commit-msg:
   commands:
     conventional-commit:
-      run: fvm dart run tool/validate_commit.dart {1}
+      run: |
+        if command -v fvm >/dev/null 2>&1; then
+          fvm dart run tool/validate_commit.dart {1}
+        else
+          dart run tool/validate_commit.dart {1}
+        fi

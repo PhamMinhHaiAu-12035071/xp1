@@ -1,6 +1,8 @@
 import 'dart:async';
 
 import 'package:bloc/bloc.dart';
+import 'package:flutter/foundation.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter/widgets.dart';
 import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
 import 'package:xp1/core/bootstrap/orchestrator/bootstrap_orchestrator.dart';
@@ -31,9 +33,7 @@ class AppBootstrap {
   ///
   /// Phases can be customized for different environments or testing.
   /// Default phases provide production-ready configuration.
-  const AppBootstrap({
-    List<BootstrapPhase>? phases,
-  }) : _customPhases = phases;
+  const AppBootstrap({List<BootstrapPhase>? phases}) : _customPhases = phases;
 
   final List<BootstrapPhase>? _customPhases;
 
@@ -143,6 +143,27 @@ class AppBootstrap {
       ..info('📍 API URL: ${EnvConfigFactory.apiUrl}')
       ..info('🔧 Debug mode: ${EnvConfigFactory.isDebugMode}');
   }
+
+  /// Registers Google Fonts licenses for bundled font files.
+  ///
+  /// This method loads the OFL license file for Public Sans fonts and
+  /// registers it with Flutter's LicenseRegistry for proper attribution
+  /// in the licenses page of the app.
+  static Future<void> _registerFontLicenses() async {
+    LicenseRegistry.addLicense(() async* {
+      try {
+        final license = await rootBundle.loadString(
+          'assets/fonts/google_fonts/OFL.txt',
+        );
+        yield LicenseEntryWithLineBreaks(<String>[
+          'Google Fonts - Public Sans',
+        ], license);
+      } on Exception catch (e) {
+        // Log error but don't fail bootstrap for missing license
+        debugPrint('Failed to load Google Fonts license: $e');
+      }
+    });
+  }
 }
 
 /// Simplified bootstrap function for backward compatibility.
@@ -151,6 +172,14 @@ class AppBootstrap {
 /// modular bootstrap system internally. It handles the complete
 /// initialization and app startup sequence.
 Future<void> bootstrap(FutureOr<Widget> Function() builder) async {
+  // CRITICAL: Initialize Flutter bindings BEFORE dependency injection
+  // This is required because SharedPreferences and other platform services
+  // need Flutter's platform channels to be available
+  WidgetsFlutterBinding.ensureInitialized();
+
+  // Register Google Fonts licenses for bundled fonts
+  await AppBootstrap._registerFontLicenses();
+
   const appBootstrap = AppBootstrap();
 
   // Execute bootstrap sequence

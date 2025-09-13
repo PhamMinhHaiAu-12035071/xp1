@@ -1,21 +1,18 @@
-# flutter_native_splash.yaml - SIMPLE ORANGE BACKGROUND
+# flutter_native_splash.yaml - TRANSPARENT PNG APPROACH
 flutter_native_splash:
   # Orange background color for all platforms
   color: "#FF7F00"
 
-  # Android 12+ specific configuration
+  # Android 12+ specific configuration with transparent PNG
   android_12:
-    # Use same orange color for Android 12+
     color: "#FF7F00"
-    # Optional: Use app's launcher icon (automatically used)
-    # icon_background_color: "#FFFFFF"  # Only if needed
+    image: "assets/splash/transparent.png"
 
   # Platform support - Enable all platforms
   android: true
   ios: true
   web: true
 
-  # ❌ NO images needed
-  # ❌ NO branding needed
-  # ❌ NO background images needed
-  # ❌ NO dark mode variants (keep simple)
+  # ✅ Transparent PNG approach ensures no unwanted icons/logos
+  # ✅ Works consistently across all Android versions including 12+
+  # ✅ Future-proof solution that won't break on package updates

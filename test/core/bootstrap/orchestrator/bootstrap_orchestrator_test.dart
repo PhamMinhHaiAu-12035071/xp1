@@ -85,23 +85,14 @@ void main() {
   group('BootstrapOrchestrator', () {
     group('constructor', () {
       test('should create orchestrator with logger and phases', () {
-        final phase = TestBootstrapPhase(
-          phaseName: 'TestPhase',
-          priority: 1,
-        );
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [phase],
-        );
+        final phase = TestBootstrapPhase(phaseName: 'TestPhase', priority: 1);
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: [phase]);
 
         expect(orchestrator, isNotNull);
       });
 
       test('should accept empty phases list', () {
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: []);
 
         expect(orchestrator, isNotNull);
       });
@@ -115,10 +106,7 @@ void main() {
           resultData: {'status': 'complete'},
         );
 
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [phase],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: [phase]);
 
         final results = await orchestrator.execute();
 
@@ -165,14 +153,8 @@ void main() {
       });
 
       test('should validate all preconditions before execution', () async {
-        final phase1 = TestBootstrapPhase(
-          phaseName: 'Phase1',
-          priority: 1,
-        );
-        final phase2 = TestBootstrapPhase(
-          phaseName: 'Phase2',
-          priority: 2,
-        );
+        final phase1 = TestBootstrapPhase(phaseName: 'Phase1', priority: 1);
+        final phase2 = TestBootstrapPhase(phaseName: 'Phase2', priority: 2);
 
         orchestrator = BootstrapOrchestrator(
           logger: logger,
@@ -192,10 +174,7 @@ void main() {
           shouldFailPreconditions: true,
         );
 
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [phase],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: [phase]);
 
         expect(
           () => orchestrator.execute(),
@@ -270,10 +249,7 @@ void main() {
       });
 
       test('should handle empty phases list', () async {
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: []);
 
         final results = await orchestrator.execute();
 
@@ -287,10 +263,7 @@ void main() {
           shouldFailExecution: true,
         );
 
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [phase],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: [phase]);
 
         expect(
           () => orchestrator.execute(),
@@ -403,10 +376,7 @@ void main() {
             await orchestrator.execute();
             fail('Expected orchestrator to throw BootstrapException');
           } on BootstrapException catch (e) {
-            expect(
-              e.message,
-              contains('exceeded timeout'),
-            );
+            expect(e.message, contains('exceeded timeout'));
             expect(e.phase, equals('TimeoutPhase'));
             expect(e.canRetry, isTrue);
           }
@@ -426,10 +396,7 @@ void main() {
           await orchestrator.execute();
           fail('Expected orchestrator to throw BootstrapException');
         } on BootstrapException catch (e) {
-          expect(
-            e.message,
-            contains('failed with unexpected error'),
-          );
+          expect(e.message, contains('failed with unexpected error'));
           expect(e.phase, equals('GenericExceptionPhase'));
         }
       });
@@ -450,10 +417,7 @@ void main() {
           await orchestrator.execute();
           fail('Expected orchestrator to throw BootstrapException');
         } on BootstrapException catch (e) {
-          expect(
-            e.message,
-            contains('failed with unexpected error'),
-          );
+          expect(e.message, contains('failed with unexpected error'));
           expect(e.phase, equals('CriticalPhase'));
         }
 
@@ -468,10 +432,7 @@ void main() {
             priority: 1,
             shouldFailRollback: true, // This rollback will fail
           );
-          final phase2 = TestBootstrapPhase(
-            phaseName: 'Phase2',
-            priority: 2,
-          );
+          final phase2 = TestBootstrapPhase(phaseName: 'Phase2', priority: 2);
           final failingPhase = TestBootstrapPhase(
             phaseName: 'FailingPhase',
             priority: 3,
@@ -499,10 +460,7 @@ void main() {
 
     group('getExecutionSummary', () {
       test('should provide correct summary for successful execution', () {
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: []);
 
         final results = <String, BootstrapResult>{
           'Phase1': const BootstrapResult.success(),
@@ -519,10 +477,7 @@ void main() {
       });
 
       test('should provide correct summary for mixed results', () {
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: []);
 
         final results = <String, BootstrapResult>{
           'Phase1': const BootstrapResult.success(),
@@ -539,10 +494,7 @@ void main() {
       });
 
       test('should handle empty results', () {
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: []);
 
         final summary = orchestrator.getExecutionSummary(
           <String, BootstrapResult>{},
@@ -567,58 +519,55 @@ void main() {
         skip: 'Timeout test requires special test environment setup',
       );
 
-      test(
-        'should trigger onTimeout callback using fakeAsync - '
-        'covers lines 150-158',
-        () {
-          fakeAsync((async) {
-            // Arrange - Setup phase that never completes (uses mocktail)
-            final mockLogger = MockLoggerService();
-            final mockPhase = MockBootstrapPhase();
+      test('should trigger onTimeout callback using fakeAsync - '
+          'covers lines 150-158', () {
+        fakeAsync((async) {
+          // Arrange - Setup phase that never completes (uses mocktail)
+          final mockLogger = MockLoggerService();
+          final mockPhase = MockBootstrapPhase();
 
-            when(() => mockPhase.phaseName).thenReturn('FakeAsyncTimeoutPhase');
-            when(() => mockPhase.priority).thenReturn(1);
-            when(() => mockPhase.canSkip).thenReturn(false);
-            when(mockPhase.validatePreconditions).thenAnswer((_) async {});
-            when(mockPhase.rollback).thenAnswer((_) async {});
+          when(() => mockPhase.phaseName).thenReturn('FakeAsyncTimeoutPhase');
+          when(() => mockPhase.priority).thenReturn(1);
+          when(() => mockPhase.canSkip).thenReturn(false);
+          when(mockPhase.validatePreconditions).thenAnswer((_) async {});
+          when(mockPhase.rollback).thenAnswer((_) async {});
 
-            // Create never-completing future to simulate hanging operation
-            final neverCompletes = Completer<BootstrapResult>();
-            when(mockPhase.execute).thenAnswer((_) => neverCompletes.future);
+          // Create never-completing future to simulate hanging operation
+          final neverCompletes = Completer<BootstrapResult>();
+          when(mockPhase.execute).thenAnswer((_) => neverCompletes.future);
 
-            orchestrator = BootstrapOrchestrator(
-              logger: mockLogger,
-              phases: [mockPhase],
-            );
+          orchestrator = BootstrapOrchestrator(
+            logger: mockLogger,
+            phases: [mockPhase],
+          );
 
-            // Act - Start execution (will timeout)
-            BootstrapException? caughtException;
-            orchestrator.execute().catchError((Object error) {
-              caughtException = error as BootstrapException;
-              return <String, BootstrapResult>{};
-            });
-
-            // Fast forward exactly 5 minutes + 1 second to trigger timeout
-            async
-              ..elapse(const Duration(minutes: 5, seconds: 1))
-              ..flushMicrotasks();
-
-            // Assert - Verify timeout exception (covers lines 152-157)
-            expect(caughtException, isA<BootstrapException>());
-            expect(
-              caughtException?.message,
-              contains('exceeded timeout of 300s'),
-            );
-            expect(caughtException?.phase, equals('FakeAsyncTimeoutPhase'));
-            expect(caughtException?.canRetry, isTrue);
-
-            // Verify timeout error logging was called (covers line 151)
-            verify(
-              () => mockLogger.error('Phase FakeAsyncTimeoutPhase timed out'),
-            ).called(1);
+          // Act - Start execution (will timeout)
+          BootstrapException? caughtException;
+          orchestrator.execute().catchError((Object error) {
+            caughtException = error as BootstrapException;
+            return <String, BootstrapResult>{};
           });
-        },
-      );
+
+          // Fast forward exactly 5 minutes + 1 second to trigger timeout
+          async
+            ..elapse(const Duration(minutes: 5, seconds: 1))
+            ..flushMicrotasks();
+
+          // Assert - Verify timeout exception (covers lines 152-157)
+          expect(caughtException, isA<BootstrapException>());
+          expect(
+            caughtException?.message,
+            contains('exceeded timeout of 300s'),
+          );
+          expect(caughtException?.phase, equals('FakeAsyncTimeoutPhase'));
+          expect(caughtException?.canRetry, isTrue);
+
+          // Verify timeout error logging was called (covers line 151)
+          verify(
+            () => mockLogger.error('Phase FakeAsyncTimeoutPhase timed out'),
+          ).called(1);
+        });
+      });
 
       test(
         'should cover onTimeout callback with manual Future.timeout',
@@ -740,10 +689,7 @@ void main() {
     group('rollback edge cases', () {
       test('should handle empty executed phases list gracefully', () async {
         // This tests the early return in _rollbackPhases when list is empty
-        orchestrator = BootstrapOrchestrator(
-          logger: logger,
-          phases: [],
-        );
+        orchestrator = BootstrapOrchestrator(logger: logger, phases: []);
 
         final results = await orchestrator.execute();
         expect(results, isEmpty);
@@ -831,53 +777,49 @@ void main() {
         mockLogger = MockLoggerService();
       });
 
-      test(
-        'should execute mocked phases successfully',
-        () async {
-          // Arrange
-          final mockPhase1 = MockBootstrapPhase();
-          final mockPhase2 = MockBootstrapPhase();
+      test('should execute mocked phases successfully', () async {
+        // Arrange
+        final mockPhase1 = MockBootstrapPhase();
+        final mockPhase2 = MockBootstrapPhase();
 
-          when(() => mockPhase1.phaseName).thenReturn('MockPhase1');
-          when(() => mockPhase1.priority).thenReturn(1);
-          when(() => mockPhase1.canSkip).thenReturn(false);
-          when(mockPhase1.validatePreconditions).thenAnswer((_) async {});
-          when(mockPhase1.execute).thenAnswer(
-            (_) async =>
-                const BootstrapResult.success(message: 'MockPhase1 completed'),
-          );
+        when(() => mockPhase1.phaseName).thenReturn('MockPhase1');
+        when(() => mockPhase1.priority).thenReturn(1);
+        when(() => mockPhase1.canSkip).thenReturn(false);
+        when(mockPhase1.validatePreconditions).thenAnswer((_) async {});
+        when(mockPhase1.execute).thenAnswer(
+          (_) async =>
+              const BootstrapResult.success(message: 'MockPhase1 completed'),
+        );
 
-          when(() => mockPhase2.phaseName).thenReturn('MockPhase2');
-          when(() => mockPhase2.priority).thenReturn(2);
-          when(() => mockPhase2.canSkip).thenReturn(true);
-          when(mockPhase2.validatePreconditions).thenAnswer((_) async {});
-          when(mockPhase2.execute).thenAnswer(
-            (_) async => const BootstrapResult.failure(
-              'MockPhase2 failed but skippable',
-            ),
-          );
+        when(() => mockPhase2.phaseName).thenReturn('MockPhase2');
+        when(() => mockPhase2.priority).thenReturn(2);
+        when(() => mockPhase2.canSkip).thenReturn(true);
+        when(mockPhase2.validatePreconditions).thenAnswer((_) async {});
+        when(mockPhase2.execute).thenAnswer(
+          (_) async =>
+              const BootstrapResult.failure('MockPhase2 failed but skippable'),
+        );
 
-          orchestrator = BootstrapOrchestrator(
-            logger: mockLogger,
-            phases: [mockPhase2, mockPhase1], // Out of order
-          );
+        orchestrator = BootstrapOrchestrator(
+          logger: mockLogger,
+          phases: [mockPhase2, mockPhase1], // Out of order
+        );
 
-          // Act
-          final results = await orchestrator.execute();
+        // Act
+        final results = await orchestrator.execute();
 
-          // Assert
-          expect(results.length, 2);
-          expect(results['MockPhase1']?.success, isTrue);
-          expect(results['MockPhase2']?.success, isFalse);
+        // Assert
+        expect(results.length, 2);
+        expect(results['MockPhase1']?.success, isTrue);
+        expect(results['MockPhase2']?.success, isFalse);
 
-          // Verify successful completion
-          verify(
-            () => mockLogger.info(
-              '🎉 Bootstrap orchestration completed successfully',
-            ),
-          ).called(1);
-        },
-      );
+        // Verify successful completion
+        verify(
+          () => mockLogger.info(
+            '🎉 Bootstrap orchestration completed successfully',
+          ),
+        ).called(1);
+      });
     });
 
     group('unexpected exception coverage', () {

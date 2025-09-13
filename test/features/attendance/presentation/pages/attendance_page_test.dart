@@ -1,10 +1,21 @@
 import 'package:flutter_test/flutter_test.dart';
 import 'package:xp1/features/attendance/presentation/pages/attendance_page.dart';
+import 'package:xp1/l10n/gen/strings.g.dart';
 
 import '../../../../helpers/helpers.dart';
 
 void main() {
   group('AttendancePage', () {
+    setUpAll(() async {
+      // Set consistent locale for testing
+      LocaleSettings.setLocaleSync(AppLocale.en);
+    });
+
+    tearDownAll(() async {
+      // Reset to prevent interference with other tests
+      LocaleSettings.setLocaleSync(AppLocale.en);
+    });
+
     // Use comprehensive helper that includes environment setup,
     // navigation testing, and memory management - following Linus's
     // principle of proper resource management

@@ -15,31 +15,33 @@ class MockLoggerService extends Mock implements ILoggerService {}
 class MockEnvConfigRepository extends Mock implements EnvConfigRepository {}
 
 void main() {
-  // Initialize Flutter test bindings and mock platform storage before any
-  // DI work
-  TestWidgetsFlutterBinding.ensureInitialized();
-  SharedPreferences.setMockInitialValues({});
-
   group('configureDependencies error path', () {
+    setUpAll(() async {
+      // Initialize Flutter test bindings and mock platform storage before any
+      // DI work
+      TestWidgetsFlutterBinding.ensureInitialized();
+      SharedPreferences.setMockInitialValues({});
+    });
+
+    setUp(() async {
+      // Reset GetIt to clean state before each test
+      await GetIt.instance.reset();
+    });
+
+    tearDown(() async {
+      // Clean up GetIt after each test
+      await GetIt.instance.reset();
+    });
     test('should handle repeated configuration calls gracefully', () async {
       // This test verifies that the new GetIt state checking approach
       // handles repeated configuration calls properly
-
-      // Reset state
-      await GetIt.instance.reset();
 
       // First, configure dependencies normally
       await configureDependencies();
 
       // Try to configure again - this should return early gracefully
       // due to GetIt's built-in state checking
-      expect(
-        configureDependencies,
-        returnsNormally,
-      );
-
-      // Clean up
-      await GetIt.instance.reset();
+      expect(configureDependencies, returnsNormally);
     });
 
     test('DependencyInjectionException should be throwable', () {
@@ -123,15 +125,19 @@ void main() {
   });
 
   group('GetIt integration scenarios', () {
-    test('should work correctly with fresh GetIt instance', () async {
-      // Ensure completely fresh start
+    setUp(() async {
+      // Reset GetIt to clean state before each test
       await GetIt.instance.reset();
+    });
 
+    tearDown(() async {
+      // Clean up GetIt after each test
+      await GetIt.instance.reset();
+    });
+
+    test('should work correctly with fresh GetIt instance', () async {
       // Configure dependencies should work without issues
-      expect(
-        configureDependencies,
-        returnsNormally,
-      );
+      expect(configureDependencies, returnsNormally);
 
       // Verify GetIt is accessible
       expect(getIt, same(GetIt.instance));
@@ -140,18 +146,25 @@ void main() {
     test('should handle multiple reset and configure cycles', () async {
       // Test multiple cycles to ensure robustness
       for (var i = 0; i < 3; i++) {
-        await GetIt.instance.reset();
         await configureDependencies();
         expect(getIt, isA<GetIt>());
+        await GetIt.instance.reset();
       }
     });
   });
 
   group('Error path coverage', () {
-    test('should throw DependencyInjectionException when init fails', () async {
-      // Reset to clean state
+    setUp(() async {
+      // Reset GetIt to clean state before each test
       await GetIt.instance.reset();
+    });
 
+    tearDown(() async {
+      // Clean up GetIt after each test
+      await GetIt.instance.reset();
+    });
+
+    test('should throw DependencyInjectionException when init fails', () async {
       // Manually register EnvConfigRepository to create a conflict
       // This will NOT trigger early return
       // (since ILoggerService not registered)
@@ -168,9 +181,6 @@ void main() {
         configureDependencies,
         throwsA(isA<DependencyInjectionException>()),
       );
-
-      // Clean up for other tests
-      await GetIt.instance.reset();
     });
   });
 }

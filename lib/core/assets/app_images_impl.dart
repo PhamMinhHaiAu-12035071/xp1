@@ -23,16 +23,26 @@ class AppImagesImpl implements AppImages {
   String get loginBackground => 'assets/images/login/background.png';
 
   @override
+  String get loginCarouselSlide1 => 'assets/images/login/slide_1.png';
+
+  @override
+  String get loginCarouselSlide2 => 'assets/images/login/slide_2.png';
+
+  @override
+  String get loginCarouselSlide3 => 'assets/images/login/slide_3.png';
+
+  @override
   String get employeeAvatar => 'assets/images/employee/avatar.png';
 
   @override
   String get employeeBadge => 'assets/images/employee/badge.png';
 
   @override
-  List<String> get criticalAssets => [
-    splashLogo,
-    loginLogo,
-  ];
+  String get forgotPasswordImage =>
+      'assets/images/forgot_password/forgot_password.png';
+
+  @override
+  List<String> get criticalAssets => [splashLogo, loginLogo];
 
   @override
   ImageSizeConstants get imageSizes => const ImageSizeConstants();

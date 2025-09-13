@@ -11,9 +11,7 @@ class AttendancePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.attendance.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.attendance.title)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

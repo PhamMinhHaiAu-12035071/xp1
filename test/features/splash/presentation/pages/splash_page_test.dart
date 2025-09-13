@@ -10,10 +10,16 @@ import 'package:mocktail/mocktail.dart';
 import 'package:xp1/core/assets/app_images.dart';
 import 'package:xp1/core/routing/app_router.dart';
 import 'package:xp1/core/services/asset_image_service.dart';
+import 'package:xp1/core/styles/colors/app_colors.dart';
+import 'package:xp1/core/styles/colors/app_colors_impl.dart';
+import 'package:xp1/features/authentication/application/blocs/auth_bloc.dart';
+import 'package:xp1/features/authentication/application/blocs/auth_state.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_cubit.dart';
 import 'package:xp1/features/splash/presentation/cubit/splash_state.dart';
 import 'package:xp1/features/splash/presentation/pages/splash_page.dart';
 import 'package:xp1/features/splash/presentation/widgets/splash_content.dart';
+
+import '../../../../helpers/test_injection_container.dart';
 
 class MockSplashCubit extends Mock implements SplashCubit {}
 
@@ -31,7 +37,7 @@ class FakePageRouteInfo extends Fake implements PageRouteInfo {}
 /// These tests validate the simplified splash screen that:
 /// - Uses only loading and ready states
 /// - Shows background.png via SplashContent with orange background
-/// - Uses simple orange background without design system
+/// - Uses design system orange background for consistency
 /// - Has timer-based navigation without complex error handling
 void main() {
   group('SplashPage (Simplified) Tests', () {
@@ -51,9 +57,8 @@ void main() {
       // Register fake for auto_route
       registerFallbackValue(FakePageRouteInfo());
       registerFallbackValue(const MainWrapperRoute());
-      registerFallbackValue(
-        <PageRouteInfo>[const MainWrapperRoute()],
-      );
+      registerFallbackValue(const LoginRoute());
+      registerFallbackValue(<PageRouteInfo>[const LoginRoute()]);
       registerFallbackValue(BoxFit.cover);
 
       // Setup GetIt mocks for simplified dependencies
@@ -62,6 +67,7 @@ void main() {
         mockAssetImageService,
       );
       GetIt.instance.registerSingleton<AppImages>(mockAppImages);
+      GetIt.instance.registerSingleton<AppColors>(const AppColorsImpl());
 
       // Setup router mocks
       when(() => mockRouter.replaceAll(any())).thenAnswer((_) async => {});
@@ -75,9 +81,7 @@ void main() {
           'assets/images/splash/background.png',
           fit: any(named: 'fit'),
         ),
-      ).thenReturn(
-        Image.asset('assets/images/splash/background.png'),
-      );
+      ).thenReturn(Image.asset('assets/images/splash/background.png'));
 
       // Setup cubit mocks
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
@@ -93,31 +97,36 @@ void main() {
       GetIt.instance.reset();
     });
 
-    testWidgets('should build with simple orange background', (tester) async {
+    testWidgets('should build with design system orange background', (
+      tester,
+    ) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 
       // Should build successfully
       expect(find.byType(SplashPage), findsOneWidget);
 
-      // Should have orange background (not design system color)
+      // Should have orange background from design system
       final scaffold = tester.widget<Scaffold>(find.byType(Scaffold));
-      expect(scaffold.backgroundColor, equals(Colors.orange));
+      const appColors = AppColorsImpl();
+      expect(scaffold.backgroundColor, equals(appColors.orangeNormal));
     });
 
     testWidgets('should contain simplified dependencies', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 
@@ -133,12 +142,17 @@ void main() {
     });
 
     testWidgets('should start splash on cubit creation', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 
@@ -147,10 +161,17 @@ void main() {
     });
 
     testWidgets('should stay on splash when loading', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
-      when(() => mockSplashCubit.stream).thenAnswer(
-        (_) => Stream.fromIterable([const SplashState.loading()]),
-      );
+      when(
+        () => mockSplashCubit.stream,
+      ).thenAnswer((_) => Stream.fromIterable([const SplashState.loading()]));
 
       await tester.pumpWidget(
         StackRouterScope(
@@ -172,6 +193,25 @@ void main() {
     });
 
     testWidgets('should navigate when ready', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
+      // Set up AuthBloc to emit unauthenticated state for navigation
+      final mockAuthBloc = GetIt.instance<AuthBloc>() as MockAuthBloc;
+      when(() => mockAuthBloc.state).thenReturn(
+        const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+      );
+      when(() => mockAuthBloc.stream).thenAnswer(
+        (_) => Stream.fromIterable([
+          const AuthState(),
+          const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+        ]),
+      );
+
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
       when(() => mockSplashCubit.stream).thenAnswer(
         (_) => Stream.fromIterable([
@@ -196,11 +236,30 @@ void main() {
       await tester.pump(); // Initial pump
       await tester.pump(); // State change pump
 
-      // Should navigate to MainWrapper
-      verify(() => mockRouter.replaceAll([const MainWrapperRoute()])).called(1);
+      // Should navigate to Login
+      verify(() => mockRouter.replaceAll([const LoginRoute()])).called(1);
     });
 
     testWidgets('should handle state changes correctly', (tester) async {
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
+      // Override the SplashCubit with our mock for this specific test
+      GetIt.instance.unregister<SplashCubit>();
+      GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
+
+      // Set up AuthBloc to emit unauthenticated state for navigation
+      final mockAuthBloc = GetIt.instance<AuthBloc>() as MockAuthBloc;
+      when(() => mockAuthBloc.state).thenReturn(
+        const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+      );
+      when(() => mockAuthBloc.stream).thenAnswer(
+        (_) => Stream.fromIterable([
+          const AuthState(),
+          const AuthState(authStatus: AuthenticationStatus.unauthenticated),
+        ]),
+      );
+
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
       when(() => mockSplashCubit.stream).thenAnswer(
         (_) => Stream.fromIterable([
@@ -227,18 +286,19 @@ void main() {
       await tester.pump(); // ready
 
       // Should navigate once for ready state
-      verify(() => mockRouter.replaceAll([const MainWrapperRoute()])).called(1);
+      verify(() => mockRouter.replaceAll([const LoginRoute()])).called(1);
     });
 
     testWidgets('should complete quickly for user experience', (tester) async {
       final stopwatch = Stopwatch()..start();
 
+      // Setup test dependencies to register AuthBloc and other services
+      await TestDependencyContainer.setupTestDependencies();
+
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 

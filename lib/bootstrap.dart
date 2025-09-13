@@ -22,7 +22,6 @@ export 'package:xp1/l10n/gen/strings.g.dart' show AppLocale, LocaleSettings;
 /// clean architecture principles.
 ///
 /// Throws [UnsupportedLocaleException] if the locale is not supported.
-/// Throws [LocaleApplicationException] for infrastructure failures.
 Future<LocaleConfiguration> switchLocale(AppLocale locale) async {
   // Retrieve the singleton instance from GetIt for efficiency and consistency
   final applicationService = getIt<LocaleApplicationService>();

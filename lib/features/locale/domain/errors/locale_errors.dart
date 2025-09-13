@@ -25,9 +25,8 @@ sealed class LocaleError with _$LocaleError {
   ///
   /// This can happen on platforms where locale detection is not
   /// available or when platform APIs fail unexpectedly.
-  const factory LocaleError.platformDetectionFailed({
-    required String reason,
-  }) = PlatformDetectionFailedError;
+  const factory LocaleError.platformDetectionFailed({required String reason}) =
+      PlatformDetectionFailedError;
 
   /// Error when locale persistence operations fail.
   ///

@@ -12,9 +12,7 @@ import 'package:xp1/l10n/gen/strings.g.dart';
 /// the ultimate sophistication."
 class LocaleBootstrap {
   /// Creates locale bootstrap with required dependencies.
-  const LocaleBootstrap({
-    required LoggerService logger,
-  }) : _logger = logger;
+  const LocaleBootstrap({required LoggerService logger}) : _logger = logger;
 
   final LoggerService _logger;
 
@@ -32,12 +30,8 @@ class LocaleBootstrap {
     try {
       _logger.info('🌐 Starting locale initialization...');
 
-      // Get LocaleCubit from dependency injection
-      final localeCubit = getIt<LocaleCubit>();
-
-      // Resolve locale using cubit business rules
-      // LocaleCubit automatically handles persistence
-      await localeCubit.resolveLocale();
+      // Get LocaleCubit from dependency injection and initialize
+      final localeCubit = getIt<LocaleCubit>()..initialize();
       final configuration = localeCubit.state;
 
       // Apply locale to translation system

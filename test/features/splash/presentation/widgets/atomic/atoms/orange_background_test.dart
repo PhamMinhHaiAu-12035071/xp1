@@ -1,5 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_test/flutter_test.dart';
+import 'package:get_it/get_it.dart';
+import 'package:xp1/core/styles/colors/app_colors.dart';
+import 'package:xp1/core/styles/colors/app_colors_impl.dart';
 import 'package:xp1/features/splash/presentation/widgets/atomic/atoms/orange_background.dart';
 
 /// Tests for [OrangeBackground] atom component.
@@ -8,6 +11,13 @@ import 'package:xp1/features/splash/presentation/widgets/atomic/atoms/orange_bac
 /// using the design system colors with full container coverage.
 void main() {
   group('OrangeBackground', () {
+    setUp(() {
+      GetIt.instance.registerSingleton<AppColors>(const AppColorsImpl());
+    });
+
+    tearDown(() {
+      GetIt.instance.reset();
+    });
     testWidgets('should display orange background with design system color', (
       tester,
     ) async {
@@ -16,11 +26,7 @@ void main() {
 
       // Act: Pump the widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: orangeBackground,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: orangeBackground)),
       );
 
       // Assert: Verify the container exists with orange background
@@ -31,7 +37,9 @@ void main() {
 
       expect(decoration, isNotNull);
       expect(decoration!.color, isNotNull);
-      // Will verify exact color once we implement with design system
+      // Verify exact design system color
+      const appColors = AppColorsImpl();
+      expect(decoration.color, equals(appColors.orangeNormal));
     });
 
     testWidgets('should take full available space by default', (tester) async {
@@ -42,11 +50,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              height: 200,
-              child: orangeBackground,
-            ),
+            body: SizedBox(width: 300, height: 200, child: orangeBackground),
           ),
         ),
       );
@@ -67,11 +71,7 @@ void main() {
 
       // Act: Pump the widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: orangeBackground,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: orangeBackground)),
       );
 
       // Assert: Verify child is rendered

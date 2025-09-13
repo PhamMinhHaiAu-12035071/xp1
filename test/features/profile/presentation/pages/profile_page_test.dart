@@ -16,7 +16,7 @@ void main() {
     // Use helper function to eliminate code duplication
     PageTestHelpers.testStandardPage<ProfilePage>(
       const ProfilePage(),
-      'Welcome to Profile',
+      'Chào mừng đến với Hồ sơ',
       () => const ProfilePage(),
       (key) => ProfilePage(key: key),
     );
@@ -36,7 +36,7 @@ void main() {
         }
 
         // Verify the page is still rendered (tap handler executed)
-        expect(find.text('Welcome to Profile'), findsOneWidget);
+        expect(find.text('Chào mừng đến với Hồ sơ'), findsOneWidget);
       });
 
       testWidgets('should handle settings tap', (tester) async {
@@ -53,7 +53,7 @@ void main() {
         }
 
         // Verify the page is still rendered (tap handler executed)
-        expect(find.text('Welcome to Profile'), findsOneWidget);
+        expect(find.text('Chào mừng đến với Hồ sơ'), findsOneWidget);
       });
 
       testWidgets('should handle preferences tap', (tester) async {
@@ -70,7 +70,7 @@ void main() {
         }
 
         // Verify the page is still rendered (tap handler executed)
-        expect(find.text('Welcome to Profile'), findsOneWidget);
+        expect(find.text('Chào mừng đến với Hồ sơ'), findsOneWidget);
       });
     });
   });

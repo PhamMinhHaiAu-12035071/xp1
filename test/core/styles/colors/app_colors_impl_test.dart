@@ -259,7 +259,7 @@ void main() {
 
       test('blueNormal should return correct MaterialColor', () {
         expect(appColors.blueNormal, isA<MaterialColor>());
-        expect(appColors.blueNormal.toARGB32(), equals(0xFF357DFF));
+        expect(appColors.blueNormal.toARGB32(), equals(0xFF8B95A7));
       });
 
       test('blueDark should return correct MaterialColor', () {
@@ -391,7 +391,7 @@ void main() {
       });
 
       test('blueNormalColor should return correct color', () {
-        expect(appColors.blueNormalColor.toARGB32(), equals(0xFF357DFF));
+        expect(appColors.blueNormalColor.toARGB32(), equals(0xFF8B95A7));
       });
 
       test('blueDarkColor should return correct color', () {
@@ -588,7 +588,7 @@ void main() {
 
         test('blueNormal MaterialColor should have correct values', () {
           expect(appColors.blueNormal, isA<MaterialColor>());
-          expect(appColors.blueNormal.toARGB32(), equals(0xFF357DFF));
+          expect(appColors.blueNormal.toARGB32(), equals(0xFF8B95A7));
         });
 
         test('blueNormalHover MaterialColor should have correct values', () {
@@ -1027,7 +1027,7 @@ void main() {
             );
           });
           test('blueNormalColor should return correct Color', () {
-            expect(appColors.blueNormalColor.toARGB32(), equals(0xFF357DFF));
+            expect(appColors.blueNormalColor.toARGB32(), equals(0xFF8B95A7));
           });
           test('blueNormalHoverColor should return correct Color', () {
             expect(

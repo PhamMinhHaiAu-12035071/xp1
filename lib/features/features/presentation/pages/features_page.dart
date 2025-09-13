@@ -12,9 +12,7 @@ class FeaturesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.features.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.features.title)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

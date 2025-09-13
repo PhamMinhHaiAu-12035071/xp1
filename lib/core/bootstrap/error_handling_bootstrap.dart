@@ -10,9 +10,8 @@ import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 /// "Do one thing and do it well."
 class ErrorHandlingBootstrap {
   /// Creates error handling bootstrap with logger dependency.
-  const ErrorHandlingBootstrap({
-    required LoggerService logger,
-  }) : _logger = logger;
+  const ErrorHandlingBootstrap({required LoggerService logger})
+    : _logger = logger;
 
   final LoggerService _logger;
 
@@ -27,11 +26,7 @@ class ErrorHandlingBootstrap {
   void setupErrorHandling() {
     // Configure Flutter error handler to log errors properly
     FlutterError.onError = (FlutterErrorDetails details) {
-      _logger.error(
-        'Flutter Error',
-        details.exception,
-        details.stack,
-      );
+      _logger.error('Flutter Error', details.exception, details.stack);
 
       // Also log to developer console for debugging
       log(

@@ -58,6 +58,9 @@ class TestAppColors implements AppColors {
   @override
   Color get textSecondaryDark => const Color(0xFFCBD5E1);
 
+  @override
+  Color get placeholderText => const Color(0xFF8B95A7);
+
   // Other properties (not used in this test)
   @override
   MaterialColor get black => throw UnimplementedError();
@@ -522,10 +525,7 @@ void main() {
         );
 
         final copied =
-            original.copyWith(
-                  primary: Colors.purple,
-                  accent: Colors.yellow,
-                )
+            original.copyWith(primary: Colors.purple, accent: Colors.yellow)
                 as AppColorExtension;
 
         expect(copied.primary, equals(Colors.purple));
@@ -535,27 +535,24 @@ void main() {
         expect(copied.textSecondary, equals(Colors.grey)); // unchanged
       });
 
-      test(
-        'should return copy with all original values when no parameters '
-        'provided',
-        () {
-          const original = AppColorExtension(
-            primary: Colors.blue,
-            secondary: Colors.green,
-            accent: Colors.red,
-            textPrimary: Colors.black,
-            textSecondary: Colors.grey,
-          );
+      test('should return copy with all original values when no parameters '
+          'provided', () {
+        const original = AppColorExtension(
+          primary: Colors.blue,
+          secondary: Colors.green,
+          accent: Colors.red,
+          textPrimary: Colors.black,
+          textSecondary: Colors.grey,
+        );
 
-          final copied = original.copyWith() as AppColorExtension;
+        final copied = original.copyWith() as AppColorExtension;
 
-          expect(copied.primary, equals(original.primary));
-          expect(copied.secondary, equals(original.secondary));
-          expect(copied.accent, equals(original.accent));
-          expect(copied.textPrimary, equals(original.textPrimary));
-          expect(copied.textSecondary, equals(original.textSecondary));
-        },
-      );
+        expect(copied.primary, equals(original.primary));
+        expect(copied.secondary, equals(original.secondary));
+        expect(copied.accent, equals(original.accent));
+        expect(copied.textPrimary, equals(original.textPrimary));
+        expect(copied.textSecondary, equals(original.textSecondary));
+      });
 
       test('should return different instance', () {
         const original = AppColorExtension(
@@ -639,18 +636,9 @@ void main() {
 
         // Colors should be equal in value, but may differ in type
         // (Color vs MaterialColor)
-        expect(
-          lerped.primary.toARGB32(),
-          equals(start.primary.toARGB32()),
-        );
-        expect(
-          lerped.secondary.toARGB32(),
-          equals(start.secondary.toARGB32()),
-        );
-        expect(
-          lerped.accent.toARGB32(),
-          equals(start.accent.toARGB32()),
-        );
+        expect(lerped.primary.toARGB32(), equals(start.primary.toARGB32()));
+        expect(lerped.secondary.toARGB32(), equals(start.secondary.toARGB32()));
+        expect(lerped.accent.toARGB32(), equals(start.accent.toARGB32()));
         expect(
           lerped.textPrimary.toARGB32(),
           equals(start.textPrimary.toARGB32()),

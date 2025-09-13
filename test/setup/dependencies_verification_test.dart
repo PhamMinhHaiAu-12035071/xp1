@@ -46,10 +46,7 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) {
-              ScreenUtil.init(
-                context,
-                designSize: const Size(375, 812),
-              );
+              ScreenUtil.init(context, designSize: const Size(375, 812));
 
               return SizedBox(
                 width: 100.w,

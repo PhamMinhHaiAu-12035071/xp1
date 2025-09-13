@@ -8,5 +8,8 @@
 	<true/>
 	<key>com.apple.security.network.server</key>
 	<true/>
+	<!-- Required for Google Fonts HTTP fetching -->
+	<key>com.apple.security.network.client</key>
+	<true/>
 </dict>
 </plist>

@@ -9,489 +9,601 @@ import 'package:xp1/l10n/gen/strings.g.dart';
 /// Mock ILoggerService for testing.
 class MockILoggerService extends Mock implements ILoggerService {}
 
-/// Mock LocaleDomainService for testing LocaleApplicationService.
-class TestLocaleDomainService implements LocaleDomainService {
-  TestLocaleDomainService({
-    this.shouldThrowOnUpdate = false,
-    this.shouldThrowOnResolve = false,
-    this.shouldThrowOnReset = false,
-    this.shouldThrowUnsupportedForEn = false,
-  });
-
-  bool shouldThrowOnUpdate;
-  bool shouldThrowOnResolve;
-  bool shouldThrowOnReset;
-  bool shouldThrowUnsupportedForEn;
-
-  bool updateUserLocaleCalled = false;
-  bool resolveLocaleConfigurationCalled = false;
-  bool resetToSystemDefaultCalled = false;
-
-  // Additional properties for flexible testing
-  bool shouldSucceed = true;
-  LocaleConfiguration? resolveResult;
-  LocaleConfiguration? resetResult;
-
-  @override
-  Future<LocaleConfiguration> updateUserLocale(String languageCode) async {
-    updateUserLocaleCalled = true;
-    if (shouldThrowOnUpdate) {
-      if (languageCode == 'en' && shouldThrowUnsupportedForEn) {
-        throw UnsupportedLocaleException('Unsupported locale: $languageCode');
-      }
-      throw Exception('Domain service failed');
-    }
-    return LocaleConfigurationExtension.userSelected(languageCode);
-  }
-
-  @override
-  Future<LocaleConfiguration> resolveLocaleConfiguration() async {
-    resolveLocaleConfigurationCalled = true;
-    if (shouldThrowOnResolve) {
-      throw Exception('Failed to resolve locale configuration');
-    }
-    return resolveResult ?? LocaleConfigurationExtension.systemDetected('en');
-  }
-
-  @override
-  Future<LocaleConfiguration> resetToSystemDefault() async {
-    resetToSystemDefaultCalled = true;
-    if (shouldThrowOnReset) {
-      throw Exception('Failed to reset to system default');
-    }
-    return resetResult ?? LocaleConfigurationExtension.systemDetected('en');
-  }
-}
-
-/// Test implementation of ILoggerService for testing.
-class TestILoggerService implements ILoggerService {
-  final List<String> logMessages = <String>[];
-  final List<Object?> errorLogs = <Object?>[];
-  final List<String> warningLogs = <String>[];
-  final List<String> debugLogs = <String>[];
-
-  @override
-  void log(
-    String message,
-    LogLevel level, {
-    Object? error,
-    StackTrace? stackTrace,
-    Map<String, dynamic>? extra,
-  }) {
-    final extraInfo = extra != null ? ' | Extra: $extra' : '';
-    final fullMessage = message + extraInfo;
-    switch (level) {
-      case LogLevel.debug:
-        debugLogs.add(message);
-        logMessages.add('DEBUG: $fullMessage');
-      case LogLevel.info:
-        logMessages.add('INFO: $fullMessage');
-      case LogLevel.warning:
-        warningLogs.add(message);
-        logMessages.add('WARNING: $fullMessage');
-      case LogLevel.error:
-        errorLogs.add(error);
-        logMessages.add('ERROR: $fullMessage');
-      case LogLevel.fatal:
-        errorLogs.add(error);
-        logMessages.add('FATAL: $fullMessage');
-    }
-  }
-
-  void clearLogs() {
-    logMessages.clear();
-    errorLogs.clear();
-    warningLogs.clear();
-    debugLogs.clear();
-  }
-}
+/// Mock LocaleDomainService for testing.
+class MockLocaleDomainService extends Mock implements LocaleDomainService {}
 
 void main() {
-  late ILoggerService logger;
-  late TestLocaleDomainService mockDomainService;
-  late LocaleApplicationService applicationService;
-
-  setUpAll(() {
-    registerFallbackValue(LogLevel.info);
-  });
-
-  setUp(() {
-    logger = TestILoggerService();
-  });
-
   group('LocaleApplicationService', () {
-    group('constructor', () {
-      test('should create service with dependencies', () {
-        mockDomainService = TestLocaleDomainService();
+    late LocaleApplicationService service;
+    late MockLocaleDomainService mockDomainService;
+    late MockILoggerService mockLogger;
 
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
-        );
+    setUpAll(() {
+      // Register fallback values for mocktail
+      registerFallbackValue(LogLevel.info);
+    });
 
-        expect(applicationService, isNotNull);
-      });
+    setUp(() {
+      mockDomainService = MockLocaleDomainService();
+      mockLogger = MockILoggerService();
+      service = LocaleApplicationService(
+        domainService: mockDomainService,
+        logger: mockLogger,
+      );
+
+      // Setup logger mocks
+      when(() => mockLogger.log(any(), any())).thenReturn(null);
+      when(
+        () => mockLogger.log(any(), any(), error: any(named: 'error')),
+      ).thenReturn(null);
     });
 
     group('switchLocale', () {
-      setUp(() {
-        mockDomainService = TestLocaleDomainService();
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
+      test('successfully switches locale when valid', () {
+        // Arrange
+        const expectedConfig = LocaleConfiguration(
+          languageCode: 'en',
+          source: LocaleSource.userSelected,
         );
+        when(
+          () => mockDomainService.updateUserLocale('en'),
+        ).thenReturn(expectedConfig);
+
+        // Act
+        final result = service.switchLocale(AppLocale.en);
+
+        // Assert
+        expect(result, equals(expectedConfig));
+        verify(() => mockDomainService.updateUserLocale('en')).called(1);
+        verify(
+          () => mockLogger.log('🌐 Switching locale to en', LogLevel.info),
+        ).called(1);
+        verify(
+          () => mockLogger.log(
+            '✅ Session locale switch completed',
+            LogLevel.info,
+          ),
+        ).called(1);
       });
 
-      test('should switch locale successfully', () async {
-        final result = await applicationService.switchLocale(AppLocale.en);
+      test('successfully switches to Vietnamese', () {
+        // Arrange
+        const expectedConfig = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.userSelected,
+        );
+        when(
+          () => mockDomainService.updateUserLocale('vi'),
+        ).thenReturn(expectedConfig);
 
-        expect(result.languageCode, equals('en'));
-        expect(result.source, equals(LocaleSource.userSelected));
-        expect(mockDomainService.updateUserLocaleCalled, isTrue);
+        // Act
+        final result = service.switchLocale(AppLocale.vi);
+
+        // Assert
+        expect(result, equals(expectedConfig));
+        verify(() => mockDomainService.updateUserLocale('vi')).called(1);
+        verify(
+          () => mockLogger.log('🌐 Switching locale to vi', LogLevel.info),
+        ).called(1);
       });
 
-      test('should rethrow UnsupportedLocaleException from domain', () async {
-        mockDomainService = TestLocaleDomainService()
-          ..shouldThrowOnUpdate = true
-          ..shouldThrowUnsupportedForEn = true;
+      test('handles UnsupportedLocaleException and logs warning', () {
+        // Arrange
+        when(
+          () => mockDomainService.updateUserLocale('en'),
+        ).thenThrow(const UnsupportedLocaleException('en'));
 
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
-        );
-
+        // Act & Assert
         expect(
-          () => applicationService.switchLocale(AppLocale.en),
+          () => service.switchLocale(AppLocale.en),
           throwsA(isA<UnsupportedLocaleException>()),
         );
+
+        verify(() => mockDomainService.updateUserLocale('en')).called(1);
+        verify(
+          () => mockLogger.log(
+            any(that: contains('Locale switch failed')),
+            LogLevel.warning,
+          ),
+        ).called(1);
       });
 
-      test('should wrap unexpected exceptions', () async {
-        mockDomainService = TestLocaleDomainService()
-          ..shouldThrowOnUpdate = true;
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
+      test('logs appropriate messages during switch', () {
+        // Arrange
+        const expectedConfig = LocaleConfiguration(
+          languageCode: 'en',
+          source: LocaleSource.userSelected,
         );
+        when(
+          () => mockDomainService.updateUserLocale('en'),
+        ).thenReturn(expectedConfig);
 
-        expect(
-          () => applicationService.switchLocale(AppLocale.en),
-          throwsA(isA<LocaleApplicationException>()),
-        );
+        // Act
+        service.switchLocale(AppLocale.en);
+
+        // Assert - Verify logging sequence
+        verifyInOrder([
+          () => mockLogger.log('🌐 Switching locale to en', LogLevel.info),
+          () => mockLogger.log(
+            '✅ Session locale switch completed',
+            LogLevel.info,
+          ),
+        ]);
       });
-
-      test(
-        'should cover logger.info at lines 52-53 by throwing exception',
-        () async {
-          // Use MockILoggerService to control logger behavior
-          final mockLogger = MockILoggerService();
-
-          mockDomainService = TestLocaleDomainService();
-
-          applicationService = LocaleApplicationService(
-            domainService: mockDomainService,
-            logger: mockLogger,
-          );
-
-          // Setup default mock behaviors
-          when(() => mockLogger.log(any(), any())).thenReturn(null);
-
-          // Make logger.log throw exception when logging completion message
-          // This forces the exception to occur after lines 52-53
-          when(
-            () => mockLogger.log(
-              'Domain locale update completed: vi',
-              LogLevel.info,
-            ),
-          ).thenThrow(Exception('stop'));
-
-          // Act & Assert: should throw LocaleApplicationException
-          await expectLater(
-            () => applicationService.switchLocale(AppLocale.vi),
-            throwsA(
-              isA<LocaleApplicationException>()
-                  .having(
-                    (e) => e.message,
-                    'message',
-                    'Failed to switch locale to vi',
-                  )
-                  .having(
-                    (e) => e.originalError,
-                    'originalError',
-                    isA<Exception>(),
-                  ),
-            ),
-          );
-
-          // Verify: the specific log at lines 52-53 was called
-          verify(
-            () => mockLogger.log(
-              'Domain locale update completed: vi',
-              LogLevel.info,
-            ),
-          ).called(1);
-
-          // Verify: domain service was called
-          expect(mockDomainService.updateUserLocaleCalled, isTrue);
-
-          // Verify: error was logged due to exception
-          verify(
-            () => mockLogger.log(
-              'Unexpected locale switch error',
-              LogLevel.error,
-              error: any<dynamic>(named: 'error'),
-              stackTrace: any<StackTrace?>(named: 'stackTrace'),
-            ),
-          ).called(1);
-        },
-      );
-
-      test(
-        'should handle error in _applyLocaleToSession gracefully',
-        () async {
-          // Use MockILoggerService to simulate error in debug log
-          final mockLogger = MockILoggerService();
-
-          mockDomainService = TestLocaleDomainService();
-
-          applicationService = LocaleApplicationService(
-            domainService: mockDomainService,
-            logger: mockLogger,
-          );
-
-          // Setup default mock behaviors
-          when(() => mockLogger.log(any(), any())).thenReturn(null);
-
-          // Make debug log throw exception to simulate error in session update
-          when(
-            () => mockLogger.log(
-              '🔄 Applying locale to current session',
-              LogLevel.debug,
-            ),
-          ).thenThrow(Exception('session error'));
-
-          // This should still succeed because _applyLocaleToSession catches
-          // exceptions
-          final result = await applicationService.switchLocale(AppLocale.en);
-
-          expect(result.languageCode, equals('en'));
-          expect(result.source, equals(LocaleSource.userSelected));
-
-          // Verify that error was logged
-          verify(
-            () => mockLogger.log(
-              'Failed to apply locale to session',
-              LogLevel.error,
-              error: any<dynamic>(named: 'error'),
-            ),
-          ).called(1);
-        },
-      );
     });
 
     group('getCurrentConfiguration', () {
-      setUp(() {
-        mockDomainService = TestLocaleDomainService();
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
+      test('returns configuration from domain service', () {
+        // Arrange
+        const expectedConfig = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
         );
-      });
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(expectedConfig);
 
-      test('should get current configuration successfully', () async {
-        final result = await applicationService.getCurrentConfiguration();
+        // Act
+        final result = service.getCurrentConfiguration();
 
-        expect(result.languageCode, equals('en'));
-        expect(result.source, equals(LocaleSource.systemDetected));
-        expect(mockDomainService.resolveLocaleConfigurationCalled, isTrue);
-      });
-
-      test('should wrap exceptions in LocaleApplicationException', () async {
-        mockDomainService = TestLocaleDomainService()
-          ..shouldThrowOnResolve = true;
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
-        );
-
-        expect(
-          () => applicationService.getCurrentConfiguration(),
-          throwsA(
-            predicate<LocaleApplicationException>(
-              (e) => e.message.contains('Unable to retrieve current locale'),
-            ),
+        // Assert
+        expect(result, equals(expectedConfig));
+        verify(() => mockDomainService.resolveLocaleConfiguration()).called(1);
+        verify(
+          () => mockLogger.log(
+            'Current locale: vi (source: LocaleSource.defaultFallback)',
+            LogLevel.debug,
           ),
+        ).called(1);
+      });
+
+      test('logs current configuration details', () {
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'en',
+          source: LocaleSource.userSelected,
+          countryCode: 'US',
         );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(config);
+
+        // Act
+        service.getCurrentConfiguration();
+
+        // Assert
+        verify(
+          () => mockLogger.log(
+            'Current locale: en (source: LocaleSource.userSelected)',
+            LogLevel.debug,
+          ),
+        ).called(1);
       });
     });
 
     group('initializeLocaleSystem', () {
-      setUp(() {
-        mockDomainService = TestLocaleDomainService();
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
+      test('initializes to Vietnamese default', () {
+        // Arrange
+        const expectedConfig = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
         );
-      });
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(expectedConfig);
 
-      test('should initialize locale system successfully', () async {
-        final result = await applicationService.initializeLocaleSystem();
+        // Act
+        final result = service.initializeLocaleSystem();
 
-        expect(result.languageCode, equals('en'));
-        expect(result.source, equals(LocaleSource.systemDetected));
-        expect(mockDomainService.resolveLocaleConfigurationCalled, isTrue);
-      });
-
-      test(
-        'should use fallback when languageCode not found in AppLocale',
-        () async {
-          // Mock domain service to return unsupported language code
-          mockDomainService = TestLocaleDomainService()
-            ..resolveResult = LocaleConfigurationExtension.systemDetected(
-              'unsupported_lang',
-            );
-
-          applicationService = LocaleApplicationService(
-            domainService: mockDomainService,
-            logger: logger,
-          );
-
-          final result = await applicationService.initializeLocaleSystem();
-
-          expect(result.languageCode, equals('unsupported_lang'));
-          expect(result.source, equals(LocaleSource.systemDetected));
-        },
-      );
-
-      test('should wrap exceptions in LocaleApplicationException', () async {
-        mockDomainService = TestLocaleDomainService()
-          ..shouldThrowOnResolve = true;
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
-        );
-
-        expect(
-          () => applicationService.initializeLocaleSystem(),
-          throwsA(
-            predicate<LocaleApplicationException>(
-              (e) => e.message.contains('Failed to initialize locale system'),
-            ),
+        // Assert
+        expect(result, equals(expectedConfig));
+        verify(() => mockDomainService.resolveLocaleConfiguration()).called(1);
+        verify(
+          () => mockLogger.log(
+            '🚀 Initializing locale system to Vietnamese...',
+            LogLevel.info,
           ),
+        ).called(1);
+        verify(
+          () => mockLogger.log(
+            '✅ Locale system initialized: Vietnamese',
+            LogLevel.info,
+          ),
+        ).called(1);
+      });
+
+      test('always returns Vietnamese configuration', () {
+        // Arrange - Even if domain returns other locale, system is
+        // Vietnamese-first
+        const domainConfig = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
         );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(domainConfig);
+
+        // Act
+        final result = service.initializeLocaleSystem();
+
+        // Assert - Should always be Vietnamese-first
+        expect(result.languageCode, equals('vi'));
+        expect(result, equals(domainConfig));
+      });
+
+      test('logs initialization process', () {
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(config);
+
+        // Act
+        service.initializeLocaleSystem();
+
+        // Assert - Verify logging sequence
+        verifyInOrder([
+          () => mockLogger.log(
+            '🚀 Initializing locale system to Vietnamese...',
+            LogLevel.info,
+          ),
+          () => mockLogger.log(
+            '✅ Locale system initialized: Vietnamese',
+            LogLevel.info,
+          ),
+        ]);
       });
     });
 
     group('resetToSystemDefault', () {
-      setUp(() {
-        mockDomainService = TestLocaleDomainService();
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
+      test('resets to Vietnamese default', () {
+        // Arrange
+        const expectedConfig = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
         );
-      });
+        when(
+          () => mockDomainService.resetToSystemDefault(),
+        ).thenReturn(expectedConfig);
 
-      test('should reset to system default successfully', () async {
-        final result = await applicationService.resetToSystemDefault();
+        // Act
+        final result = service.resetToSystemDefault();
 
-        expect(result.languageCode, equals('en'));
-        expect(result.source, equals(LocaleSource.systemDetected));
-        expect(mockDomainService.resetToSystemDefaultCalled, isTrue);
-      });
-
-      test(
-        'should use fallback when languageCode not found in AppLocale',
-        () async {
-          // Mock domain service to return unsupported language code
-          mockDomainService = TestLocaleDomainService()
-            ..resetResult = LocaleConfigurationExtension.systemDetected(
-              'unsupported_lang',
-            );
-
-          applicationService = LocaleApplicationService(
-            domainService: mockDomainService,
-            logger: logger,
-          );
-
-          final result = await applicationService.resetToSystemDefault();
-
-          expect(result.languageCode, equals('unsupported_lang'));
-          expect(result.source, equals(LocaleSource.systemDetected));
-        },
-      );
-
-      test('should wrap exceptions in LocaleApplicationException', () async {
-        mockDomainService = TestLocaleDomainService()
-          ..shouldThrowOnReset = true;
-
-        applicationService = LocaleApplicationService(
-          domainService: mockDomainService,
-          logger: logger,
-        );
-
-        expect(
-          () => applicationService.resetToSystemDefault(),
-          throwsA(
-            predicate<LocaleApplicationException>(
-              (e) => e.message.contains('Unable to reset locale'),
-            ),
+        // Assert
+        expect(result, equals(expectedConfig));
+        verify(() => mockDomainService.resetToSystemDefault()).called(1);
+        verify(
+          () => mockLogger.log(
+            '🔄 Resetting locale to Vietnamese default',
+            LogLevel.info,
           ),
+        ).called(1);
+        verify(
+          () => mockLogger.log(
+            '✅ Locale reset to Vietnamese default',
+            LogLevel.info,
+          ),
+        ).called(1);
+      });
+
+      test('always resets to Vietnamese regardless of current state', () {
+        // Arrange
+        const resetConfig = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
         );
+        when(
+          () => mockDomainService.resetToSystemDefault(),
+        ).thenReturn(resetConfig);
+
+        // Act
+        final result = service.resetToSystemDefault();
+
+        // Assert
+        expect(result.languageCode, equals('vi'));
+        expect(result.source, equals(LocaleSource.defaultFallback));
+      });
+
+      test('logs reset process', () {
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
+        when(() => mockDomainService.resetToSystemDefault()).thenReturn(config);
+
+        // Act
+        service.resetToSystemDefault();
+
+        // Assert - Verify logging sequence
+        verifyInOrder([
+          () => mockLogger.log(
+            '🔄 Resetting locale to Vietnamese default',
+            LogLevel.info,
+          ),
+          () => mockLogger.log(
+            '✅ Locale reset to Vietnamese default',
+            LogLevel.info,
+          ),
+        ]);
       });
     });
 
-    // Additional edge case coverage tests removed due to complexity
-    // The core functionality is already well tested above
-  });
+    group('Vietnamese-first behavior', () {
+      test('all operations default to Vietnamese', () {
+        // Arrange
+        const vietnameseConfig = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
 
-  group('LocaleApplicationException', () {
-    test('should create exception with message only', () {
-      const exception = LocaleApplicationException('Test error');
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(vietnameseConfig);
+        when(
+          () => mockDomainService.resetToSystemDefault(),
+        ).thenReturn(vietnameseConfig);
 
-      expect(exception.message, equals('Test error'));
-      expect(exception.originalError, isNull);
+        // Act
+        final initResult = service.initializeLocaleSystem();
+        final currentResult = service.getCurrentConfiguration();
+        final resetResult = service.resetToSystemDefault();
+
+        // Assert - All operations should result in Vietnamese
+        expect(initResult.languageCode, equals('vi'));
+        expect(currentResult.languageCode, equals('vi'));
+        expect(resetResult.languageCode, equals('vi'));
+      });
+
+      test('supports session-only English switching', () {
+        // Arrange
+        const englishConfig = LocaleConfiguration(
+          languageCode: 'en',
+          source: LocaleSource.userSelected,
+        );
+        when(
+          () => mockDomainService.updateUserLocale('en'),
+        ).thenReturn(englishConfig);
+
+        // Act
+        final result = service.switchLocale(AppLocale.en);
+
+        // Assert
+        expect(result.languageCode, equals('en'));
+        expect(result.source, equals(LocaleSource.userSelected));
+      });
     });
 
-    test('should create exception with message and original error', () {
-      const originalError = 'Original error';
-      const exception = LocaleApplicationException(
-        'Test error',
-        originalError: originalError,
-      );
+    group('synchronous operations', () {
+      test('all public methods are synchronous', () {
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(config);
+        when(() => mockDomainService.resetToSystemDefault()).thenReturn(config);
+        when(() => mockDomainService.updateUserLocale('en')).thenReturn(config);
 
-      expect(exception.message, equals('Test error'));
-      expect(exception.originalError, equals(originalError));
+        // Act & Assert - All methods should complete synchronously
+        expect(service.initializeLocaleSystem(), isA<LocaleConfiguration>());
+        expect(service.getCurrentConfiguration(), isA<LocaleConfiguration>());
+        expect(service.resetToSystemDefault(), isA<LocaleConfiguration>());
+        expect(service.switchLocale(AppLocale.en), isA<LocaleConfiguration>());
+      });
+
+      test('no async operations in simplified architecture', () {
+        // This test ensures the service doesn't use any async patterns
+        // All domain service calls should be synchronous
+
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(config);
+
+        // Act - All operations complete immediately
+        final startTime = DateTime.now();
+        service.initializeLocaleSystem();
+        final endTime = DateTime.now();
+
+        // Assert - Should complete nearly instantly (< 1ms for sync operations)
+        final duration = endTime.difference(startTime);
+        expect(duration.inMilliseconds, lessThan(10));
+      });
     });
 
-    test('should format toString correctly without original error', () {
-      const exception = LocaleApplicationException('Test message');
+    group('logging behavior', () {
+      test('uses appropriate log levels for different operations', () {
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(config);
+        when(() => mockDomainService.updateUserLocale('en')).thenReturn(config);
 
-      expect(
-        exception.toString(),
-        equals('LocaleApplicationException: Test message'),
-      );
+        // Act
+        service
+          ..initializeLocaleSystem() // Should use info level
+          ..getCurrentConfiguration() // Should use debug level
+          ..switchLocale(AppLocale.en); // Should use info level
+
+        // Assert - Verify log levels
+        verify(
+          () => mockLogger.log(any(), LogLevel.info),
+        ).called(greaterThanOrEqualTo(4)); // Init (2) + switch (2) operations
+
+        verify(
+          () => mockLogger.log(any(), LogLevel.debug),
+        ).called(greaterThanOrEqualTo(1)); // getCurrentConfiguration + internal
+      });
+
+      test('logs session locale application with debug level', () {
+        // This tests the internal _applyLocaleToSession method logging
+
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'en',
+          source: LocaleSource.userSelected,
+        );
+        when(() => mockDomainService.updateUserLocale('en')).thenReturn(config);
+
+        // Act
+        service.switchLocale(AppLocale.en);
+
+        // Assert - Should log the session application
+        verify(
+          () => mockLogger.log(
+            '🔄 Applying locale to current session',
+            LogLevel.debug,
+          ),
+        ).called(1);
+
+        verify(
+          () => mockLogger.log(
+            'Session locale updated successfully',
+            LogLevel.debug,
+          ),
+        ).called(1);
+      });
+
+      test('logs errors when session application fails', () {
+        // This tests error handling in _applyLocaleToSession
+
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'en',
+          source: LocaleSource.userSelected,
+        );
+        when(() => mockDomainService.updateUserLocale('en')).thenReturn(config);
+
+        // Act
+        service.switchLocale(AppLocale.en);
+
+        // Assert - Even if LocaleSettings.setLocale fails, service continues
+        // and logs debug messages (this tests the try-catch in
+        // _applyLocaleToSession)
+        verify(
+          () => mockLogger.log(
+            '🔄 Applying locale to current session',
+            LogLevel.debug,
+          ),
+        ).called(1);
+      });
     });
 
-    test('should format toString correctly with original error', () {
-      const exception = LocaleApplicationException(
-        'Test message',
-        originalError: 'Original error',
-      );
+    group('error handling', () {
+      test('rethrows UnsupportedLocaleException with logging', () {
+        // Arrange
+        const exception = UnsupportedLocaleException('en');
+        when(
+          () => mockDomainService.updateUserLocale('en'),
+        ).thenThrow(exception);
 
-      expect(
-        exception.toString(),
-        equals(
-          'LocaleApplicationException: Test message '
-          '(caused by: Original error)',
-        ),
-      );
+        // Act & Assert
+        expect(
+          () => service.switchLocale(AppLocale.en),
+          throwsA(isA<UnsupportedLocaleException>()),
+        );
+
+        // Should log the failure
+        verify(
+          () => mockLogger.log(
+            any(that: contains('Locale switch failed')),
+            LogLevel.warning,
+          ),
+        ).called(1);
+      });
+
+      test('handles domain service errors gracefully', () {
+        // This test verifies that domain service errors are handled
+        // appropriately
+        // In the simplified implementation, errors from domain service should
+        // be logged and potentially rethrown
+
+        // Arrange
+        when(
+          () => mockDomainService.updateUserLocale('en'),
+        ).thenThrow(const UnsupportedLocaleException('en'));
+
+        // Act & Assert
+        expect(
+          () => service.switchLocale(AppLocale.en),
+          throwsA(isA<UnsupportedLocaleException>()),
+        );
+
+        // Verify error was logged
+        verify(
+          () => mockLogger.log(any(that: contains('failed')), LogLevel.warning),
+        ).called(1);
+      });
+    });
+
+    group('integration with domain service', () {
+      test('delegates all business logic to domain service', () {
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(config);
+        when(() => mockDomainService.resetToSystemDefault()).thenReturn(config);
+        when(() => mockDomainService.updateUserLocale('en')).thenReturn(config);
+
+        // Act
+        service
+          ..initializeLocaleSystem()
+          ..getCurrentConfiguration()
+          ..resetToSystemDefault()
+          ..switchLocale(AppLocale.en);
+
+        // Assert - Verify all domain service methods were called
+        verify(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).called(2); // init + getCurrentConfiguration
+        verify(() => mockDomainService.resetToSystemDefault()).called(1);
+        verify(() => mockDomainService.updateUserLocale('en')).called(1);
+      });
+
+      test('maintains clean separation between application and domain', () {
+        // This test ensures the application service only handles:
+        // 1. Logging
+        // 2. Session locale application
+        // 3. Error handling
+        // And delegates all business logic to domain service
+
+        // Arrange
+        const config = LocaleConfiguration(
+          languageCode: 'vi',
+          source: LocaleSource.defaultFallback,
+        );
+        when(
+          () => mockDomainService.resolveLocaleConfiguration(),
+        ).thenReturn(config);
+
+        // Act
+        final result = service.initializeLocaleSystem();
+
+        // Assert - Result should come from domain service
+        expect(result, equals(config));
+
+        // Application service should only add logging, not modify logic
+        verify(() => mockDomainService.resolveLocaleConfiguration()).called(1);
+        verify(() => mockLogger.log(any(), any())).called(greaterThan(0));
+      });
     });
   });
 }

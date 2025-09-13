@@ -4,23 +4,18 @@ import 'package:xp1/features/env/infrastructure/env_config_factory.dart';
 void main() {
   group('EnvConfigFactory with Sealed Class', () {
     test('should return development environment by default', () {
-      expect(
-        EnvConfigFactory.currentEnvironment,
-        isA<Development>(),
-      );
+      expect(EnvConfigFactory.currentEnvironment, isA<Development>());
     });
 
     test('should return correct API URL for development', () {
       final apiUrl = EnvConfigFactory.getApiUrlForEnvironment(
         const Development(),
       );
-      expect(apiUrl, contains('dev-api.xp1.com'));
+      expect(apiUrl, contains('api-dev.px1.vn'));
     });
 
     test('should return valid API URL for staging', () {
-      final apiUrl = EnvConfigFactory.getApiUrlForEnvironment(
-        const Staging(),
-      );
+      final apiUrl = EnvConfigFactory.getApiUrlForEnvironment(const Staging());
       expect(apiUrl, isNotEmpty);
       expect(apiUrl, contains('api'));
       expect(apiUrl, startsWith('http'));
@@ -187,27 +182,24 @@ void main() {
     });
   });
 
-  group(
-    'Repository Pattern Integration',
-    () {
-      test('should provide EnvConfigRepository implementation', () {
-        // Verify that the factory provides a repository implementation
-        expect(
-          () => EnvConfigFactory.repository,
-          returnsNormally,
-          reason: 'Should provide repository implementation',
-        );
-      });
+  group('Repository Pattern Integration', () {
+    test('should provide EnvConfigRepository implementation', () {
+      // Verify that the factory provides a repository implementation
+      expect(
+        () => EnvConfigFactory.repository,
+        returnsNormally,
+        reason: 'Should provide repository implementation',
+      );
+    });
 
-      test('repository should implement EnvConfigRepository interface', () {
-        // Verify that the repository properly implements the interface
-        final repo = EnvConfigFactory.repository;
-        expect(repo.apiUrl, isNotEmpty);
-        expect(repo.appName, isNotEmpty);
-        expect(repo.environmentName, isNotEmpty);
-        expect(repo.isDebugMode, isA<bool>());
-        expect(repo.apiTimeoutMs, greaterThan(0));
-      });
-    },
-  );
+    test('repository should implement EnvConfigRepository interface', () {
+      // Verify that the repository properly implements the interface
+      final repo = EnvConfigFactory.repository;
+      expect(repo.apiUrl, isNotEmpty);
+      expect(repo.appName, isNotEmpty);
+      expect(repo.environmentName, isNotEmpty);
+      expect(repo.isDebugMode, isA<bool>());
+      expect(repo.apiTimeoutMs, greaterThan(0));
+    });
+  });
 }

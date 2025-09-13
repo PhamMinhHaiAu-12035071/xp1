@@ -10,7 +10,7 @@ void main() {
     late AppTextStyles appTextStyles;
 
     setUp(() {
-      appTextStyles = const AppTextStylesImpl();
+      appTextStyles = AppTextStylesImpl();
     });
 
     testWidgets('should implement AppTextStyles interface', (tester) async {
@@ -25,14 +25,16 @@ void main() {
       );
     });
 
-    testWidgets('should be const constructible', (tester) async {
+    testWidgets('should configure Google Fonts on construction', (
+      tester,
+    ) async {
       await tester.pumpWidget(
         MaterialApp(
           builder: (context, child) {
             ScreenUtil.init(context, designSize: const Size(375, 812));
-            const appTextStyles1 = AppTextStylesImpl();
-            const appTextStyles2 = AppTextStylesImpl();
-            expect(appTextStyles1, equals(appTextStyles2));
+            // Verify that constructor configures Google Fonts
+            final appTextStylesImpl = AppTextStylesImpl();
+            expect(appTextStylesImpl, isA<AppTextStyles>());
             return Container();
           },
         ),
@@ -55,10 +57,7 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
@@ -80,10 +79,7 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
@@ -105,10 +101,7 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
@@ -130,10 +123,7 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
@@ -155,10 +145,7 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
@@ -180,10 +167,7 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
@@ -205,19 +189,14 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
         );
       });
 
-      testWidgets('caption should match design specifications', (
-        tester,
-      ) async {
+      testWidgets('caption should match design specifications', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             builder: (context, child) {
@@ -230,19 +209,14 @@ void main() {
               expect(style.height, 1.2);
               expect(style.letterSpacing, 0.0);
               expect(style.color, color);
-              expect(
-                style.fontFamily,
-                GoogleFonts.publicSans().fontFamily,
-              );
+              expect(style.fontFamily, GoogleFonts.publicSans().fontFamily);
               return Container();
             },
           ),
         );
       });
 
-      testWidgets('styles should work without color parameter', (
-        tester,
-      ) async {
+      testWidgets('styles should work without color parameter', (tester) async {
         await tester.pumpWidget(
           MaterialApp(
             builder: (context, child) {

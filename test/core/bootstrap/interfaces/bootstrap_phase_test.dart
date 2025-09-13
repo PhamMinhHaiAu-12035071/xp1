@@ -3,10 +3,7 @@ import 'package:xp1/core/bootstrap/interfaces/bootstrap_phase.dart';
 
 /// Default implementation of BootstrapPhase for testing default methods.
 class DefaultBootstrapPhase extends BootstrapPhase {
-  DefaultBootstrapPhase({
-    required this.phaseName,
-    required this.priority,
-  });
+  DefaultBootstrapPhase({required this.phaseName, required this.priority});
 
   @override
   final String phaseName;
@@ -62,10 +59,7 @@ class MockBootstrapPhase implements BootstrapPhase {
     if (shouldThrow) {
       throw Exception('Phase execution failed');
     }
-    return BootstrapResult.success(
-      data: resultData,
-      message: resultMessage,
-    );
+    return BootstrapResult.success(data: resultData, message: resultMessage);
   }
 
   @override
@@ -115,10 +109,7 @@ void main() {
       test('success() should accept optional data and message', () {
         const data = {'status': 'complete'};
         const message = 'Phase completed';
-        const result = BootstrapResult.success(
-          data: data,
-          message: message,
-        );
+        const result = BootstrapResult.success(data: data, message: message);
 
         expect(result.success, isTrue);
         expect(result.data, equals(data));
@@ -152,9 +143,7 @@ void main() {
       });
 
       test('getRequiredData should return typed data when key exists', () {
-        const result = BootstrapResult.success(
-          data: {'value': 'required'},
-        );
+        const result = BootstrapResult.success(data: {'value': 'required'});
 
         expect(result.getRequiredData<String>('value'), equals('required'));
       });
@@ -273,10 +262,7 @@ void main() {
     late MockBootstrapPhase mockPhase;
 
     setUp(() {
-      mockPhase = MockBootstrapPhase(
-        phaseName: 'TestPhase',
-        priority: 1,
-      );
+      mockPhase = MockBootstrapPhase(phaseName: 'TestPhase', priority: 1);
     });
 
     test('should have correct default values', () {
@@ -332,10 +318,7 @@ void main() {
       );
 
       // Test the actual default implementation (should complete without error)
-      await expectLater(
-        defaultPhase.validatePreconditions(),
-        completes,
-      );
+      await expectLater(defaultPhase.validatePreconditions(), completes);
     });
 
     test('should use default rollback implementation', () async {
@@ -345,10 +328,7 @@ void main() {
       );
 
       // Test the actual default implementation (should complete without error)
-      await expectLater(
-        defaultPhase.rollback(),
-        completes,
-      );
+      await expectLater(defaultPhase.rollback(), completes);
     });
   });
 }

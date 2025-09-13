@@ -235,6 +235,18 @@ int alphaValue = (color.a * 255.0).round() & 0xff;
 expect((color.a * 255.0).round() & 0xff, equals(255));
 ```
 
+#### **Replace withOpacity() with withValues()**
+
+```dart
+// ❌ DEPRECATED: withOpacity() (Flutter 3.27+)
+Color semiTransparent = Colors.blue.withOpacity(0.5);
+Color borderColor = Colors.white.withOpacity(0.7);
+
+// ✅ CORRECT: Use withValues() to avoid precision loss
+Color semiTransparent = Colors.blue.withValues(alpha: 0.5);
+Color borderColor = Colors.white.withValues(alpha: 0.7);
+```
+
 #### **Use Component Accessors for Color Values**
 
 ```dart
@@ -288,6 +300,7 @@ expect(
 - [ ] Replace all `Color.value` with `Color.toARGB32()`
 - [ ] Replace all `Color.alpha` with `(color.a * 255.0).round() & 0xff`
 - [ ] Replace `Color.red/green/blue` with `Color.r/g/b` (floating-point)
+- [ ] Replace all `withOpacity()` with `withValues(alpha: value)`
 - [ ] Update MaterialColor constructors to use `toARGB32()`
 - [ ] Update test expectations to use new methods
 - [ ] Verify color precision in critical applications
@@ -296,7 +309,7 @@ expect(
 
 Flutter deprecated these properties to support **wide gamut color spaces** and improve color accuracy. The new methods provide explicit conversion with awareness of precision loss when converting from floating-point to 32-bit integer representation.
 
-**Note**: `toARGB32()` may not produce identical results to `value` due to floating-point precision differences, but this is intentional for better color space support.
+**Note**: `toARGB32()` may not produce identical results to `value` due to floating-point precision differences, but this is intentional for better color space support. Similarly, `withValues()` provides better precision control compared to `withOpacity()`.
 
 ### Environment Usage Patterns
 
@@ -444,7 +457,7 @@ final xLargeIcon = appImages.imageSizes.xLarge;  // 192.0
 // Test widget with image service
 testWidgets('should display image with responsive sizing', (tester) async {
   final service = const AssetImageServiceImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(
@@ -505,7 +518,7 @@ Widget buildStatusIcon(AppState state) {
     AppState.warning => (appIcons.warning, Colors.orange),
     AppState.info => (appIcons.info, Colors.blue),
   };
-  
+
   return iconService.svgIcon(iconPath, color: color);
 }
 
@@ -522,7 +535,7 @@ Future<void> preloadCriticalSvgIcons(BuildContext context) async {
 
 // Standard icon sizes
 final smallIcon = appIcons.iconSizes.small;    // 16px
-final mediumIcon = appIcons.iconSizes.medium;  // 24px  
+final mediumIcon = appIcons.iconSizes.medium;  // 24px
 final largeIcon = appIcons.iconSizes.large;    // 32px
 final xLargeIcon = appIcons.iconSizes.xLarge;  // 48px
 ```
@@ -533,7 +546,7 @@ final xLargeIcon = appIcons.iconSizes.xLarge;  // 48px
 // Test SVG service with responsive sizing
 testWidgets('should display SVG icon with responsive sizing', (tester) async {
   final service = const SvgIconServiceImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(
@@ -555,7 +568,7 @@ testWidgets('should display SVG icon with responsive sizing', (tester) async {
 testWidgets('should handle tap events when provided', (tester) async {
   var tapped = false;
   final service = const SvgIconServiceImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: service.svgIcon(
@@ -564,7 +577,7 @@ testWidgets('should handle tap events when provided', (tester) async {
       ),
     ),
   );
-  
+
   await tester.tap(find.byType(GestureDetector));
   expect(tapped, isTrue);
 });
@@ -609,7 +622,7 @@ Container buildInteractiveCard({required bool isHovered, required bool isPressed
   } else {
     cardColor = appColors.amberLight;          // Default state
   }
-  
+
   return Container(
     color: cardColor,
     child: Text('Interactive Card'),
@@ -650,7 +663,7 @@ Widget buildResponsiveLayout() {
 // Theme integration - light/dark mode support
 Widget buildThemedWidget(BuildContext context) {
   final colorExtension = context.theme.extension<AppColorExtension>()!;
-  
+
   return Container(
     color: colorExtension.primary,      // Automatically switches with theme
     child: Text(
@@ -670,17 +683,17 @@ Widget buildColorPaletteExample() {
       Container(color: appColors.amberLight, width: 50, height: 50),
       Container(color: appColors.amberNormal, width: 50, height: 50),
       Container(color: appColors.amberDark, width: 50, height: 50),
-      
+
       // Blue palette (informational)
       Container(color: appColors.blueLight, width: 50, height: 50),
       Container(color: appColors.blueNormal, width: 50, height: 50),
       Container(color: appColors.blueDark, width: 50, height: 50),
-      
+
       // Green palette (success states)
       Container(color: appColors.greenLight, width: 50, height: 50),
       Container(color: appColors.greenNormal, width: 50, height: 50),
       Container(color: appColors.greenDark, width: 50, height: 50),
-      
+
       // Red palette (error states)
       Container(color: appColors.redLight, width: 50, height: 50),
       Container(color: appColors.redNormal, width: 50, height: 50),
@@ -700,15 +713,15 @@ Widget buildStatefulButton({
     ButtonState.active => appColors.amberNormalActive,
     ButtonState.disabled => appColors.greyLight,
   };
-  
+
   return ElevatedButton(
     style: ElevatedButton.styleFrom(backgroundColor: buttonColors),
     onPressed: state == ButtonState.disabled ? null : onPressed,
     child: Text(
       'Stateful Button',
       style: appTextStyles.bodyMedium(
-        color: state == ButtonState.disabled 
-          ? appColors.greyNormal 
+        color: state == ButtonState.disabled
+          ? appColors.greyNormal
           : appColors.charcoal,
       ),
     ),
@@ -722,7 +735,7 @@ Widget buildStatefulButton({
 // Test design system integration
 testWidgets('should use consistent colors throughout UI', (tester) async {
   final appColors = const AppColorsImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(
@@ -740,10 +753,10 @@ testWidgets('should use consistent colors throughout UI', (tester) async {
   );
 
   expect(find.byType(ElevatedButton), findsOneWidget);
-  
+
   final button = tester.widget<ElevatedButton>(find.byType(ElevatedButton));
   final buttonStyle = button.style!;
-  
+
   // Verify color consistency
   expect(
     buttonStyle.backgroundColor!.resolve({}),
@@ -754,7 +767,7 @@ testWidgets('should use consistent colors throughout UI', (tester) async {
 // Test responsive sizing
 testWidgets('should apply responsive sizing correctly', (tester) async {
   final appSizes = AppSizesImpl();
-  
+
   await tester.pumpWidget(
     MaterialApp(
       home: Builder(
@@ -1570,3 +1583,12 @@ throw ConfigurationException('Failed to load configuration');
 5. **Review Process**: Check English compliance during code reviews
 
 This English-only policy ensures our codebase remains accessible, professional, and compatible with all development tools and international collaboration standards.
+
+# important-instruction-reminders
+
+Do what has been asked; nothing more, nothing less.
+NEVER create files unless they're absolutely necessary for achieving your goal.
+ALWAYS prefer editing an existing file to creating a new one.
+NEVER proactively create documentation files (\*.md) or README files. Only create documentation files if explicitly requested by the User.
+
+      IMPORTANT: this context may or may not be relevant to your tasks. You should not respond to this context unless it is highly relevant to your task.

@@ -69,4 +69,52 @@ void main() {
       expect(appIcons.iconSizes.xLarge, equals(48.0));
     });
   });
+
+  group('Login Decorative Assets Tests (RED PHASE)', () {
+    late AppIcons appIcons;
+
+    setUp(() {
+      appIcons = const AppIconsImpl();
+    });
+
+    test('should provide login decorative assets with proper paths', () {
+      // ❌ FAILS: Properties don't exist in AppIcons interface yet
+      expect(appIcons.loginTopLeftAccent, isNotEmpty);
+      expect(
+        appIcons.loginTopLeftAccent,
+        startsWith('assets/icons/decorative/login/'),
+      );
+      expect(
+        appIcons.loginTopLeftAccent,
+        equals('assets/icons/decorative/login/login_top_left_accent.svg'),
+      );
+
+      expect(appIcons.loginTopRightAccent, isNotEmpty);
+      expect(
+        appIcons.loginTopRightAccent,
+        equals('assets/icons/decorative/login/login_top_right_accent.svg'),
+      );
+
+      expect(appIcons.loginCenterLeftAccent, isNotEmpty);
+      expect(
+        appIcons.loginCenterLeftAccent,
+        equals('assets/icons/decorative/login/login_center_left_accent.svg'),
+      );
+
+      expect(appIcons.loginCenterLogo, isNotEmpty);
+      expect(
+        appIcons.loginCenterLogo,
+        equals('assets/icons/decorative/login/login_center_logo.svg'),
+      );
+    });
+
+    test('should have descriptive naming for login decorative assets', () {
+      // ❌ FAILS: Properties don't exist yet
+      // Test that the naming follows the story requirements
+      expect(appIcons.loginTopLeftAccent, contains('top_left_accent'));
+      expect(appIcons.loginTopRightAccent, contains('top_right_accent'));
+      expect(appIcons.loginCenterLeftAccent, contains('center_left_accent'));
+      expect(appIcons.loginCenterLogo, contains('center_logo'));
+    });
+  });
 }

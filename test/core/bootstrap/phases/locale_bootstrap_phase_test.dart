@@ -30,15 +30,15 @@ void main() {
     ).thenReturn(null);
     when(() => logger.warning(any())).thenReturn(null);
 
-    // Setup locale service stubs
-    when(() => localeService.initializeLocaleSystem()).thenAnswer(
-      (_) async => const LocaleConfiguration(
+    // Setup locale service stubs for Vietnamese default
+    when(() => localeService.initializeLocaleSystem()).thenReturn(
+      const LocaleConfiguration(
         languageCode: 'vi',
         source: LocaleSource.defaultFallback,
       ),
     );
-    when(() => localeService.resetToSystemDefault()).thenAnswer(
-      (_) async => const LocaleConfiguration(
+    when(() => localeService.resetToSystemDefault()).thenReturn(
+      const LocaleConfiguration(
         languageCode: 'vi',
         source: LocaleSource.defaultFallback,
       ),
@@ -91,60 +91,7 @@ void main() {
       getIt.registerSingleton<LocaleApplicationService>(localeService);
     });
 
-    test('should successfully initialize locale system', () async {
-      // Arrange
-      const expectedConfig = LocaleConfiguration(
-        languageCode: 'vi',
-        source: LocaleSource.userSelected,
-      );
-
-      when(
-        () => localeService.initializeLocaleSystem(),
-      ).thenAnswer((_) async => expectedConfig);
-
-      // Act
-      final result = await phase.execute();
-
-      // Assert
-      expect(result.success, isTrue);
-      expect(result.data['locale_configuration'], expectedConfig);
-      expect(result.data['language_code'], 'vi');
-      expect(result.data['locale_source'], 'userSelected');
-      expect(result.data['full_locale_id'], 'vi');
-      expect(result.message, 'Locale system initialized with vi');
-
-      // Verify service call
-      verify(() => localeService.initializeLocaleSystem()).called(1);
-    });
-
-    test('should handle system detected locale', () async {
-      // Arrange
-      const expectedConfig = LocaleConfiguration(
-        languageCode: 'en',
-        source: LocaleSource.systemDetected,
-        countryCode: 'US',
-      );
-
-      when(
-        () => localeService.initializeLocaleSystem(),
-      ).thenAnswer((_) async => expectedConfig);
-
-      // Act
-      final result = await phase.execute();
-
-      // Assert
-      expect(result.success, isTrue);
-      expect(result.data['locale_configuration'], expectedConfig);
-      expect(result.data['language_code'], 'en');
-      expect(result.data['locale_source'], 'systemDetected');
-      expect(result.data['full_locale_id'], 'en_US');
-      expect(result.message, 'Locale system initialized with en');
-
-      // Verify service call
-      verify(() => localeService.initializeLocaleSystem()).called(1);
-    });
-
-    test('should handle default fallback locale', () async {
+    test('should successfully initialize Vietnamese locale system', () async {
       // Arrange
       const expectedConfig = LocaleConfiguration(
         languageCode: 'vi',
@@ -153,7 +100,59 @@ void main() {
 
       when(
         () => localeService.initializeLocaleSystem(),
-      ).thenAnswer((_) async => expectedConfig);
+      ).thenReturn(expectedConfig);
+
+      // Act
+      final result = await phase.execute();
+
+      // Assert - Vietnamese-first implementation
+      expect(result.success, isTrue);
+      expect(result.data['locale_configuration'], expectedConfig);
+      expect(result.data['language_code'], 'vi');
+      expect(result.data['locale_source'], 'defaultFallback');
+      expect(result.data['full_locale_id'], 'vi_VN');
+      expect(result.message, 'Vietnamese locale system initialized');
+
+      // Verify service call
+      verify(() => localeService.initializeLocaleSystem()).called(1);
+    });
+
+    test('should always return Vietnamese configuration', () async {
+      // Arrange - Vietnamese default configuration
+      const expectedConfig = LocaleConfiguration(
+        languageCode: 'vi',
+        source: LocaleSource.defaultFallback,
+      );
+
+      when(
+        () => localeService.initializeLocaleSystem(),
+      ).thenReturn(expectedConfig);
+
+      // Act
+      final result = await phase.execute();
+
+      // Assert - Always Vietnamese in simplified system
+      expect(result.success, isTrue);
+      expect(result.data['locale_configuration'], expectedConfig);
+      expect(result.data['language_code'], 'vi');
+      expect(result.data['locale_source'], 'defaultFallback');
+      expect(result.data['full_locale_id'], 'vi_VN');
+      expect(result.message, 'Vietnamese locale system initialized');
+
+      // Verify service call
+      verify(() => localeService.initializeLocaleSystem()).called(1);
+    });
+
+    test('should handle Vietnamese default fallback locale', () async {
+      // Arrange
+      const expectedConfig = LocaleConfiguration(
+        languageCode: 'vi',
+        source: LocaleSource.defaultFallback,
+      );
+
+      when(
+        () => localeService.initializeLocaleSystem(),
+      ).thenReturn(expectedConfig);
 
       // Act
       final result = await phase.execute();
@@ -163,7 +162,7 @@ void main() {
       expect(result.data['locale_configuration'], expectedConfig);
       expect(result.data['language_code'], 'vi');
       expect(result.data['locale_source'], 'defaultFallback');
-      expect(result.message, 'Locale system initialized with vi');
+      expect(result.message, 'Vietnamese locale system initialized');
     });
 
     test(
@@ -182,18 +181,10 @@ void main() {
                 .having(
                   (e) => e.message,
                   'message',
-                  'Failed to initialize locale system',
+                  'Failed to initialize Vietnamese locale system',
                 )
-                .having(
-                  (e) => e.phase,
-                  'phase',
-                  'Locale System',
-                )
-                .having(
-                  (e) => e.canRetry,
-                  'canRetry',
-                  true,
-                ),
+                .having((e) => e.phase, 'phase', 'Locale System')
+                .having((e) => e.canRetry, 'canRetry', true),
           ),
         );
 
@@ -223,44 +214,35 @@ void main() {
                 'message',
                 'Locale service bootstrap error',
               )
-              .having(
-                (e) => e.phase,
-                'phase',
-                'Locale System',
-              ),
+              .having((e) => e.phase, 'phase', 'Locale System'),
         ),
       );
     });
 
-    test(
-      'should throw BootstrapException when LocaleApplicationService not '
-      'registered',
-      () async {
-        // Arrange - don't register the service to trigger the validation error
-        await getIt.reset();
+    test('should throw BootstrapException when LocaleApplicationService not '
+        'registered', () async {
+      // Arrange - don't register the service to trigger the validation error
+      await getIt.reset();
 
-        // Act & Assert - should throw BootstrapException (covers lines 46-49)
-        expect(
-          () => phase.execute(),
-          throwsA(
-            isA<BootstrapException>()
-                .having(
-                  (e) => e.message,
-                  'message',
-                  'LocaleApplicationService not registered in DI container',
-                )
-                .having(
-                  (e) => e.phase,
-                  'phase',
-                  'Locale System',
-                ),
-          ),
-        );
+      // Act & Assert - should throw BootstrapException (covers lines 46-49)
+      expect(
+        () => phase.execute(),
+        throwsA(
+          isA<BootstrapException>()
+              .having(
+                (e) => e.message,
+                'message',
+                'LocaleApplicationService not registered in DI container',
+              )
+              .having((e) => e.phase, 'phase', 'Locale System'),
+        ),
+      );
 
-        // Verify logger was called before the exception
-        verify(() => logger.info('🌐 Initializing locale system...')).called(1);
-      },
-    );
+      // Verify logger was called before the exception
+      verify(
+        () => logger.info('🌐 Initializing Vietnamese locale system...'),
+      ).called(1);
+    });
   });
 
   group('rollback', () {
@@ -269,23 +251,27 @@ void main() {
       getIt.registerSingleton<LocaleApplicationService>(localeService);
     });
 
-    test('should successfully rollback locale system', () async {
+    test('should successfully rollback to Vietnamese locale', () async {
       // Arrange
       const expectedConfig = LocaleConfiguration(
-        languageCode: 'en',
-        source: LocaleSource.systemDetected,
+        languageCode: 'vi',
+        source: LocaleSource.defaultFallback,
       );
 
       when(
         () => localeService.resetToSystemDefault(),
-      ).thenAnswer((_) async => expectedConfig);
+      ).thenReturn(expectedConfig);
 
       // Act
       await phase.rollback();
 
-      // Assert
-      verify(() => logger.info('🔄 Rolling back locale system...')).called(1);
-      verify(() => logger.info('✅ Locale system rollback completed')).called(1);
+      // Assert - Vietnamese-specific messages
+      verify(
+        () => logger.info('🔄 Rolling back to Vietnamese locale...'),
+      ).called(1);
+      verify(
+        () => logger.info('✅ Vietnamese locale rollback completed'),
+      ).called(1);
       verify(() => localeService.resetToSystemDefault()).called(1);
       verifyNoMoreInteractions(logger);
     });
@@ -299,8 +285,10 @@ void main() {
       // Act - should not throw
       await phase.rollback();
 
-      // Assert
-      verify(() => logger.info('🔄 Rolling back locale system...')).called(1);
+      // Assert - Vietnamese-specific logging
+      verify(
+        () => logger.info('🔄 Rolling back to Vietnamese locale...'),
+      ).called(1);
       // Verify service call was attempted
       verify(() => localeService.resetToSystemDefault()).called(1);
     });
@@ -312,9 +300,13 @@ void main() {
       // Act - should not throw
       await phase.rollback();
 
-      // Assert
-      verify(() => logger.info('🔄 Rolling back locale system...')).called(1);
-      verify(() => logger.info('✅ Locale system rollback completed')).called(1);
+      // Assert - Vietnamese-specific messages
+      verify(
+        () => logger.info('🔄 Rolling back to Vietnamese locale...'),
+      ).called(1);
+      verify(
+        () => logger.info('✅ Vietnamese locale rollback completed'),
+      ).called(1);
       // Should not call the service since it's not registered
     });
   });
@@ -326,17 +318,17 @@ void main() {
 
       const expectedConfig = LocaleConfiguration(
         languageCode: 'vi',
-        source: LocaleSource.userSelected,
+        source: LocaleSource.defaultFallback,
       );
 
       when(
         () => localeService.initializeLocaleSystem(),
-      ).thenAnswer((_) async => expectedConfig);
+      ).thenReturn(expectedConfig);
 
       // Act
       final result = await phase.execute();
 
-      // Assert
+      // Assert - Vietnamese locale system
       expect(result.success, isTrue);
       expect(result.data['locale_configuration'], expectedConfig);
 

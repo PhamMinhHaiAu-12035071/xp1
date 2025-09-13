@@ -1,69 +1,36 @@
 import 'package:injectable/injectable.dart';
 import 'package:xp1/features/locale/domain/entities/locale_configuration.dart';
-import 'package:xp1/features/locale/domain/repositories/locale_repository.dart';
-import 'package:xp1/features/locale/domain/services/platform_locale_provider.dart';
 import 'package:xp1/l10n/gen/strings.g.dart';
 
-/// Domain service for locale business logic and orchestration.
+/// Simplified domain service for Vietnamese-first locale management.
 ///
-/// This service encapsulates the core business rules for locale management
-/// following DDD principles. It coordinates between repository, platform
-/// detection, and validation without depending on infrastructure concerns.
-///
-/// As Eric Evans explains: "Domain services encapsulate domain logic that
-/// doesn't naturally fit within an entity or value object."
+/// This service implements a simplified locale strategy:
+/// - Always defaults to Vietnamese on startup
+/// - Session-only language switching (no persistence)
+/// - Synchronous operations for fast performance
+/// - No platform detection or complex resolution logic
 @injectable
 class LocaleDomainService {
-  /// Creates locale domain service with required dependencies.
-  const LocaleDomainService({
-    required LocaleRepository repository,
-    required PlatformLocaleProvider platformProvider,
-  }) : _repository = repository,
-       _platformProvider = platformProvider;
+  /// Creates locale domain service with no external dependencies.
+  LocaleDomainService();
 
-  final LocaleRepository _repository;
-  final PlatformLocaleProvider _platformProvider;
+  LocaleConfiguration? _sessionLocale;
 
-  /// Determines the best locale configuration for the current context.
+  /// Returns current locale configuration.
   ///
-  /// This method implements the locale resolution strategy:
-  /// 1. Use saved user preference if available
-  /// 2. Detect and validate system locale
-  /// 3. Fall back to default project locale (Vietnamese)
-  ///
-  /// This business logic is centralized here rather than scattered
-  /// across the application, following single responsibility principle.
-  Future<LocaleConfiguration> resolveLocaleConfiguration() async {
-    // Strategy 1: Use saved user preference
-    final savedLocale = await _repository.getCurrentLocale();
-    if (savedLocale != null && _isLocaleSupported(savedLocale.languageCode)) {
-      return savedLocale;
-    }
-
-    // Strategy 2: Detect and validate system locale
-    final systemLocaleCode = _platformProvider.getSystemLocale();
-    if (_isLocaleSupported(systemLocaleCode)) {
-      final systemLocale = LocaleConfigurationExtension.systemDetected(
-        systemLocaleCode,
-      );
-      // Auto-save system locale for consistency
-      await _repository.saveLocale(systemLocale);
-      return systemLocale;
-    }
-
-    // Strategy 3: Default fallback
-    final defaultLocale = LocaleConfigurationExtension.defaultFallback();
-    await _repository.saveLocale(defaultLocale);
-    return defaultLocale;
+  /// Always starts with Vietnamese default, but can be changed during session.
+  /// No async operations - returns immediately for fast startup performance.
+  LocaleConfiguration resolveLocaleConfiguration() {
+    return _sessionLocale ?? LocaleConfigurationExtension.defaultFallback();
   }
 
-  /// Updates user's locale preference with validation.
+  /// Updates user's locale preference for current session only.
   ///
-  /// This method handles the business rules around locale changes:
+  /// This method handles session-only locale changes:
   /// - Validates locale is supported
-  /// - Persists the choice for future sessions
-  /// - Returns the final configuration
-  Future<LocaleConfiguration> updateUserLocale(String languageCode) async {
+  /// - Updates session state only (no persistence)
+  /// - Returns immediately without async operations
+  LocaleConfiguration updateUserLocale(String languageCode) {
     if (!_isLocaleSupported(languageCode)) {
       throw UnsupportedLocaleException(
         'Locale "$languageCode" is not supported. '
@@ -74,15 +41,16 @@ class LocaleDomainService {
     final configuration = LocaleConfigurationExtension.userSelected(
       languageCode,
     );
-    await _repository.saveLocale(configuration);
+    _sessionLocale = configuration;
     return configuration;
   }
 
-  /// Resets locale to system default, clearing user preference.
+  /// Resets locale to Vietnamese default for current session.
   ///
-  /// This is useful for "reset to default" functionality or testing.
-  Future<LocaleConfiguration> resetToSystemDefault() async {
-    await _repository.clearSavedLocale();
+  /// This clears any session locale and returns to Vietnamese default.
+  /// No async operations or persistence involved.
+  LocaleConfiguration resetToSystemDefault() {
+    _sessionLocale = null;
     return resolveLocaleConfiguration();
   }
 

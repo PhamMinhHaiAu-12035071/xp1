@@ -86,9 +86,7 @@ class BootstrapOrchestrator {
           }
 
           // Record failure for skippable phases
-          results[phase.phaseName] = BootstrapResult.failure(
-            exception.message,
-          );
+          results[phase.phaseName] = BootstrapResult.failure(exception.message);
         }
       }
 
@@ -140,9 +138,7 @@ class BootstrapOrchestrator {
   }
 
   /// Executes a phase with timeout protection.
-  Future<BootstrapResult> _executePhaseWithTimeout(
-    BootstrapPhase phase,
-  ) async {
+  Future<BootstrapResult> _executePhaseWithTimeout(BootstrapPhase phase) async {
     const timeout = Duration(minutes: 5); // Configurable timeout
 
     return phase.execute().timeout(
@@ -171,11 +167,7 @@ class BootstrapOrchestrator {
         await phase.rollback();
         _logger.info('↩️  Rolled back: ${phase.phaseName}');
       } on Exception catch (e, stackTrace) {
-        _logger.error(
-          'Rollback failed for ${phase.phaseName}',
-          e,
-          stackTrace,
-        );
+        _logger.error('Rollback failed for ${phase.phaseName}', e, stackTrace);
         // Continue rollback even if one phase fails
       }
     }

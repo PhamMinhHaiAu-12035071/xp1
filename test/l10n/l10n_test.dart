@@ -9,18 +9,26 @@ void main() {
   group('Slang Translations', () {
     setUpAll(() async {
       await TestDependencyContainer.setupTestDependencies();
+      // Ensure English locale for consistent testing
+      LocaleSettings.setLocaleSync(AppLocale.en);
     });
 
     tearDownAll(() async {
       await TestDependencyContainer.resetTestDependencies();
+      // Reset to English to prevent interference with other tests
+      LocaleSettings.setLocaleSync(AppLocale.en);
     });
 
     testWidgets('should provide global t access to translations', (
       tester,
     ) async {
+      // Ensure English locale for this test
+      LocaleSettings.setLocaleSync(AppLocale.en);
+
       await tester.pumpWidget(
         TranslationProvider(
           child: MaterialApp(
+            locale: const Locale('en'),
             supportedLocales: AppLocaleUtils.supportedLocales,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
@@ -34,12 +42,7 @@ void main() {
                 final homeTitle = t.pages.home.title;
 
                 return Scaffold(
-                  body: Column(
-                    children: [
-                      Text(appTitle),
-                      Text(homeTitle),
-                    ],
-                  ),
+                  body: Column(children: [Text(appTitle), Text(homeTitle)]),
                 );
               },
             ),
@@ -47,15 +50,21 @@ void main() {
         ),
       );
 
+      await tester.pumpAndSettle();
+
       // Verify translations are accessible
       expect(find.text('XP1'), findsOneWidget);
       expect(find.text('Home'), findsOneWidget);
     });
 
     testWidgets('should provide context-based translations', (tester) async {
+      // Ensure English locale for this test
+      LocaleSettings.setLocaleSync(AppLocale.en);
+
       await tester.pumpWidget(
         TranslationProvider(
           child: MaterialApp(
+            locale: const Locale('en'),
             supportedLocales: AppLocaleUtils.supportedLocales,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
@@ -80,6 +89,8 @@ void main() {
         ),
       );
 
+      await tester.pumpAndSettle();
+
       expect(find.text('XP1'), findsOneWidget);
       expect(find.text('Home'), findsOneWidget);
     });
@@ -102,10 +113,7 @@ void main() {
               builder: (context) {
                 return Scaffold(
                   body: Column(
-                    children: [
-                      Text(t.app.title),
-                      Text(t.navigation.home),
-                    ],
+                    children: [Text(t.app.title), Text(t.navigation.home)],
                   ),
                 );
               },
@@ -123,9 +131,13 @@ void main() {
     });
 
     testWidgets('should handle parameterized translations', (tester) async {
+      // Ensure English locale for this test
+      LocaleSettings.setLocaleSync(AppLocale.en);
+
       await tester.pumpWidget(
         TranslationProvider(
           child: MaterialApp(
+            locale: const Locale('en'),
             supportedLocales: AppLocaleUtils.supportedLocales,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
@@ -139,14 +151,14 @@ void main() {
                   'Test Page',
                 );
 
-                return Scaffold(
-                  body: Text(welcomeMessage),
-                );
+                return Scaffold(body: Text(welcomeMessage));
               },
             ),
           ),
         ),
       );
+
+      await tester.pumpAndSettle();
 
       expect(find.text('Welcome to Test Page'), findsOneWidget);
     });
@@ -161,9 +173,13 @@ void main() {
     testWidgets('should provide consistent translations across contexts', (
       tester,
     ) async {
+      // Ensure English locale for this test
+      LocaleSettings.setLocaleSync(AppLocale.en);
+
       await tester.pumpWidget(
         TranslationProvider(
           child: MaterialApp(
+            locale: const Locale('en'),
             supportedLocales: AppLocaleUtils.supportedLocales,
             localizationsDelegates: const [
               GlobalMaterialLocalizations.delegate,
@@ -194,6 +210,8 @@ void main() {
         ),
       );
 
+      await tester.pumpAndSettle();
+
       expect(find.text('Outer: XP1'), findsOneWidget);
       expect(find.text('Inner: XP1'), findsOneWidget);
     });
@@ -214,9 +232,7 @@ void main() {
               ],
               home: Builder(
                 builder: (context) {
-                  return Scaffold(
-                    body: Text(t.app.title),
-                  );
+                  return Scaffold(body: Text(t.app.title));
                 },
               ),
             ),
