@@ -38,10 +38,7 @@ class AppImagesImpl implements AppImages {
   String get employeeBadge => 'assets/images/employee/badge.png';
 
   @override
-  List<String> get criticalAssets => [
-    splashLogo,
-    loginLogo,
-  ];
+  List<String> get criticalAssets => [splashLogo, loginLogo];
 
   @override
   ImageSizeConstants get imageSizes => const ImageSizeConstants();

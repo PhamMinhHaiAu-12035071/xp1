@@ -65,9 +65,7 @@ class TestDependencyContainer {
       ..registerLazySingleton<AssetImageService>(
         () => const AssetImageServiceImpl(),
       )
-      ..registerLazySingleton<SvgIconService>(
-        () => const SvgIconServiceImpl(),
-      )
+      ..registerLazySingleton<SvgIconService>(() => const SvgIconServiceImpl())
       // Register SplashCubit for splash screen functionality
       ..registerFactory<SplashCubit>(SplashCubit.new)
       // Register authentication services for login functionality

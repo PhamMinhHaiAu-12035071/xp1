@@ -449,10 +449,7 @@ void main() {
         expect(theme.useMaterial3, isTrue);
         expect(theme.extensions, isNotNull);
         expect(theme.extensions.length, equals(1));
-        expect(
-          theme.extensions[AppColorExtension],
-          isA<AppColorExtension>(),
-        );
+        expect(theme.extensions[AppColorExtension], isA<AppColorExtension>());
       });
 
       test('should create light theme with custom ThemeData', () {
@@ -470,10 +467,7 @@ void main() {
         expect(theme.useMaterial3, isFalse);
         expect(theme.extensions, isNotNull);
         expect(theme.extensions.length, equals(1));
-        expect(
-          theme.extensions[AppColorExtension],
-          isA<AppColorExtension>(),
-        );
+        expect(theme.extensions[AppColorExtension], isA<AppColorExtension>());
       });
 
       test('should have AppColorExtension with light colors', () {
@@ -507,10 +501,7 @@ void main() {
         expect(theme.useMaterial3, isTrue);
         expect(theme.extensions, isNotNull);
         expect(theme.extensions.length, equals(1));
-        expect(
-          theme.extensions[AppColorExtension],
-          isA<AppColorExtension>(),
-        );
+        expect(theme.extensions[AppColorExtension], isA<AppColorExtension>());
       });
 
       test('should create dark theme with custom ThemeData', () {
@@ -528,10 +519,7 @@ void main() {
         expect(theme.useMaterial3, isFalse);
         expect(theme.extensions, isNotNull);
         expect(theme.extensions.length, equals(1));
-        expect(
-          theme.extensions[AppColorExtension],
-          isA<AppColorExtension>(),
-        );
+        expect(theme.extensions[AppColorExtension], isA<AppColorExtension>());
       });
 
       test('should have AppColorExtension with dark colors', () {
@@ -632,9 +620,7 @@ void main() {
           textTheme: const TextTheme(
             bodyLarge: TextStyle(fontFamily: 'CustomFont'),
           ),
-          appBarTheme: const AppBarTheme(
-            backgroundColor: Colors.red,
-          ),
+          appBarTheme: const AppBarTheme(backgroundColor: Colors.red),
         );
 
         final lightTheme = AppTheme.lightTheme(customTheme);
@@ -652,22 +638,14 @@ void main() {
         'should override extensions even if custom theme has extensions',
         () {
           final customTheme = ThemeData(
-            extensions: const [
-              _MockThemeExtension(),
-            ],
+            extensions: const [_MockThemeExtension()],
           );
 
           final theme = AppTheme.lightTheme(customTheme);
 
           expect(theme.extensions.length, equals(1));
-          expect(
-            theme.extensions[AppColorExtension],
-            isA<AppColorExtension>(),
-          );
-          expect(
-            theme.extensions[_MockThemeExtension],
-            isNull,
-          );
+          expect(theme.extensions[AppColorExtension], isA<AppColorExtension>());
+          expect(theme.extensions[_MockThemeExtension], isNull);
         },
       );
     });

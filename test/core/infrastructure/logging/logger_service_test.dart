@@ -107,10 +107,7 @@ void main() {
 
         // Production mode should skip debug logs due to kDebugMode check
         // This exercises the early return logic at line 48
-        expect(
-          () => prodLogger.log(message, LogLevel.debug),
-          returnsNormally,
-        );
+        expect(() => prodLogger.log(message, LogLevel.debug), returnsNormally);
       });
 
       test('appends extra data to message when provided', () {

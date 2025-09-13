@@ -42,12 +42,7 @@ void main() {
                 final homeTitle = t.pages.home.title;
 
                 return Scaffold(
-                  body: Column(
-                    children: [
-                      Text(appTitle),
-                      Text(homeTitle),
-                    ],
-                  ),
+                  body: Column(children: [Text(appTitle), Text(homeTitle)]),
                 );
               },
             ),
@@ -118,10 +113,7 @@ void main() {
               builder: (context) {
                 return Scaffold(
                   body: Column(
-                    children: [
-                      Text(t.app.title),
-                      Text(t.navigation.home),
-                    ],
+                    children: [Text(t.app.title), Text(t.navigation.home)],
                   ),
                 );
               },
@@ -159,9 +151,7 @@ void main() {
                   'Test Page',
                 );
 
-                return Scaffold(
-                  body: Text(welcomeMessage),
-                );
+                return Scaffold(body: Text(welcomeMessage));
               },
             ),
           ),
@@ -242,9 +232,7 @@ void main() {
               ],
               home: Builder(
                 builder: (context) {
-                  return Scaffold(
-                    body: Text(t.app.title),
-                  );
+                  return Scaffold(body: Text(t.app.title));
                 },
               ),
             ),

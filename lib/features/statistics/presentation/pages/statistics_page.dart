@@ -12,9 +12,7 @@ class StatisticsPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.statistics.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.statistics.title)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

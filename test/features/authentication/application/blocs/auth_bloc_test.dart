@@ -38,9 +38,7 @@ void main() {
       password: 'testpassword',
     );
 
-    const testLoginResult = LoginResult(
-      token: testToken,
-    );
+    const testLoginResult = LoginResult(token: testToken);
 
     setUp(() {
       mockAuthRepository = MockAuthRepository();
@@ -60,9 +58,9 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [loading, authenticated] when login succeeds',
         build: () {
-          when(() => mockLoginUseCase(testLoginInput)).thenAnswer(
-            (_) async => right(testLoginResult),
-          );
+          when(
+            () => mockLoginUseCase(testLoginInput),
+          ).thenAnswer((_) async => right(testLoginResult));
           return authBloc;
         },
         act: (bloc) => bloc.add(
@@ -147,9 +145,9 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [loading, error] when login fails with server error',
         build: () {
-          when(() => mockLoginUseCase(testLoginInput)).thenAnswer(
-            (_) async => left(const AuthFailure.serverError(500)),
-          );
+          when(
+            () => mockLoginUseCase(testLoginInput),
+          ).thenAnswer((_) async => left(const AuthFailure.serverError(500)));
           return authBloc;
         },
         act: (bloc) => bloc.add(
@@ -177,19 +175,15 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [loading, unauthenticated] when logout succeeds',
         build: () {
-          when(() => mockAuthRepository.logout()).thenAnswer(
-            (_) async => right(null),
-          );
+          when(
+            () => mockAuthRepository.logout(),
+          ).thenAnswer((_) async => right(null));
           return authBloc;
         },
         act: (bloc) => bloc.add(const AuthEvent.logoutRequested()),
         expect: () => [
-          const AuthState(
-            authStatus: AuthenticationStatus.loading,
-          ),
-          const AuthState(
-            authStatus: AuthenticationStatus.unauthenticated,
-          ),
+          const AuthState(authStatus: AuthenticationStatus.loading),
+          const AuthState(authStatus: AuthenticationStatus.unauthenticated),
         ],
         verify: (_) {
           verify(() => mockAuthRepository.logout()).called(1);
@@ -206,9 +200,7 @@ void main() {
         },
         act: (bloc) => bloc.add(const AuthEvent.logoutRequested()),
         expect: () => [
-          const AuthState(
-            authStatus: AuthenticationStatus.loading,
-          ),
+          const AuthState(authStatus: AuthenticationStatus.loading),
           const AuthState(
             authStatus: AuthenticationStatus.error,
             errorMessage:
@@ -222,14 +214,13 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'successfully refreshes token without state change',
         build: () {
-          when(() => mockAuthRepository.refreshToken()).thenAnswer(
-            (_) async => right(testToken),
-          );
+          when(
+            () => mockAuthRepository.refreshToken(),
+          ).thenAnswer((_) async => right(testToken));
           return authBloc;
         },
-        seed: () => const AuthState(
-          authStatus: AuthenticationStatus.authenticated,
-        ),
+        seed: () =>
+            const AuthState(authStatus: AuthenticationStatus.authenticated),
         act: (bloc) => bloc.add(const AuthEvent.tokenRefreshRequested()),
         expect: () => <AuthState>[],
         verify: (_) {
@@ -240,28 +231,24 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits unauthenticated when refresh fails',
         build: () {
-          when(() => mockAuthRepository.refreshToken()).thenAnswer(
-            (_) async => left(const AuthFailure.tokenExpired()),
-          );
+          when(
+            () => mockAuthRepository.refreshToken(),
+          ).thenAnswer((_) async => left(const AuthFailure.tokenExpired()));
           return authBloc;
         },
-        seed: () => const AuthState(
-          authStatus: AuthenticationStatus.authenticated,
-        ),
+        seed: () =>
+            const AuthState(authStatus: AuthenticationStatus.authenticated),
         act: (bloc) => bloc.add(const AuthEvent.tokenRefreshRequested()),
         expect: () => <AuthState>[
-          const AuthState(
-            authStatus: AuthenticationStatus.unauthenticated,
-          ),
+          const AuthState(authStatus: AuthenticationStatus.unauthenticated),
         ],
       );
 
       blocTest<AuthBloc, AuthState>(
         'does nothing when not authenticated',
         build: () => authBloc,
-        seed: () => const AuthState(
-          authStatus: AuthenticationStatus.unauthenticated,
-        ),
+        seed: () =>
+            const AuthState(authStatus: AuthenticationStatus.unauthenticated),
         act: (bloc) => bloc.add(const AuthEvent.tokenRefreshRequested()),
         expect: () => <AuthState>[],
         verify: (_) {
@@ -274,19 +261,15 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [loading, authenticated] when tokens are valid',
         build: () {
-          when(() => mockAuthRepository.refreshToken()).thenAnswer(
-            (_) async => right(testToken),
-          );
+          when(
+            () => mockAuthRepository.refreshToken(),
+          ).thenAnswer((_) async => right(testToken));
           return authBloc;
         },
         act: (bloc) => bloc.add(const AuthEvent.authCheckRequested()),
         expect: () => [
-          const AuthState(
-            authStatus: AuthenticationStatus.loading,
-          ),
-          const AuthState(
-            authStatus: AuthenticationStatus.authenticated,
-          ),
+          const AuthState(authStatus: AuthenticationStatus.loading),
+          const AuthState(authStatus: AuthenticationStatus.authenticated),
         ],
         verify: (_) {
           verify(() => mockAuthRepository.refreshToken()).called(1);
@@ -296,19 +279,15 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'emits [loading, unauthenticated] when tokens are invalid',
         build: () {
-          when(() => mockAuthRepository.refreshToken()).thenAnswer(
-            (_) async => left(const AuthFailure.tokenExpired()),
-          );
+          when(
+            () => mockAuthRepository.refreshToken(),
+          ).thenAnswer((_) async => left(const AuthFailure.tokenExpired()));
           return authBloc;
         },
         act: (bloc) => bloc.add(const AuthEvent.authCheckRequested()),
         expect: () => [
-          const AuthState(
-            authStatus: AuthenticationStatus.loading,
-          ),
-          const AuthState(
-            authStatus: AuthenticationStatus.unauthenticated,
-          ),
+          const AuthState(authStatus: AuthenticationStatus.loading),
+          const AuthState(authStatus: AuthenticationStatus.unauthenticated),
         ],
       );
     });
@@ -320,9 +299,9 @@ void main() {
 
         // Access private method through reflection would be complex,
         // so we test through the public interface
-        when(() => mockLoginUseCase(testLoginInput)).thenAnswer(
-          (_) async => left(failure),
-        );
+        when(
+          () => mockLoginUseCase(testLoginInput),
+        ).thenAnswer((_) async => left(failure));
 
         expectLater(
           bloc.stream,
@@ -351,9 +330,9 @@ void main() {
         final bloc = AuthBloc(mockAuthRepository, mockLoginUseCase);
         const failure = AuthFailure.tokenExpired();
 
-        when(() => mockLoginUseCase(testLoginInput)).thenAnswer(
-          (_) async => left(failure),
-        );
+        when(
+          () => mockLoginUseCase(testLoginInput),
+        ).thenAnswer((_) async => left(failure));
 
         expectLater(
           bloc.stream,
@@ -382,9 +361,9 @@ void main() {
         final bloc = AuthBloc(mockAuthRepository, mockLoginUseCase);
         const failure = AuthFailure.unauthorized();
 
-        when(() => mockLoginUseCase(testLoginInput)).thenAnswer(
-          (_) async => left(failure),
-        );
+        when(
+          () => mockLoginUseCase(testLoginInput),
+        ).thenAnswer((_) async => left(failure));
 
         expectLater(
           bloc.stream,
@@ -413,9 +392,9 @@ void main() {
         final bloc = AuthBloc(mockAuthRepository, mockLoginUseCase);
         const failure = AuthFailure.unknown('Unknown error');
 
-        when(() => mockLoginUseCase(testLoginInput)).thenAnswer(
-          (_) async => left(failure),
-        );
+        when(
+          () => mockLoginUseCase(testLoginInput),
+        ).thenAnswer((_) async => left(failure));
 
         expectLater(
           bloc.stream,
@@ -447,9 +426,9 @@ void main() {
       // a controllable timer abstraction
 
       test('starts monitoring after successful login', () async {
-        when(() => mockLoginUseCase(testLoginInput)).thenAnswer(
-          (_) async => right(testLoginResult),
-        );
+        when(
+          () => mockLoginUseCase(testLoginInput),
+        ).thenAnswer((_) async => right(testLoginResult));
 
         authBloc.add(
           const AuthEvent.loginRequested(
@@ -469,27 +448,18 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'updates username field and keeps form validation state',
         build: () => authBloc,
-        act: (bloc) => bloc.add(
-          const AuthEvent.usernameChanged(username: 'newuser'),
-        ),
+        act: (bloc) =>
+            bloc.add(const AuthEvent.usernameChanged(username: 'newuser')),
         expect: () => [
-          const AuthState(
-            username: Username.dirty(value: 'newuser'),
-          ),
+          const AuthState(username: Username.dirty(value: 'newuser')),
         ],
       );
 
       blocTest<AuthBloc, AuthState>(
         'updates username with empty value',
         build: () => authBloc,
-        act: (bloc) => bloc.add(
-          const AuthEvent.usernameChanged(username: ''),
-        ),
-        expect: () => [
-          const AuthState(
-            username: Username.dirty(),
-          ),
-        ],
+        act: (bloc) => bloc.add(const AuthEvent.usernameChanged(username: '')),
+        expect: () => [const AuthState(username: Username.dirty())],
       );
     });
 
@@ -497,27 +467,18 @@ void main() {
       blocTest<AuthBloc, AuthState>(
         'updates password field and keeps form validation state',
         build: () => authBloc,
-        act: (bloc) => bloc.add(
-          const AuthEvent.passwordChanged(password: 'newpass'),
-        ),
+        act: (bloc) =>
+            bloc.add(const AuthEvent.passwordChanged(password: 'newpass')),
         expect: () => [
-          const AuthState(
-            password: Password.dirty(value: 'newpass'),
-          ),
+          const AuthState(password: Password.dirty(value: 'newpass')),
         ],
       );
 
       blocTest<AuthBloc, AuthState>(
         'updates password with empty value',
         build: () => authBloc,
-        act: (bloc) => bloc.add(
-          const AuthEvent.passwordChanged(password: ''),
-        ),
-        expect: () => [
-          const AuthState(
-            password: Password.dirty(),
-          ),
-        ],
+        act: (bloc) => bloc.add(const AuthEvent.passwordChanged(password: '')),
+        expect: () => [const AuthState(password: Password.dirty())],
       );
     });
 

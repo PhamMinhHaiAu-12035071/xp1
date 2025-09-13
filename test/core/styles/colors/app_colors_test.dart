@@ -564,10 +564,7 @@ void main() {
       });
 
       test('onboardingGradientEnd should return correct color', () {
-        expect(
-          appColors.onboardingGradientEnd.toARGB32(),
-          equals(0xFF5D84B4),
-        );
+        expect(appColors.onboardingGradientEnd.toARGB32(), equals(0xFF5D84B4));
       });
     });
 

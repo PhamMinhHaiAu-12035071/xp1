@@ -104,12 +104,11 @@ void main() {
 
       // Assert
       expect(result, isA<Right<AuthFailure, LoginResult>>());
-      result.fold(
-        (failure) => fail('Expected Right but got Left: $failure'),
-        (loginResult) {
-          expect(loginResult.token, equals(expectedToken));
-        },
-      );
+      result.fold((failure) => fail('Expected Right but got Left: $failure'), (
+        loginResult,
+      ) {
+        expect(loginResult.token, equals(expectedToken));
+      });
 
       verify(() => mockAuthRepository.login(testLoginInput)).called(1);
     });

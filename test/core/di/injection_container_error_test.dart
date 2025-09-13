@@ -41,10 +41,7 @@ void main() {
 
       // Try to configure again - this should return early gracefully
       // due to GetIt's built-in state checking
-      expect(
-        configureDependencies,
-        returnsNormally,
-      );
+      expect(configureDependencies, returnsNormally);
     });
 
     test('DependencyInjectionException should be throwable', () {
@@ -140,10 +137,7 @@ void main() {
 
     test('should work correctly with fresh GetIt instance', () async {
       // Configure dependencies should work without issues
-      expect(
-        configureDependencies,
-        returnsNormally,
-      );
+      expect(configureDependencies, returnsNormally);
 
       // Verify GetIt is accessible
       expect(getIt, same(GetIt.instance));

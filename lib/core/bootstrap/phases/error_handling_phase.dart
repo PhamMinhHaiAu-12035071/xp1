@@ -8,9 +8,7 @@ import 'package:xp1/core/infrastructure/logging/logger_service.dart';
 /// only on error handling setup.
 class ErrorHandlingPhase implements BootstrapPhase {
   /// Creates error handling phase with logger dependency.
-  const ErrorHandlingPhase({
-    required LoggerService logger,
-  }) : _logger = logger;
+  const ErrorHandlingPhase({required LoggerService logger}) : _logger = logger;
 
   final LoggerService _logger;
 

@@ -44,15 +44,15 @@ pre-commit:
 pre-push:
   parallel: false
   commands:
+    # Optimize project size before push
+    optimize-project:
+      run: ./scripts/optimize-for-push.sh
     # Run bash script tests first (TDD validation)
     bash-script-tests:
       run: npm test
-    # Full license compliance check before push
-    license-compliance:
-      run: make license-check
-    # Run complete CI pipeline via Makefile
-    full-ci-pipeline:
-      run: make local-ci
+    # Quick pre-push checks (optimized for speed)
+    quick-checks:
+      run: make pre-push-ci
     # Full dependency validation before push
     validate-dependencies:
       run: make validate-deps

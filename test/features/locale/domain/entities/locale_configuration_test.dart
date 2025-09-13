@@ -50,10 +50,7 @@ void main() {
 
       test('should create configuration from JSON without country code', () {
         // Arrange
-        final json = {
-          'languageCode': 'en',
-          'source': 'userSelected',
-        };
+        final json = {'languageCode': 'en', 'source': 'userSelected'};
 
         // Act
         final configuration = LocaleConfiguration.fromJson(json);

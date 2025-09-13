@@ -11,9 +11,8 @@ import 'package:xp1/features/locale/application/locale_application_service.dart'
 /// - No persistence or complex resolution logic
 class LocaleBootstrapPhase implements BootstrapPhase {
   /// Creates locale bootstrap phase with logger.
-  const LocaleBootstrapPhase({
-    required LoggerService logger,
-  }) : _logger = logger;
+  const LocaleBootstrapPhase({required LoggerService logger})
+    : _logger = logger;
 
   final LoggerService _logger;
 

@@ -24,9 +24,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: fullScreenContainer,
-              );
+              return const Scaffold(body: fullScreenContainer);
             },
           ),
         ),
@@ -47,12 +45,7 @@ void main() {
 
     testWidgets('should render child widget correctly', (tester) async {
       // Arrange: Create atom with specific child
-      const testChild = Column(
-        children: [
-          Text('Title'),
-          Text('Subtitle'),
-        ],
-      );
+      const testChild = Column(children: [Text('Title'), Text('Subtitle')]);
       const fullScreenContainer = FullScreenContainer(child: testChild);
 
       // Act: Pump the widget
@@ -61,9 +54,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: fullScreenContainer,
-              );
+              return const Scaffold(body: fullScreenContainer);
             },
           ),
         ),
@@ -85,11 +76,7 @@ void main() {
 
       // Act: Pump widget without ScreenUtil initialization
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: fullScreenContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: fullScreenContainer)),
       );
 
       // Assert: Should not crash and should render content
@@ -101,12 +88,8 @@ void main() {
       // Arrange: Create atom with complex child structure
       const complexChild = Stack(
         children: [
-          Positioned.fill(
-            child: ColoredBox(color: Colors.blue),
-          ),
-          Center(
-            child: Text('Centered Text'),
-          ),
+          Positioned.fill(child: ColoredBox(color: Colors.blue)),
+          Center(child: Text('Centered Text')),
         ],
       );
       const fullScreenContainer = FullScreenContainer(child: complexChild);
@@ -117,9 +100,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: fullScreenContainer,
-              );
+              return const Scaffold(body: fullScreenContainer);
             },
           ),
         ),
@@ -133,46 +114,45 @@ void main() {
       expect(find.byType(SizedBox), findsOneWidget);
     });
 
-    testWidgets(
-      'should handle infinite width constraints (line 25 coverage)',
-      (tester) async {
-        // Arrange: Create a scenario with infinite width constraints
-        const fullScreenContainer = FullScreenContainer(
-          child: Text('Infinite Width Test'),
-        );
+    testWidgets('should handle infinite width constraints (line 25 coverage)', (
+      tester,
+    ) async {
+      // Arrange: Create a scenario with infinite width constraints
+      const fullScreenContainer = FullScreenContainer(
+        child: Text('Infinite Width Test'),
+      );
 
-        // Act: Pump widget inside a Column which provides infinite width
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Builder(
-              builder: (context) {
-                ScreenUtil.init(context, designSize: const Size(375, 812));
-                return const Scaffold(
-                  body: Column(
-                    children: [
-                      // Column provides infinite width constraints to children
-                      fullScreenContainer,
-                    ],
-                  ),
-                );
-              },
-            ),
+      // Act: Pump widget inside a Column which provides infinite width
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              ScreenUtil.init(context, designSize: const Size(375, 812));
+              return const Scaffold(
+                body: Column(
+                  children: [
+                    // Column provides infinite width constraints to children
+                    fullScreenContainer,
+                  ],
+                ),
+              );
+            },
           ),
-        );
+        ),
+      );
 
-        // Assert: Widget should handle infinite width and fall back to
-        // MediaQuery
-        expect(find.text('Infinite Width Test'), findsOneWidget);
-        expect(find.byType(SizedBox), findsOneWidget);
+      // Assert: Widget should handle infinite width and fall back to
+      // MediaQuery
+      expect(find.text('Infinite Width Test'), findsOneWidget);
+      expect(find.byType(SizedBox), findsOneWidget);
 
-        final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox));
-        final mediaQuery = MediaQuery.of(
-          tester.element(find.byType(MaterialApp)),
-        );
-        // Should use MediaQuery.of(context).size.width when width is infinite
-        expect(sizedBox.width, equals(mediaQuery.size.width));
-      },
-    );
+      final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox));
+      final mediaQuery = MediaQuery.of(
+        tester.element(find.byType(MaterialApp)),
+      );
+      // Should use MediaQuery.of(context).size.width when width is infinite
+      expect(sizedBox.width, equals(mediaQuery.size.width));
+    });
 
     testWidgets(
       'should handle infinite height constraints (line 28 coverage)',
@@ -215,47 +195,46 @@ void main() {
       },
     );
 
-    testWidgets(
-      'should handle both infinite width and height constraints',
-      (tester) async {
-        // Arrange: Create a scenario with both infinite constraints
-        const fullScreenContainer = FullScreenContainer(
-          child: Text('Both Infinite Test'),
-        );
+    testWidgets('should handle both infinite width and height constraints', (
+      tester,
+    ) async {
+      // Arrange: Create a scenario with both infinite constraints
+      const fullScreenContainer = FullScreenContainer(
+        child: Text('Both Infinite Test'),
+      );
 
-        // Act: Pump widget inside SingleChildScrollView which can provide
-        // infinite constraints
-        await tester.pumpWidget(
-          MaterialApp(
-            home: Builder(
-              builder: (context) {
-                ScreenUtil.init(context, designSize: const Size(375, 812));
-                return const Scaffold(
-                  body: SingleChildScrollView(
-                    child: SingleChildScrollView(
-                      scrollDirection: Axis.horizontal,
-                      child: fullScreenContainer,
-                    ),
+      // Act: Pump widget inside SingleChildScrollView which can provide
+      // infinite constraints
+      await tester.pumpWidget(
+        MaterialApp(
+          home: Builder(
+            builder: (context) {
+              ScreenUtil.init(context, designSize: const Size(375, 812));
+              return const Scaffold(
+                body: SingleChildScrollView(
+                  child: SingleChildScrollView(
+                    scrollDirection: Axis.horizontal,
+                    child: fullScreenContainer,
                   ),
-                );
-              },
-            ),
+                ),
+              );
+            },
           ),
-        );
+        ),
+      );
 
-        // Assert: Widget should handle both infinite constraints
-        expect(find.text('Both Infinite Test'), findsOneWidget);
-        expect(find.byType(SizedBox), findsOneWidget);
+      // Assert: Widget should handle both infinite constraints
+      expect(find.text('Both Infinite Test'), findsOneWidget);
+      expect(find.byType(SizedBox), findsOneWidget);
 
-        final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox));
-        final mediaQuery = MediaQuery.of(
-          tester.element(find.byType(MaterialApp)),
-        );
+      final sizedBox = tester.widget<SizedBox>(find.byType(SizedBox));
+      final mediaQuery = MediaQuery.of(
+        tester.element(find.byType(MaterialApp)),
+      );
 
-        // Should use MediaQuery values when constraints are infinite
-        expect(sizedBox.width, equals(mediaQuery.size.width));
-        expect(sizedBox.height, equals(mediaQuery.size.height));
-      },
-    );
+      // Should use MediaQuery values when constraints are infinite
+      expect(sizedBox.width, equals(mediaQuery.size.width));
+      expect(sizedBox.height, equals(mediaQuery.size.height));
+    });
   });
 }

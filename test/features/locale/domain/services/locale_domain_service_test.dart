@@ -118,25 +118,22 @@ void main() {
         },
       );
 
-      test(
-        'should include supported locales list in exception message',
-        () {
-          // Arrange
-          const unsupportedLanguageCode = 'invalid';
+      test('should include supported locales list in exception message', () {
+        // Arrange
+        const unsupportedLanguageCode = 'invalid';
 
-          // Act & Assert
-          try {
-            localeDomainService.updateUserLocale(unsupportedLanguageCode);
-            fail('Expected UnsupportedLocaleException');
-          } on UnsupportedLocaleException catch (e) {
-            expect(e, isA<UnsupportedLocaleException>());
-            expect(e.message, contains(unsupportedLanguageCode));
-            expect(e.message, contains('Supported locales:'));
-            expect(e.message, contains('en'));
-            expect(e.message, contains('vi'));
-          }
-        },
-      );
+        // Act & Assert
+        try {
+          localeDomainService.updateUserLocale(unsupportedLanguageCode);
+          fail('Expected UnsupportedLocaleException');
+        } on UnsupportedLocaleException catch (e) {
+          expect(e, isA<UnsupportedLocaleException>());
+          expect(e.message, contains(unsupportedLanguageCode));
+          expect(e.message, contains('Supported locales:'));
+          expect(e.message, contains('en'));
+          expect(e.message, contains('vi'));
+        }
+      });
 
       test('should be synchronous operation', () {
         // Act & Assert - should complete immediately without await

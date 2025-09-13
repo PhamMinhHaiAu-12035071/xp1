@@ -136,11 +136,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
       },
       (tokenEntity) {
         // Token refreshed successfully, maintain authenticated state
-        emit(
-          state.copyWith(
-            authStatus: AuthenticationStatus.authenticated,
-          ),
-        );
+        emit(state.copyWith(authStatus: AuthenticationStatus.authenticated));
         // Continue monitoring after successful refresh
       },
     );
@@ -187,11 +183,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         if (tokenEntity.accessToken.isNotEmpty &&
             tokenEntity.refreshToken.isNotEmpty) {
           // User is authenticated with valid tokens
-          emit(
-            state.copyWith(
-              authStatus: AuthenticationStatus.authenticated,
-            ),
-          );
+          emit(state.copyWith(authStatus: AuthenticationStatus.authenticated));
         } else {
           // Invalid token structure - treat as unauthenticated
           emit(
@@ -209,10 +201,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   /// Handles username field change event for real-time validation
-  void _onUsernameChanged(
-    UsernameChanged event,
-    Emitter<AuthState> emit,
-  ) {
+  void _onUsernameChanged(UsernameChanged event, Emitter<AuthState> emit) {
     final username = Username.dirty(value: event.username);
     emit(
       state.copyWith(
@@ -226,10 +215,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
   }
 
   /// Handles password field change event for real-time validation
-  void _onPasswordChanged(
-    PasswordChanged event,
-    Emitter<AuthState> emit,
-  ) {
+  void _onPasswordChanged(PasswordChanged event, Emitter<AuthState> emit) {
     final password = Password.dirty(value: event.password);
     emit(
       state.copyWith(
@@ -251,12 +237,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     final username = Username.dirty(value: state.username.value);
     final password = Password.dirty(value: state.password.value);
 
-    emit(
-      state.copyWith(
-        username: username,
-        password: password,
-      ),
-    );
+    emit(state.copyWith(username: username, password: password));
 
     // Only proceed with login if form is valid
     if (state.isFormValid) {
@@ -296,10 +277,6 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     await _authRepository.logout();
 
     // Reset to initial state
-    emit(
-      const AuthState(
-        authStatus: AuthenticationStatus.unauthenticated,
-      ),
-    );
+    emit(const AuthState(authStatus: AuthenticationStatus.unauthenticated));
   }
 }

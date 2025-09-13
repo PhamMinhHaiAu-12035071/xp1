@@ -18,11 +18,7 @@ void main() {
           designSize: designSize,
           builder: (context) {
             builderCalled = true;
-            return const MaterialApp(
-              home: Scaffold(
-                body: Text('Test Widget'),
-              ),
-            );
+            return const MaterialApp(home: Scaffold(body: Text('Test Widget')));
           },
         ),
       );
@@ -49,9 +45,7 @@ void main() {
             builder: (context) {
               builderCalled = true;
               return const MaterialApp(
-                home: Scaffold(
-                  body: Text('Test Widget'),
-                ),
+                home: Scaffold(body: Text('Test Widget')),
               );
             },
           ),
@@ -168,9 +162,8 @@ void main() {
         await tester.pumpWidget(
           ResponsiveInitializer(
             designSize: const Size(375, 812), // iPhone X
-            builder: (context) => const MaterialApp(
-              home: Scaffold(body: Text('iPhone X')),
-            ),
+            builder: (context) =>
+                const MaterialApp(home: Scaffold(body: Text('iPhone X'))),
           ),
         );
 
@@ -183,9 +176,8 @@ void main() {
         await tester.pumpWidget(
           ResponsiveInitializer(
             designSize: const Size(414, 736), // iPhone 8 Plus
-            builder: (context) => const MaterialApp(
-              home: Scaffold(body: Text('iPhone 8 Plus')),
-            ),
+            builder: (context) =>
+                const MaterialApp(home: Scaffold(body: Text('iPhone 8 Plus'))),
           ),
         );
 
@@ -198,9 +190,8 @@ void main() {
         await tester.pumpWidget(
           ResponsiveInitializer(
             designSize: const Size(360, 640), // Android medium
-            builder: (context) => const MaterialApp(
-              home: Scaffold(body: Text('Android Medium')),
-            ),
+            builder: (context) =>
+                const MaterialApp(home: Scaffold(body: Text('Android Medium'))),
           ),
         );
 
@@ -215,9 +206,8 @@ void main() {
         await tester.pumpWidget(
           ResponsiveInitializer(
             designSize: const Size(100, 100), // Very small
-            builder: (context) => const MaterialApp(
-              home: Scaffold(body: Text('Small Design')),
-            ),
+            builder: (context) =>
+                const MaterialApp(home: Scaffold(body: Text('Small Design'))),
           ),
         );
 
@@ -229,9 +219,8 @@ void main() {
         await tester.pumpWidget(
           ResponsiveInitializer(
             designSize: const Size(1920, 1080), // Large desktop
-            builder: (context) => const MaterialApp(
-              home: Scaffold(body: Text('Large Design')),
-            ),
+            builder: (context) =>
+                const MaterialApp(home: Scaffold(body: Text('Large Design'))),
           ),
         );
 
@@ -243,9 +232,8 @@ void main() {
         await tester.pumpWidget(
           ResponsiveInitializer(
             // Should use constraint dimensions when no designSize provided
-            builder: (context) => const MaterialApp(
-              home: Scaffold(body: Text('No Design Size')),
-            ),
+            builder: (context) =>
+                const MaterialApp(home: Scaffold(body: Text('No Design Size'))),
           ),
         );
 

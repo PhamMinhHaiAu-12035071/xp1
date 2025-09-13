@@ -25,9 +25,7 @@ class AppRouter extends RootStackRouter {
   /// Implements Linus's principle: "Never break userspace" by ensuring
   /// smooth authentication flow without breaking existing navigation.
   @override
-  List<AutoRouteGuard> get guards => [
-    AuthGuard(),
-  ];
+  List<AutoRouteGuard> get guards => [AuthGuard()];
 
   @override
   List<AutoRoute> get routes => [
@@ -39,36 +37,18 @@ class AppRouter extends RootStackRouter {
     ),
 
     /// Login Route - No longer initial
-    AutoRoute(
-      page: LoginRoute.page,
-      path: '/${RouteConstants.login}',
-    ),
+    AutoRoute(page: LoginRoute.page, path: '/${RouteConstants.login}'),
 
     /// Main App Routes with Bottom Navigation
     AutoRoute(
       page: MainWrapperRoute.page,
       path: '/${RouteConstants.mainWrapper}',
       children: [
-        AutoRoute(
-          page: HomeRoute.page,
-          path: RouteConstants.home,
-        ),
-        AutoRoute(
-          page: StatisticsRoute.page,
-          path: RouteConstants.statistics,
-        ),
-        AutoRoute(
-          page: AttendanceRoute.page,
-          path: RouteConstants.attendance,
-        ),
-        AutoRoute(
-          page: FeaturesRoute.page,
-          path: RouteConstants.features,
-        ),
-        AutoRoute(
-          page: ProfileRoute.page,
-          path: RouteConstants.profile,
-        ),
+        AutoRoute(page: HomeRoute.page, path: RouteConstants.home),
+        AutoRoute(page: StatisticsRoute.page, path: RouteConstants.statistics),
+        AutoRoute(page: AttendanceRoute.page, path: RouteConstants.attendance),
+        AutoRoute(page: FeaturesRoute.page, path: RouteConstants.features),
+        AutoRoute(page: ProfileRoute.page, path: RouteConstants.profile),
       ],
     ),
   ];

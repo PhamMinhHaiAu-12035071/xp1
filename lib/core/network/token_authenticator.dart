@@ -80,10 +80,7 @@ class TokenAuthenticator extends Authenticator {
 
       // Create retry request with new token
       final retryRequest = request.copyWith(
-        headers: {
-          ...request.headers,
-          'Authorization': 'Bearer $newToken',
-        },
+        headers: {...request.headers, 'Authorization': 'Bearer $newToken'},
       );
 
       // Clean up attempt count on successful token refresh

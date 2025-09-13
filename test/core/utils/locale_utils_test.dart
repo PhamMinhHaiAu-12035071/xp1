@@ -43,10 +43,7 @@ void main() {
         test('should always throw UnsupportedError consistently', () {
           // Multiple calls should consistently throw the same error
           for (var i = 0; i < 5; i++) {
-            expect(
-              getWebLocale,
-              throwsA(isA<UnsupportedError>()),
-            );
+            expect(getWebLocale, throwsA(isA<UnsupportedError>()));
           }
         });
       });
@@ -56,22 +53,16 @@ void main() {
           // Test that the conditional export works correctly
           // The imported getWebLocale should be from the stub implementation
           // when running on non-web platforms (like during testing)
-          expect(
-            getWebLocale,
-            throwsA(isA<UnsupportedError>()),
-          );
+          expect(getWebLocale, throwsA(isA<UnsupportedError>()));
         });
 
         test('should maintain function signature across platforms', () {
           // Ensure the function signature is consistent
           // This tests that getWebLocale returns String type
-          expect(
-            () {
-              final result = getWebLocale();
-              return result;
-            },
-            throwsA(isA<UnsupportedError>()),
-          );
+          expect(() {
+            final result = getWebLocale();
+            return result;
+          }, throwsA(isA<UnsupportedError>()));
         });
       });
 
@@ -79,20 +70,14 @@ void main() {
         test('should handle multiple rapid calls without issues', () {
           // Test that rapid successive calls don't cause issues
           for (var i = 0; i < 100; i++) {
-            expect(
-              getWebLocale,
-              throwsA(isA<UnsupportedError>()),
-            );
+            expect(getWebLocale, throwsA(isA<UnsupportedError>()));
           }
         });
 
         test('should throw same error type for all calls', () {
           // Ensure consistent error type using throwsA matcher
           for (var i = 0; i < 3; i++) {
-            expect(
-              getWebLocale,
-              throwsA(isA<UnsupportedError>()),
-            );
+            expect(getWebLocale, throwsA(isA<UnsupportedError>()));
           }
         });
       });
@@ -165,24 +150,18 @@ void main() {
       group('Documentation and API compliance', () {
         test('should have consistent function signature', () {
           // Test that the function signature matches expected API
-          expect(
-            () {
-              // This should compile and throw, proving correct signature
-              const webLocaleFunction = getWebLocale;
-              return webLocaleFunction();
-            },
-            throwsA(isA<UnsupportedError>()),
-          );
+          expect(() {
+            // This should compile and throw, proving correct signature
+            const webLocaleFunction = getWebLocale;
+            return webLocaleFunction();
+          }, throwsA(isA<UnsupportedError>()));
         });
 
         test('should be callable as a function reference', () {
           // Test that the function can be passed as a reference
           const localeFunction = getWebLocale;
 
-          expect(
-            localeFunction,
-            throwsA(isA<UnsupportedError>()),
-          );
+          expect(localeFunction, throwsA(isA<UnsupportedError>()));
         });
 
         test('should support function composition patterns', () {
@@ -194,10 +173,7 @@ void main() {
           ];
 
           for (final func in localeFunctions) {
-            expect(
-              func,
-              throwsA(isA<UnsupportedError>()),
-            );
+            expect(func, throwsA(isA<UnsupportedError>()));
           }
         });
       });
@@ -209,10 +185,7 @@ void main() {
         // web and non-web platforms, even though we're testing the stub
 
         // On non-web platforms (like test environment), should throw
-        expect(
-          getWebLocale,
-          throwsA(isA<UnsupportedError>()),
-        );
+        expect(getWebLocale, throwsA(isA<UnsupportedError>()));
 
         // Note: On web platforms, the actual implementation would
         // return window.navigator.language.split('-').first

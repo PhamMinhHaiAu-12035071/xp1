@@ -20,9 +20,8 @@ sealed class TokenState with _$TokenState {
   /// Token refresh operation is in progress.
   ///
   /// [refreshToken] - Token being used for refresh
-  const factory TokenState.refreshing({
-    required String refreshToken,
-  }) = TokenRefreshing;
+  const factory TokenState.refreshing({required String refreshToken}) =
+      TokenRefreshing;
 
   /// User is not authenticated.
   const factory TokenState.unauthenticated() = TokenUnauthenticated;
@@ -30,9 +29,8 @@ sealed class TokenState with _$TokenState {
   /// Access token has expired and needs refresh.
   ///
   /// [refreshToken] - Token to use for refresh
-  const factory TokenState.expired({
-    required String refreshToken,
-  }) = TokenExpired;
+  const factory TokenState.expired({required String refreshToken}) =
+      TokenExpired;
 }
 
 /// Extension for token state validation logic.

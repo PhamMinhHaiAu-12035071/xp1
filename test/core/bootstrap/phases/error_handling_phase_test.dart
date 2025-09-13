@@ -88,33 +88,26 @@ void main() {
     },
   );
 
-  test(
-    'execute: when Exception occurs (e.g. logger.info throws), '
-    'must wrap as BootstrapException',
-    () async {
-      // Make first info call throw error to jump into catch
-      when(() => logger.info(any())).thenThrow(Exception('io-failed'));
+  test('execute: when Exception occurs (e.g. logger.info throws), '
+      'must wrap as BootstrapException', () async {
+    // Make first info call throw error to jump into catch
+    when(() => logger.info(any())).thenThrow(Exception('io-failed'));
 
-      expect(
-        () => phase.execute(),
-        throwsA(
-          isA<BootstrapException>()
-              .having(
-                (e) => e.message,
-                'message',
-                'Failed to configure error handling',
-              )
-              .having((e) => e.phase, 'phase', 'Error Handling')
-              .having((e) => e.canRetry, 'canRetry', true)
-              .having(
-                (e) => e.originalError,
-                'originalError',
-                isA<Exception>(),
-              ),
-        ),
-      );
-    },
-  );
+    expect(
+      () => phase.execute(),
+      throwsA(
+        isA<BootstrapException>()
+            .having(
+              (e) => e.message,
+              'message',
+              'Failed to configure error handling',
+            )
+            .having((e) => e.phase, 'phase', 'Error Handling')
+            .having((e) => e.canRetry, 'canRetry', true)
+            .having((e) => e.originalError, 'originalError', isA<Exception>()),
+      ),
+    );
+  });
 
   test('rollback: normally resets onError to null and logs info', () async {
     // Setup first: set any handler
@@ -126,20 +119,17 @@ void main() {
     verify(() => logger.info('✅ Error handling rollback completed')).called(1);
   });
 
-  test(
-    'rollback: when logger.info throws error, must not throw outside '
-    'and must call logger.error',
-    () async {
-      // First info call in rollback throws error to enter catch
-      when(() => logger.info(any())).thenThrow(Exception('io-failed'));
+  test('rollback: when logger.info throws error, must not throw outside '
+      'and must call logger.error', () async {
+    // First info call in rollback throws error to enter catch
+    when(() => logger.info(any())).thenThrow(Exception('io-failed'));
 
-      // Must not throw outside
-      await expectLater(() => phase.rollback(), returnsNormally);
+    // Must not throw outside
+    await expectLater(() => phase.rollback(), returnsNormally);
 
-      // Must log error
-      verify(
-        () => logger.error('Failed to rollback error handling', any<dynamic>()),
-      ).called(1);
-    },
-  );
+    // Must log error
+    verify(
+      () => logger.error('Failed to rollback error handling', any<dynamic>()),
+    ).called(1);
+  });
 }

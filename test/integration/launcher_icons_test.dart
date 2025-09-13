@@ -154,10 +154,7 @@ void main() {
 
         final webIconsDir = Directory('web/icons/');
         if (webIconsDir.existsSync()) {
-          final webIcons = [
-            'Icon-192.png',
-            'Icon-512.png',
-          ];
+          final webIcons = ['Icon-192.png', 'Icon-512.png'];
 
           for (final iconFileName in webIcons) {
             final iconFile = File('${webIconsDir.path}$iconFileName');

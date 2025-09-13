@@ -29,16 +29,14 @@ sealed class AuthEvent with _$AuthEvent {
   /// Username field changed event for real-time validation
   ///
   /// [username] - New username value from form input
-  const factory AuthEvent.usernameChanged({
-    required String username,
-  }) = UsernameChanged;
+  const factory AuthEvent.usernameChanged({required String username}) =
+      UsernameChanged;
 
   /// Password field changed event for real-time validation
   ///
   /// [password] - New password value from form input
-  const factory AuthEvent.passwordChanged({
-    required String password,
-  }) = PasswordChanged;
+  const factory AuthEvent.passwordChanged({required String password}) =
+      PasswordChanged;
 
   /// Form submitted event for validation and submission
   ///

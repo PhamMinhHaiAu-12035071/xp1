@@ -14,11 +14,7 @@ abstract class LocaleModule {
   /// This cubit handles session-only locale management with Vietnamese
   /// default. All operations are synchronous for fast performance.
   @lazySingleton
-  LocaleCubit localeCubit(
-    LocaleDomainService domainService,
-  ) {
-    return LocaleCubit(
-      domainService: domainService,
-    );
+  LocaleCubit localeCubit(LocaleDomainService domainService) {
+    return LocaleCubit(domainService: domainService);
   }
 }

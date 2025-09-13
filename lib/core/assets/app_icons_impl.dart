@@ -84,12 +84,7 @@ class AppIconsImpl implements AppIcons {
       'assets/icons/decorative/login/login_center_logo.svg';
 
   @override
-  List<String> get criticalIcons => [
-    logo,
-    arrowBack,
-    search,
-    menu,
-  ];
+  List<String> get criticalIcons => [logo, arrowBack, search, menu];
 
   @override
   IconSizeConstants get iconSizes => const IconSizeConstants();

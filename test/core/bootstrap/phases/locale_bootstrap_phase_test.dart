@@ -183,16 +183,8 @@ void main() {
                   'message',
                   'Failed to initialize Vietnamese locale system',
                 )
-                .having(
-                  (e) => e.phase,
-                  'phase',
-                  'Locale System',
-                )
-                .having(
-                  (e) => e.canRetry,
-                  'canRetry',
-                  true,
-                ),
+                .having((e) => e.phase, 'phase', 'Locale System')
+                .having((e) => e.canRetry, 'canRetry', true),
           ),
         );
 
@@ -222,46 +214,35 @@ void main() {
                 'message',
                 'Locale service bootstrap error',
               )
-              .having(
-                (e) => e.phase,
-                'phase',
-                'Locale System',
-              ),
+              .having((e) => e.phase, 'phase', 'Locale System'),
         ),
       );
     });
 
-    test(
-      'should throw BootstrapException when LocaleApplicationService not '
-      'registered',
-      () async {
-        // Arrange - don't register the service to trigger the validation error
-        await getIt.reset();
+    test('should throw BootstrapException when LocaleApplicationService not '
+        'registered', () async {
+      // Arrange - don't register the service to trigger the validation error
+      await getIt.reset();
 
-        // Act & Assert - should throw BootstrapException (covers lines 46-49)
-        expect(
-          () => phase.execute(),
-          throwsA(
-            isA<BootstrapException>()
-                .having(
-                  (e) => e.message,
-                  'message',
-                  'LocaleApplicationService not registered in DI container',
-                )
-                .having(
-                  (e) => e.phase,
-                  'phase',
-                  'Locale System',
-                ),
-          ),
-        );
+      // Act & Assert - should throw BootstrapException (covers lines 46-49)
+      expect(
+        () => phase.execute(),
+        throwsA(
+          isA<BootstrapException>()
+              .having(
+                (e) => e.message,
+                'message',
+                'LocaleApplicationService not registered in DI container',
+              )
+              .having((e) => e.phase, 'phase', 'Locale System'),
+        ),
+      );
 
-        // Verify logger was called before the exception
-        verify(
-          () => logger.info('🌐 Initializing Vietnamese locale system...'),
-        ).called(1);
-      },
-    );
+      // Verify logger was called before the exception
+      verify(
+        () => logger.info('🌐 Initializing Vietnamese locale system...'),
+      ).called(1);
+    });
   });
 
   group('rollback', () {

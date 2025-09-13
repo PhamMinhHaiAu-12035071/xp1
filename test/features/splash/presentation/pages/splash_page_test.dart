@@ -58,9 +58,7 @@ void main() {
       registerFallbackValue(FakePageRouteInfo());
       registerFallbackValue(const MainWrapperRoute());
       registerFallbackValue(const LoginRoute());
-      registerFallbackValue(
-        <PageRouteInfo>[const LoginRoute()],
-      );
+      registerFallbackValue(<PageRouteInfo>[const LoginRoute()]);
       registerFallbackValue(BoxFit.cover);
 
       // Setup GetIt mocks for simplified dependencies
@@ -83,9 +81,7 @@ void main() {
           'assets/images/splash/background.png',
           fit: any(named: 'fit'),
         ),
-      ).thenReturn(
-        Image.asset('assets/images/splash/background.png'),
-      );
+      ).thenReturn(Image.asset('assets/images/splash/background.png'));
 
       // Setup cubit mocks
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
@@ -110,9 +106,7 @@ void main() {
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 
@@ -132,9 +126,7 @@ void main() {
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 
@@ -160,9 +152,7 @@ void main() {
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 
@@ -179,9 +169,9 @@ void main() {
       GetIt.instance.registerFactory<SplashCubit>(() => mockSplashCubit);
 
       when(() => mockSplashCubit.state).thenReturn(const SplashState.loading());
-      when(() => mockSplashCubit.stream).thenAnswer(
-        (_) => Stream.fromIterable([const SplashState.loading()]),
-      );
+      when(
+        () => mockSplashCubit.stream,
+      ).thenAnswer((_) => Stream.fromIterable([const SplashState.loading()]));
 
       await tester.pumpWidget(
         StackRouterScope(
@@ -308,9 +298,7 @@ void main() {
       await tester.pumpWidget(
         const ScreenUtilInit(
           designSize: Size(375, 812),
-          child: MaterialApp(
-            home: SplashPage(),
-          ),
+          child: MaterialApp(home: SplashPage()),
         ),
       );
 

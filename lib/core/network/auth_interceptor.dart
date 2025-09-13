@@ -40,10 +40,7 @@ class AuthInterceptor implements Interceptor {
 
       if (token != null) {
         final authenticatedRequest = request.copyWith(
-          headers: {
-            ...request.headers,
-            'Authorization': 'Bearer $token',
-          },
+          headers: {...request.headers, 'Authorization': 'Bearer $token'},
         );
 
         _logger.log(

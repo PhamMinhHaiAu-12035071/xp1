@@ -23,10 +23,7 @@ class _PathAnimationUtils {
   ///
   /// [originalPath] The complete path to animate.
   /// [animationPercent] Progress from 0.0 to 1.0.
-  static Path createAnimatedPath(
-    Path originalPath,
-    double animationPercent,
-  ) {
+  static Path createAnimatedPath(Path originalPath, double animationPercent) {
     // ComputeMetrics can only be iterated once!
     final totalLength = originalPath.computeMetrics().fold<double>(
       0,
@@ -42,10 +39,7 @@ class _PathAnimationUtils {
   ///
   /// [originalPath] The complete path to extract from.
   /// [length] The length to extract up to.
-  static Path _extractPathUntilLength(
-    Path originalPath,
-    double length,
-  ) {
+  static Path _extractPathUntilLength(Path originalPath, double length) {
     var currentLength = 0.0;
     final path = Path();
     final metricsIterator = originalPath.computeMetrics().iterator;
@@ -249,16 +243,12 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
           ),
         );
 
-    _eyeIconScaleAnimation =
-        Tween<double>(
-          begin: 1,
-          end: 0.8,
-        ).animate(
-          CurvedAnimation(
-            parent: _eyeIconAnimationController,
-            curve: Curves.easeInCubic,
-          ),
-        );
+    _eyeIconScaleAnimation = Tween<double>(begin: 1, end: 0.8).animate(
+      CurvedAnimation(
+        parent: _eyeIconAnimationController,
+        curve: Curves.easeInCubic,
+      ),
+    );
 
     // Add listeners
     _usernameFocusNode.addListener(
@@ -286,9 +276,10 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
   /// Creates a border animation with standard configuration.
   Animation<double> _createBorderAnimation(AnimationController controller) {
-    return Tween<double>(begin: 0, end: 1).animate(
-      CurvedAnimation(parent: controller, curve: Curves.easeOut),
-    );
+    return Tween<double>(
+      begin: 0,
+      end: 1,
+    ).animate(CurvedAnimation(parent: controller, curve: Curves.easeOut));
   }
 
   @override
@@ -434,10 +425,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
             blurRadius: 32,
             spreadRadius: 2,
           ),
-          BoxShadow(
-            color: Color(0x1F919EAB),
-            blurRadius: 2,
-          ),
+          BoxShadow(color: Color(0x1F919EAB), blurRadius: 2),
         ],
       ),
       child: iconService.svgIcon(
@@ -585,10 +573,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
           blurRadius: 32,
           spreadRadius: 2,
         ),
-        BoxShadow(
-          color: Color(0x1F919EAB),
-          blurRadius: 2,
-        ),
+        BoxShadow(color: Color(0x1F919EAB), blurRadius: 2),
       ],
     );
   }

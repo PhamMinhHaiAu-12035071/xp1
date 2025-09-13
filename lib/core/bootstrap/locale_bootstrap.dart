@@ -12,9 +12,7 @@ import 'package:xp1/l10n/gen/strings.g.dart';
 /// the ultimate sophistication."
 class LocaleBootstrap {
   /// Creates locale bootstrap with required dependencies.
-  const LocaleBootstrap({
-    required LoggerService logger,
-  }) : _logger = logger;
+  const LocaleBootstrap({required LoggerService logger}) : _logger = logger;
 
   final LoggerService _logger;
 

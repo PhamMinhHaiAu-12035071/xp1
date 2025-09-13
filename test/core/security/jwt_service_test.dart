@@ -191,9 +191,7 @@ void main() {
         final jwtExpiringSoon = 'header.$encodedPayload.signature';
 
         // Act - check with 5 minute threshold
-        final result = jwtService.willTokenExpireSoon(
-          jwtExpiringSoon,
-        );
+        final result = jwtService.willTokenExpireSoon(jwtExpiringSoon);
 
         // Assert
         expect(result, isTrue);
@@ -276,10 +274,7 @@ void main() {
 
       test('should return null for token without exp claim', () {
         // Arrange - create JWT without exp claim
-        final payloadWithoutExp = {
-          'sub': '1234567890',
-          'name': 'John Doe',
-        };
+        final payloadWithoutExp = {'sub': '1234567890', 'name': 'John Doe'};
         final encodedPayload = base64Url.encode(
           utf8.encode(jsonEncode(payloadWithoutExp)),
         );

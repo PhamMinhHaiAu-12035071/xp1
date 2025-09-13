@@ -117,18 +117,12 @@ void main() {
 
         // Assert
         expect(result.isLeft(), isTrue);
-        result.fold(
-          (error) {
-            expect(error, isA<UnsupportedLocaleError>());
-            final unsupportedError = error as UnsupportedLocaleError;
-            expect(unsupportedError.invalidLocaleCode, equals('invalid'));
-            expect(
-              unsupportedError.supportedLocales,
-              containsAll(['en', 'vi']),
-            );
-          },
-          (_) => fail('Expected Left but got Right'),
-        );
+        result.fold((error) {
+          expect(error, isA<UnsupportedLocaleError>());
+          final unsupportedError = error as UnsupportedLocaleError;
+          expect(unsupportedError.invalidLocaleCode, equals('invalid'));
+          expect(unsupportedError.supportedLocales, containsAll(['en', 'vi']));
+        }, (_) => fail('Expected Left but got Right'));
 
         // State should remain unchanged
         expect(

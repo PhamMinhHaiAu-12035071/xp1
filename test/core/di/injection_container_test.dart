@@ -28,10 +28,7 @@ void main() {
     group('configureDependencies', () {
       test('should initialize dependencies successfully', () async {
         // Should complete without throwing
-        expect(
-          configureDependencies,
-          returnsNormally,
-        );
+        expect(configureDependencies, returnsNormally);
 
         // Verify GetIt instance is accessible
         expect(getIt, isA<GetIt>());
@@ -44,10 +41,7 @@ void main() {
 
         // Try to initialize again - this should return early without error
         // due to the duplicate configuration guard using GetIt state checking
-        expect(
-          configureDependencies,
-          returnsNormally,
-        );
+        expect(configureDependencies, returnsNormally);
       });
 
       test(
@@ -107,10 +101,7 @@ void main() {
       final error1 = Exception('Test exception');
       final exception1 = DependencyInjectionException(error1);
       expect(exception1.originalError, equals(error1));
-      expect(
-        exception1.toString(),
-        contains('Exception: Test exception'),
-      );
+      expect(exception1.toString(), contains('Exception: Test exception'));
 
       const error2 = 42;
       const exception2 = DependencyInjectionException(error2);
@@ -200,9 +191,7 @@ void main() {
       );
 
       // Test with String
-      const exception3 = DependencyInjectionException(
-        'Simple string error',
-      );
+      const exception3 = DependencyInjectionException('Simple string error');
       expect(
         exception3.toString(),
         allOf([

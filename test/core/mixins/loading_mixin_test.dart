@@ -59,9 +59,7 @@ void main() {
           home: Builder(
             builder: (context) {
               testContext = context;
-              return const Scaffold(
-                body: Text('Test Widget'),
-              );
+              return const Scaffold(body: Text('Test Widget'));
             },
           ),
         ),
@@ -91,9 +89,7 @@ void main() {
           home: Builder(
             builder: (context) {
               testContext = context;
-              return const Scaffold(
-                body: Text('Test Widget'),
-              );
+              return const Scaffold(body: Text('Test Widget'));
             },
           ),
         ),

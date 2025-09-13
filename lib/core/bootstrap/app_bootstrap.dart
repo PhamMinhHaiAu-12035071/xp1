@@ -33,9 +33,7 @@ class AppBootstrap {
   ///
   /// Phases can be customized for different environments or testing.
   /// Default phases provide production-ready configuration.
-  const AppBootstrap({
-    List<BootstrapPhase>? phases,
-  }) : _customPhases = phases;
+  const AppBootstrap({List<BootstrapPhase>? phases}) : _customPhases = phases;
 
   final List<BootstrapPhase>? _customPhases;
 
@@ -157,10 +155,9 @@ class AppBootstrap {
         final license = await rootBundle.loadString(
           'assets/fonts/google_fonts/OFL.txt',
         );
-        yield LicenseEntryWithLineBreaks(
-          <String>['Google Fonts - Public Sans'],
-          license,
-        );
+        yield LicenseEntryWithLineBreaks(<String>[
+          'Google Fonts - Public Sans',
+        ], license);
       } on Exception catch (e) {
         // Log error but don't fail bootstrap for missing license
         debugPrint('Failed to load Google Fonts license: $e');

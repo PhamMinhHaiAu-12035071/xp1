@@ -28,9 +28,7 @@ void main() {
       build: SplashCubit.new,
       act: (cubit) => cubit.startSplash(),
       wait: const Duration(seconds: 3), // Wait a bit longer than 2 seconds
-      expect: () => [
-        const SplashState.ready(),
-      ],
+      expect: () => [const SplashState.ready()],
       tearDown: () => splashCubit.close(),
     );
 

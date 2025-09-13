@@ -51,16 +51,12 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
     );
 
     // Create keyboard animation
-    _keyboardAnimation =
-        Tween<double>(
-          begin: 0,
-          end: 1,
-        ).animate(
-          CurvedAnimation(
-            parent: _keyboardAnimationController,
-            curve: Curves.easeOutCubic,
-          ),
-        );
+    _keyboardAnimation = Tween<double>(begin: 0, end: 1).animate(
+      CurvedAnimation(
+        parent: _keyboardAnimationController,
+        curve: Curves.easeOutCubic,
+      ),
+    );
 
     // Initialize keyboard visibility controller
     _keyboardVisibilityController = KeyboardVisibilityController();
@@ -193,9 +189,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
           children: [
             // Lớp background phủ toàn màn hình, kể cả status bar
             Positioned.fill(
-              child: Container(
-                color: context.colors.orangeLight,
-              ),
+              child: Container(color: context.colors.orangeLight),
             ),
 
             /// Render SVG Orange Curved with entrance animation
@@ -330,10 +324,7 @@ class _LoginPageState extends State<LoginPage> with TickerProviderStateMixin {
                         Flexible(flex: 36, child: SizedBox.expand()),
 
                         /// Login Form
-                        Expanded(
-                          flex: 511,
-                          child: _LoginFormLayout(),
-                        ),
+                        Expanded(flex: 511, child: _LoginFormLayout()),
                         Flexible(flex: 36, child: SizedBox.expand()),
                       ],
                     ),

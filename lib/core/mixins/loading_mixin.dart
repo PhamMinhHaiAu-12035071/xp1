@@ -34,10 +34,7 @@ mixin LoadingMixin {
   /// [operation] - Future operation to execute
   ///
   /// Returns the result of the operation
-  Future<T> withLoading<T>(
-    BuildContext context,
-    Future<T> operation,
-  ) async {
+  Future<T> withLoading<T>(BuildContext context, Future<T> operation) async {
     try {
       showLoading(context);
       return await operation;

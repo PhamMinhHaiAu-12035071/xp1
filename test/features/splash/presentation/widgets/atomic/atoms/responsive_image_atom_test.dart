@@ -27,9 +27,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: responsiveImage,
-              );
+              return const Scaffold(body: responsiveImage);
             },
           ),
         ),
@@ -59,9 +57,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: responsiveImage,
-              );
+              return const Scaffold(body: responsiveImage);
             },
           ),
         ),
@@ -92,9 +88,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: responsiveImage,
-              );
+              return const Scaffold(body: responsiveImage);
             },
           ),
         ),
@@ -121,9 +115,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: responsiveImage,
-              );
+              return const Scaffold(body: responsiveImage);
             },
           ),
         ),
@@ -150,9 +142,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: responsiveImage,
-              );
+              return const Scaffold(body: responsiveImage);
             },
           ),
         ),

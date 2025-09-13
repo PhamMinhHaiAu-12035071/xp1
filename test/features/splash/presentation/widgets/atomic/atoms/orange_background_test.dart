@@ -26,11 +26,7 @@ void main() {
 
       // Act: Pump the widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: orangeBackground,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: orangeBackground)),
       );
 
       // Assert: Verify the container exists with orange background
@@ -54,11 +50,7 @@ void main() {
       await tester.pumpWidget(
         const MaterialApp(
           home: Scaffold(
-            body: SizedBox(
-              width: 300,
-              height: 200,
-              child: orangeBackground,
-            ),
+            body: SizedBox(width: 300, height: 200, child: orangeBackground),
           ),
         ),
       );
@@ -79,11 +71,7 @@ void main() {
 
       // Act: Pump the widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: orangeBackground,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: orangeBackground)),
       );
 
       // Assert: Verify child is rendered

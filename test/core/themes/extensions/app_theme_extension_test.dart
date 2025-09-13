@@ -114,40 +114,39 @@ void main() {
     });
 
     group('all extension methods together', () {
-      testWidgets(
-        'should provide access to all services through context',
-        (tester) async {
-          // Arrange
-          GetIt.I
-            ..registerSingleton<AppSizes>(testAppSizes)
-            ..registerSingleton<AppColors>(testAppColors)
-            ..registerSingleton<AppTextStyles>(testAppTextStyles)
-            ..registerSingleton<AppImages>(testAppImages);
+      testWidgets('should provide access to all services through context', (
+        tester,
+      ) async {
+        // Arrange
+        GetIt.I
+          ..registerSingleton<AppSizes>(testAppSizes)
+          ..registerSingleton<AppColors>(testAppColors)
+          ..registerSingleton<AppTextStyles>(testAppTextStyles)
+          ..registerSingleton<AppImages>(testAppImages);
 
-          // Act & Assert
-          await tester.pumpWidget(
-            MaterialApp(
-              home: Builder(
-                builder: (context) {
-                  // Test all extension methods are accessible
-                  expect(context.sizes, isA<AppSizes>());
-                  expect(context.colors, isA<AppColors>());
-                  expect(context.textStyles, isA<AppTextStyles>());
-                  expect(context.images, isA<AppImages>());
+        // Act & Assert
+        await tester.pumpWidget(
+          MaterialApp(
+            home: Builder(
+              builder: (context) {
+                // Test all extension methods are accessible
+                expect(context.sizes, isA<AppSizes>());
+                expect(context.colors, isA<AppColors>());
+                expect(context.textStyles, isA<AppTextStyles>());
+                expect(context.images, isA<AppImages>());
 
-                  // Test that they return the correct instances
-                  expect(context.sizes, equals(testAppSizes));
-                  expect(context.colors, equals(testAppColors));
-                  expect(context.textStyles, equals(testAppTextStyles));
-                  expect(context.images, equals(testAppImages));
+                // Test that they return the correct instances
+                expect(context.sizes, equals(testAppSizes));
+                expect(context.colors, equals(testAppColors));
+                expect(context.textStyles, equals(testAppTextStyles));
+                expect(context.images, equals(testAppImages));
 
-                  return Container();
-                },
-              ),
+                return Container();
+              },
             ),
-          );
-        },
-      );
+          ),
+        );
+      });
     });
 
     group('extension method coverage', () {

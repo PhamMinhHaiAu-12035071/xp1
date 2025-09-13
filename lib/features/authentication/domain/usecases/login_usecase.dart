@@ -31,9 +31,7 @@ sealed class LoginResult with _$LoginResult {
   /// Creates a LoginResult with authentication data
   ///
   /// [token] - JWT tokens for API authentication
-  const factory LoginResult({
-    required TokenEntity token,
-  }) = _LoginResult;
+  const factory LoginResult({required TokenEntity token}) = _LoginResult;
 }
 
 /// Use case for user authentication via login credentials

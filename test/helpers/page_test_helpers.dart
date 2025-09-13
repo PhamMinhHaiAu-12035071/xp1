@@ -81,13 +81,10 @@ class PageTestHelpers {
           expect(find.byType(AppBar), findsOneWidget);
         });
       } else {
-        testWidgets(
-          'should render without AppBar by default',
-          (tester) async {
-            await tester.pumpApp(page);
-            expect(find.byType(AppBar), findsNothing);
-          },
-        );
+        testWidgets('should render without AppBar by default', (tester) async {
+          await tester.pumpApp(page);
+          expect(find.byType(AppBar), findsNothing);
+        });
       }
 
       testWidgets('should have correct widget structure', (tester) async {
@@ -252,10 +249,7 @@ class PageTestHelpers {
     testWidgetConstructors<T>(createWidget, T);
 
     // Test key support
-    testWidgetWithKey<T>(
-      createWidgetWithKey,
-      const Key('test_key'),
-    );
+    testWidgetWithKey<T>(createWidgetWithKey, const Key('test_key'));
   }
 
   /// Enhanced standard page testing with navigation and environment setup.

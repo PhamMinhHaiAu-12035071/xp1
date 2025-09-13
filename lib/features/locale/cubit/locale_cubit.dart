@@ -14,10 +14,9 @@ import 'package:xp1/l10n/gen/strings.g.dart';
 /// - Delegates business logic to LocaleDomainService
 class LocaleCubit extends Cubit<LocaleConfiguration> {
   /// Creates a LocaleCubit with domain service dependency.
-  LocaleCubit({
-    required LocaleDomainService domainService,
-  }) : _domainService = domainService,
-       super(LocaleConfigurationExtension.defaultFallback());
+  LocaleCubit({required LocaleDomainService domainService})
+    : _domainService = domainService,
+      super(LocaleConfigurationExtension.defaultFallback());
 
   final LocaleDomainService _domainService;
 

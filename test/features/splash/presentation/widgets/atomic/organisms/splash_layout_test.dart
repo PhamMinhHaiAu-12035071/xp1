@@ -34,9 +34,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -63,9 +61,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -84,9 +80,7 @@ void main() {
       expect(decoration.color, equals(appColors.orangeNormal));
     });
 
-    testWidgets('should display background image', (
-      tester,
-    ) async {
+    testWidgets('should display background image', (tester) async {
       // Arrange: Create the organism
       const splashLayout = SplashLayout();
 
@@ -96,9 +90,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -124,9 +116,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -157,9 +147,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -191,9 +179,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -223,9 +209,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: splashLayout,
-              );
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),
@@ -266,13 +250,8 @@ void main() {
         MaterialApp(
           home: Builder(
             builder: (context) {
-              ScreenUtil.init(
-                context,
-                designSize: ipadSize,
-              );
-              return const Scaffold(
-                body: splashLayout,
-              );
+              ScreenUtil.init(context, designSize: ipadSize);
+              return const Scaffold(body: splashLayout);
             },
           ),
         ),

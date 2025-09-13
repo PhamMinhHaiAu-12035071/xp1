@@ -188,18 +188,14 @@ class _LoginCarouselState extends State<LoginCarousel>
           SizedBox(height: context.sizes.r8),
           Text(
             'Image unavailable',
-            style: context.textStyles.bodySmall(
-              color: context.colors.greyDark,
-            ),
+            style: context.textStyles.bodySmall(color: context.colors.greyDark),
             textAlign: TextAlign.center,
           ),
           if (kDebugMode) ...[
             SizedBox(height: context.sizes.r4),
             Text(
               'Debug: $error',
-              style: context.textStyles.caption(
-                color: context.colors.error,
-              ),
+              style: context.textStyles.caption(color: context.colors.error),
               textAlign: TextAlign.center,
               maxLines: 2,
               overflow: TextOverflow.ellipsis,
@@ -218,9 +214,7 @@ class _LoginCarouselState extends State<LoginCarousel>
       child: Container(
         decoration: BoxDecoration(
           color: context.colors.greyLight,
-          borderRadius: BorderRadius.circular(
-            context.sizes.borderRadiusMd,
-          ),
+          borderRadius: BorderRadius.circular(context.sizes.borderRadiusMd),
         ),
         child: Center(
           child: Column(
@@ -269,10 +263,8 @@ class _LoginCarouselState extends State<LoginCarousel>
           child: SizedBox(
             width: double.infinity,
             child: GestureDetector(
-              onTap: () => widget.onImageTap?.call(
-                _currentIndex,
-                images[_currentIndex],
-              ),
+              onTap: () =>
+                  widget.onImageTap?.call(_currentIndex, images[_currentIndex]),
               // Add swipe gesture support for fade animation
               onPanEnd: (details) {
                 if (_isTransitioning) return;
@@ -293,9 +285,7 @@ class _LoginCarouselState extends State<LoginCarousel>
               child: FadeTransition(
                 opacity: _fadeAnimation,
                 child: Container(
-                  margin: EdgeInsets.symmetric(
-                    horizontal: context.sizes.r8,
-                  ),
+                  margin: EdgeInsets.symmetric(horizontal: context.sizes.r8),
                   child: ClipRRect(
                     borderRadius: BorderRadius.circular(
                       context.sizes.borderRadiusMd,

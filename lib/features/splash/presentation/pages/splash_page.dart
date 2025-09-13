@@ -27,9 +27,7 @@ class SplashPage extends StatelessWidget {
         BlocProvider(
           create: (context) => GetIt.instance<SplashCubit>()..startSplash(),
         ),
-        BlocProvider(
-          create: (context) => GetIt.instance<AuthBloc>(),
-        ),
+        BlocProvider(create: (context) => GetIt.instance<AuthBloc>()),
       ],
       child: MultiBlocListener(
         listeners: [

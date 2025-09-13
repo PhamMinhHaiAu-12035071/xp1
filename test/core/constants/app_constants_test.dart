@@ -103,34 +103,28 @@ void main() {
         },
       );
 
-      test(
-        'widget test timeout should be reasonable for UI testing',
-        () {
-          // Arrange
-          const widgetTimeout = TestConstants.widgetTestTimeout;
-          const frameInterval = TestConstants.framePumpInterval;
+      test('widget test timeout should be reasonable for UI testing', () {
+        // Arrange
+        const widgetTimeout = TestConstants.widgetTestTimeout;
+        const frameInterval = TestConstants.framePumpInterval;
 
-          // Assert
-          expect(
-            widgetTimeout.inMilliseconds,
-            greaterThan(frameInterval.inMilliseconds),
-          );
-          // Not too long for UI testing
-          expect(widgetTimeout.inSeconds, lessThanOrEqualTo(10));
-        },
-      );
+        // Assert
+        expect(
+          widgetTimeout.inMilliseconds,
+          greaterThan(frameInterval.inMilliseconds),
+        );
+        // Not too long for UI testing
+        expect(widgetTimeout.inSeconds, lessThanOrEqualTo(10));
+      });
 
-      test(
-        'locale initialization should complete within reasonable time',
-        () {
-          // Arrange
-          const localeTimeout = LocaleConstants.initializationTimeout;
+      test('locale initialization should complete within reasonable time', () {
+        // Arrange
+        const localeTimeout = LocaleConstants.initializationTimeout;
 
-          // Assert
-          expect(localeTimeout.inSeconds, greaterThan(0));
-          expect(localeTimeout.inSeconds, lessThanOrEqualTo(5)); // Reasonable
-        },
-      );
+        // Assert
+        expect(localeTimeout.inSeconds, greaterThan(0));
+        expect(localeTimeout.inSeconds, lessThanOrEqualTo(5)); // Reasonable
+      });
     });
   });
 }

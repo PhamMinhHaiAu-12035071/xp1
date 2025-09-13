@@ -36,6 +36,11 @@ local-ci: test-scripts semantic-check flutter-ci
 	@echo "🎉 Complete local CI pipeline finished!"
 	@echo "✅ All checks equivalent to GitHub Actions passed!"
 
+# Optimized CI for pre-push (faster, lighter)
+pre-push-ci: format analyze test license-check
+	@echo "🚀 Optimized pre-push CI completed!"
+	@echo "✅ Quick checks passed - ready for push!"
+
 # Quick development commands
 check:
 	@echo "✅ Quick development check..."

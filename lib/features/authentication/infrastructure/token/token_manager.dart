@@ -82,9 +82,7 @@ class TokenManager {
       final storedRefreshToken = await _storageService.getRefreshToken();
 
       _updateState(
-        TokenState.refreshing(
-          refreshToken: storedRefreshToken ?? '',
-        ),
+        TokenState.refreshing(refreshToken: storedRefreshToken ?? ''),
       );
 
       if (storedRefreshToken == null || storedRefreshToken.isEmpty) {

@@ -9,18 +9,14 @@ abstract class AppTheme {
   /// Initialize dark mode theme
   static ThemeData darkTheme([ThemeData? data]) => _buildAppTheme(
     themeData: data,
-    extensions: [
-      AppColorExtension.dark(),
-    ],
+    extensions: [AppColorExtension.dark()],
     brightness: Brightness.dark,
   );
 
   /// Initialize light mode theme
   static ThemeData lightTheme([ThemeData? data]) => _buildAppTheme(
     themeData: data,
-    extensions: [
-      AppColorExtension.light(),
-    ],
+    extensions: [AppColorExtension.light()],
     brightness: Brightness.light,
   );
 
@@ -30,14 +26,9 @@ abstract class AppTheme {
     required Brightness brightness,
     ThemeData? themeData,
   }) {
-    final defaultTheme = ThemeData(
-      brightness: brightness,
-      useMaterial3: true,
-    );
+    final defaultTheme = ThemeData(brightness: brightness, useMaterial3: true);
 
-    final theme = (themeData ?? defaultTheme).copyWith(
-      extensions: extensions,
-    );
+    final theme = (themeData ?? defaultTheme).copyWith(extensions: extensions);
 
     return theme;
   }

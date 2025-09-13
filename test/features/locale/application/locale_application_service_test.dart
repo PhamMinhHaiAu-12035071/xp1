@@ -56,10 +56,7 @@ void main() {
         expect(result, equals(expectedConfig));
         verify(() => mockDomainService.updateUserLocale('en')).called(1);
         verify(
-          () => mockLogger.log(
-            '🌐 Switching locale to en',
-            LogLevel.info,
-          ),
+          () => mockLogger.log('🌐 Switching locale to en', LogLevel.info),
         ).called(1);
         verify(
           () => mockLogger.log(
@@ -86,10 +83,7 @@ void main() {
         expect(result, equals(expectedConfig));
         verify(() => mockDomainService.updateUserLocale('vi')).called(1);
         verify(
-          () => mockLogger.log(
-            '🌐 Switching locale to vi',
-            LogLevel.info,
-          ),
+          () => mockLogger.log('🌐 Switching locale to vi', LogLevel.info),
         ).called(1);
       });
 
@@ -129,10 +123,7 @@ void main() {
 
         // Assert - Verify logging sequence
         verifyInOrder([
-          () => mockLogger.log(
-            '🌐 Switching locale to en',
-            LogLevel.info,
-          ),
+          () => mockLogger.log('🌐 Switching locale to en', LogLevel.info),
           () => mockLogger.log(
             '✅ Session locale switch completed',
             LogLevel.info,
@@ -554,10 +545,7 @@ void main() {
 
         // Verify error was logged
         verify(
-          () => mockLogger.log(
-            any(that: contains('failed')),
-            LogLevel.warning,
-          ),
+          () => mockLogger.log(any(that: contains('failed')), LogLevel.warning),
         ).called(1);
       });
     });

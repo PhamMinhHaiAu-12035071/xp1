@@ -20,9 +20,7 @@ class OrangeBackground extends StatelessWidget {
     return Container(
       width: double.infinity,
       height: double.infinity,
-      decoration: BoxDecoration(
-        color: context.colors.orangeNormal,
-      ),
+      decoration: BoxDecoration(color: context.colors.orangeNormal),
       child: child,
     );
   }

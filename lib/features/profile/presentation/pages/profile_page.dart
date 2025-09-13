@@ -12,9 +12,7 @@ class ProfilePage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        title: Text(t.pages.profile.title),
-      ),
+      appBar: AppBar(title: Text(t.pages.profile.title)),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

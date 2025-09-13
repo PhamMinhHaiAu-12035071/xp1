@@ -31,9 +31,7 @@ class LoadingOverlay {
           color: Colors.transparent,
           child: Padding(
             padding: EdgeInsets.all(20),
-            child: SpinKitFadingCircle(
-              color: Colors.amber,
-            ),
+            child: SpinKitFadingCircle(color: Colors.amber),
           ),
         ),
       ),

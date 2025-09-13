@@ -37,11 +37,7 @@ void main() {
 
       // Act: Pump the widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: immersiveContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: immersiveContainer)),
       );
 
       // Assert: Verify SystemChrome.setEnabledSystemUIMode was called
@@ -72,11 +68,7 @@ void main() {
 
       // Act: Pump the widget then remove it
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: immersiveContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: immersiveContainer)),
       );
 
       // Clear previous method calls to focus on disposal
@@ -84,11 +76,7 @@ void main() {
 
       // Remove the widget to trigger disposal
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Text('Other Content'),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: Text('Other Content'))),
       );
 
       // Assert: Verify SystemChrome.setEnabledSystemUIMode was called to
@@ -109,23 +97,13 @@ void main() {
     testWidgets('should render child widget correctly', (tester) async {
       // Arrange: Create molecule with complex child
       const complexChild = Column(
-        children: [
-          Text('Title'),
-          Text('Subtitle'),
-          Icon(Icons.star),
-        ],
+        children: [Text('Title'), Text('Subtitle'), Icon(Icons.star)],
       );
-      const immersiveContainer = ImmersiveSystemContainer(
-        child: complexChild,
-      );
+      const immersiveContainer = ImmersiveSystemContainer(child: complexChild);
 
       // Act: Pump the widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: immersiveContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: immersiveContainer)),
       );
 
       // Assert: Verify all child content is rendered
@@ -143,11 +121,7 @@ void main() {
 
       // Act: Pump initial widget
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: initialContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: initialContainer)),
       );
 
       // Update to new content
@@ -156,11 +130,7 @@ void main() {
       );
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: updatedContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: updatedContainer)),
       );
 
       // Assert: Verify updated content is rendered
@@ -179,19 +149,11 @@ void main() {
 
       // Act: Pump widget, remove it, and pump again
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: immersiveContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: immersiveContainer)),
       );
 
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: Text('Other'),
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: Text('Other'))),
       );
 
       // Clear method calls from previous operations
@@ -199,11 +161,7 @@ void main() {
 
       // Pump the immersive container again
       await tester.pumpWidget(
-        const MaterialApp(
-          home: Scaffold(
-            body: immersiveContainer,
-          ),
-        ),
+        const MaterialApp(home: Scaffold(body: immersiveContainer)),
       );
 
       // Assert: Should set immersive mode again

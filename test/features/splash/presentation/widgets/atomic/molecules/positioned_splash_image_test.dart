@@ -27,9 +27,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: positionedImage,
-              );
+              return const Scaffold(body: positionedImage);
             },
           ),
         ),
@@ -62,9 +60,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: positionedImage,
-              );
+              return const Scaffold(body: positionedImage);
             },
           ),
         ),
@@ -95,9 +91,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: positionedImage,
-              );
+              return const Scaffold(body: positionedImage);
             },
           ),
         ),
@@ -127,9 +121,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: positionedImage,
-              );
+              return const Scaffold(body: positionedImage);
             },
           ),
         ),
@@ -157,9 +149,7 @@ void main() {
           home: Builder(
             builder: (context) {
               ScreenUtil.init(context, designSize: const Size(375, 812));
-              return const Scaffold(
-                body: positionedImage,
-              );
+              return const Scaffold(body: positionedImage);
             },
           ),
         ),
@@ -192,13 +182,8 @@ void main() {
             MaterialApp(
               home: Builder(
                 builder: (context) {
-                  ScreenUtil.init(
-                    context,
-                    designSize: const Size(375, 812),
-                  );
-                  return const Scaffold(
-                    body: positionedImage,
-                  );
+                  ScreenUtil.init(context, designSize: const Size(375, 812));
+                  return const Scaffold(body: positionedImage);
                 },
               ),
             ),
@@ -263,13 +248,8 @@ void main() {
               MaterialApp(
                 home: Builder(
                   builder: (context) {
-                    ScreenUtil.init(
-                      context,
-                      designSize: testCase.screenSize,
-                    );
-                    return const Scaffold(
-                      body: positionedImage,
-                    );
+                    ScreenUtil.init(context, designSize: testCase.screenSize);
+                    return const Scaffold(body: positionedImage);
                   },
                 ),
               ),
@@ -324,9 +304,7 @@ void main() {
               home: Builder(
                 builder: (context) {
                   ScreenUtil.init(context, designSize: const Size(375, 812));
-                  return const Scaffold(
-                    body: positionedImage,
-                  );
+                  return const Scaffold(body: positionedImage);
                 },
               ),
             ),
@@ -363,9 +341,7 @@ void main() {
                 builder: (context) {
                   // Use exact design size for precise calculation
                   ScreenUtil.init(context, designSize: const Size(393, 812));
-                  return const Scaffold(
-                    body: positionedImage,
-                  );
+                  return const Scaffold(body: positionedImage);
                 },
               ),
             ),

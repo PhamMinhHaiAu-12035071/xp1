@@ -78,14 +78,8 @@ void main() {
       });
 
       test('should have consistent naming convention', () {
-        expect(
-          EnvDev.environmentName.toLowerCase(),
-          equals('development'),
-        );
-        expect(
-          EnvDev.appName.toLowerCase(),
-          contains('development'),
-        );
+        expect(EnvDev.environmentName.toLowerCase(), equals('development'));
+        expect(EnvDev.appName.toLowerCase(), contains('development'));
       });
     });
 

@@ -10,9 +10,7 @@ class LoggerService implements ILoggerService {
   /// Factory constructor with immediate logger creation.
   ///
   /// [isDevelopment] enables detailed logging if true. Defaults to kDebugMode.
-  factory LoggerService({
-    bool? isDevelopment,
-  }) {
+  factory LoggerService({bool? isDevelopment}) {
     final devMode = isDevelopment ?? kDebugMode;
     _instance ??= LoggerService._internal(_createLogger(devMode));
     return _instance!;
