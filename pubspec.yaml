@@ -23,7 +23,7 @@ dependencies:
   envied: ^1.2.0 # Secure environment variable management
 
   # === FUNCTIONAL PROGRAMMING ===
-  equatable: ^2.0.5 # Value equality for immutable objects
+  equatable: ^2.0.7 # Value equality for immutable objects
 
   # === CORE FRAMEWORK ===
   flutter:

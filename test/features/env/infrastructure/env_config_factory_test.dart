@@ -14,7 +14,7 @@ void main() {
       final apiUrl = EnvConfigFactory.getApiUrlForEnvironment(
         const Development(),
       );
-      expect(apiUrl, contains('dev-api.px1.vn'));
+      expect(apiUrl, contains('api-dev.px1.vn'));
     });
 
     test('should return valid API URL for staging', () {
