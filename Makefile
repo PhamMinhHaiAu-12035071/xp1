@@ -11,7 +11,7 @@ else
   FLUTTER_CMD = flutter
 endif
 
-.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod i18n-generate i18n-watch i18n-analyze i18n-validate i18n-clean i18n-help deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
+.PHONY: semantic-check flutter-ci spell-check test-scripts local-ci check check-strict check-all format format-check analyze analyze-quick analyze-strict validate-deps test test-coverage coverage coverage-html coverage-open coverage-clean coverage-report build-android build-ios build-web build-dev build-staging build-prod generate-env-dev generate-env-staging generate-env-prod generate-icons i18n-generate i18n-watch i18n-analyze i18n-validate i18n-clean i18n-help deps clean reset pre-commit setup setup-full hooks-install hooks-uninstall test-commit-validation install-dev install-staging install-prod install-all run-dev run-staging run-prod help license-check license-audit license-report license-validate-main license-validate-dev license-ci license-quick license-override license-clean-check license-help check-very-good-cli naming-check naming-fix naming-docs
 
 # GitHub Actions equivalent commands
 semantic-check:
@@ -195,6 +195,12 @@ generate-env-prod:
 	@echo "🏗️ Generating production environment..."
 	@$(DART_CMD) run build_runner clean
 	@$(DART_CMD) run build_runner build --define=envied_generator:envied=path=lib/features/env/production.env --delete-conflicting-outputs
+
+# App icon generation commands
+generate-icons:
+	@echo "🎨 Generating app icons..."
+	@$(FLUTTER_CMD) pub run flutter_launcher_icons
+	@echo "✅ Icons generated successfully"
 
 # Internationalization (i18n) commands using Slang
 i18n-generate:
@@ -535,6 +541,9 @@ help:
 	@echo "  make generate-env-dev     - Generate development environment"
 	@echo "  make generate-env-staging - Generate staging environment"
 	@echo "  make generate-env-prod    - Generate production environment"
+	@echo ""
+	@echo "🎨 App Icon Generation:"
+	@echo "  make generate-icons       - Generate app icons for all platforms"
 	@echo ""
 	@echo "🌐 Internationalization (i18n) with Slang:"
 	@echo "  make i18n-generate        - Generate slang translations from JSON files"
