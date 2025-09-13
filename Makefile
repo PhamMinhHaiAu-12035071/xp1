@@ -103,7 +103,7 @@ analyze:
 
 analyze-quick:
 	@echo "⚡ Quick analysis..."
-	@$(DART_CMD) analyze --fatal-warnings
+	@$(DART_CMD) analyze --fatal-infos --no-fatal-warnings
 
 analyze-strict:
 	@echo "🔍 Strict analysis..."
