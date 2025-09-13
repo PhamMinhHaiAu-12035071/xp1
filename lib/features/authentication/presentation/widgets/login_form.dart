@@ -4,9 +4,11 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:formz/formz.dart';
 import 'package:xp1/core/constants/design_constants.dart';
 import 'package:xp1/core/routing/app_router.dart';
 import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
+import 'package:xp1/core/widgets/loading_overlay.dart';
 import 'package:xp1/features/authentication/application/blocs/auth_bloc.dart';
 import 'package:xp1/features/authentication/application/blocs/auth_event.dart';
 import 'package:xp1/features/authentication/application/blocs/auth_state.dart';
@@ -202,7 +204,6 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   final _passwordFocusNode = FocusNode();
 
   bool _obscurePassword = true;
-  bool _isLoading = false;
   bool _hasSubmitted = false;
   bool _hasShownErrorDialog = false;
   late AnimationController _usernameBorderAnimationController;
@@ -504,6 +505,20 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
     );
   }
 
+  /// Safely hides the loading overlay with error handling.
+  ///
+  /// This method ensures that the loading overlay is properly hidden
+  /// and handles edge cases where the overlay might not be showing.
+  void _safeHideLoading() {
+    if (LoadingOverlay.isShowing) {
+      final success = LoadingOverlay.hide(context);
+      if (!success) {
+        // If normal hide failed, try force hide as fallback
+        LoadingOverlay.forceHide(context);
+      }
+    }
+  }
+
   /// Handles password visibility toggle with smooth fade animation.
   void _togglePasswordVisibility() {
     // Start fade out animation
@@ -615,7 +630,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   }
 
   /// Builds a unified animated input field with consistent styling.
-  Widget _buildAnimatedField(_FieldConfig config) {
+  Widget _buildAnimatedField(_FieldConfig config, {required bool isLoading}) {
     return Container(
       height: context.sizes.r48,
       decoration: _createFieldDecoration(),
@@ -638,7 +653,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
               TextFormField(
                 controller: config.controller,
                 focusNode: config.focusNode,
-                enabled: !_isLoading,
+                enabled: !isLoading,
                 obscureText: config.obscureText,
                 keyboardType: config.keyboardType,
                 textInputAction: config.textInputAction,
@@ -703,22 +718,31 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       listener: (context, state) {
         switch (state.authStatus) {
           case AuthenticationStatus.initial:
-            // No action needed for initial state
-            break;
+          // No action needed for initial state
           case AuthenticationStatus.loading:
-            break;
-          // No action needed, handled by BlocBuilder
+            // Only show loading overlay during actual login, not auth check
+            if (state.status == FormzSubmissionStatus.inProgress) {
+              LoadingOverlay.show(context);
+            }
           case AuthenticationStatus.authenticated:
-            // Navigate to main app area on successful authentication
-            context.router.replaceAll([const MainWrapperRoute()]);
+            // Hide loading overlay and navigate to main app area
+            // Only navigate if we're on login page (not splash)
+            _safeHideLoading();
+            if (context.router.current.name == LoginRoute.name) {
+              context.router.replaceAll([const MainWrapperRoute()]);
+            }
           case AuthenticationStatus.unauthenticated:
-            // No action needed for unauthenticated state
-            break;
-          // No action needed for unauthenticated state
+            // Hide loading overlay on unauthenticated state
+            _safeHideLoading();
           case AuthenticationStatus.error:
+            // Hide loading overlay on error
+            _safeHideLoading();
             // Only show error dialog if it hasn't been shown yet for this error
             // and only when form has been submitted (not during field input)
-            if (!_hasShownErrorDialog && _hasSubmitted) {
+            // and only if we're on login page (not splash)
+            if (!_hasShownErrorDialog &&
+                _hasSubmitted &&
+                context.router.current.name == LoginRoute.name) {
               setState(() {
                 _hasShownErrorDialog = true;
               });
@@ -731,10 +755,10 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
       },
       child: BlocBuilder<AuthBloc, AuthState>(
         builder: (context, state) {
-          // Update loading state based on AuthBloc state
+          // Only show loading during actual login submission, not auth check
           final isLoading =
-              state.authStatus == AuthenticationStatus.loading ||
-              state.isSubmitting;
+              state.authStatus == AuthenticationStatus.loading &&
+              state.status == FormzSubmissionStatus.inProgress;
 
           return _buildLoginForm(isLoading);
         },
@@ -745,8 +769,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   Widget _buildLoginForm(bool isLoading) {
     final appIcons = context.appIcons;
 
-    // Update local loading state to match AuthBloc state
-    _isLoading = isLoading;
+    // Local loading state is now derived from AuthBloc state
 
     // Create field configurations to eliminate duplication
     final usernameConfig = _FieldConfig(
@@ -793,12 +816,12 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
           SizedBox(height: _getResponsiveSpacing(context.sizes.v40)),
 
           // Username field
-          _buildAnimatedField(usernameConfig),
+          _buildAnimatedField(usernameConfig, isLoading: isLoading),
 
           SizedBox(height: _getResponsiveSpacing(context.sizes.v20)),
 
           // Password field
-          _buildAnimatedField(passwordConfig),
+          _buildAnimatedField(passwordConfig, isLoading: isLoading),
 
           SizedBox(height: _getResponsiveSpacing(context.sizes.v12)),
 
@@ -840,9 +863,12 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   Widget _buildLoginButton() {
     return BlocBuilder<AuthBloc, AuthState>(
       builder: (context, state) {
+        // Only show loading during actual authentication, not form validation
+        final isLoading = state.authStatus == AuthenticationStatus.loading;
+
         // Button is disabled if either field is empty or if loading
         final isButtonDisabled =
-            _isLoading ||
+            isLoading ||
             state.username.value.isEmpty ||
             state.password.value.isEmpty;
 
@@ -884,7 +910,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                     horizontal: context.sizes.r12,
                   ),
                   child: Center(
-                    child: _isLoading
+                    child: isLoading
                         ? SizedBox(
                             height: context.sizes.r20,
                             width: context.sizes.r20,

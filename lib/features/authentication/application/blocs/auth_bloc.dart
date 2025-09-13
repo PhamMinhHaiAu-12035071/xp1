@@ -29,6 +29,7 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     on<UsernameChanged>(_onUsernameChanged);
     on<PasswordChanged>(_onPasswordChanged);
     on<FormSubmitted>(_onFormSubmitted);
+    on<ClearAuthState>(_onClearAuthState);
   }
 
   final AuthRepository _authRepository;
@@ -180,12 +181,29 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
         // 2. Restore user info from secure storage
         // 3. Decode user info from JWT payload
 
-        // User is authenticated with valid tokens
-        emit(
-          state.copyWith(
-            authStatus: AuthenticationStatus.authenticated,
-          ),
-        );
+        // For now, we'll check if the token has a reasonable structure
+        // This is a basic validation - in production you'd decode JWT and
+        // check expiry
+        if (tokenEntity.accessToken.isNotEmpty &&
+            tokenEntity.refreshToken.isNotEmpty) {
+          // User is authenticated with valid tokens
+          emit(
+            state.copyWith(
+              authStatus: AuthenticationStatus.authenticated,
+            ),
+          );
+        } else {
+          // Invalid token structure - treat as unauthenticated
+          emit(
+            state.copyWith(
+              authStatus: AuthenticationStatus.unauthenticated,
+              username: const Username.pure(),
+              password: const Password.pure(),
+              status: FormzSubmissionStatus.initial,
+              errorMessage: null,
+            ),
+          );
+        }
       },
     );
   }
@@ -199,6 +217,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(
       state.copyWith(
         username: username,
+        authStatus: state.authStatus == AuthenticationStatus.error
+            ? AuthenticationStatus.unauthenticated
+            : state.authStatus,
+        errorMessage: null,
       ),
     );
   }
@@ -212,6 +234,10 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
     emit(
       state.copyWith(
         password: password,
+        authStatus: state.authStatus == AuthenticationStatus.error
+            ? AuthenticationStatus.unauthenticated
+            : state.authStatus,
+        errorMessage: null,
       ),
     );
   }
@@ -258,6 +284,22 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           'Authentication session expired. Please log in again.',
       refreshFailed: () => 'Unable to refresh session. Please log in again.',
       unknown: (message) => 'An unexpected error occurred. Please try again.',
+    );
+  }
+
+  /// Handles clear authentication state event
+  Future<void> _onClearAuthState(
+    ClearAuthState event,
+    Emitter<AuthState> emit,
+  ) async {
+    // Clear all stored tokens
+    await _authRepository.logout();
+
+    // Reset to initial state
+    emit(
+      const AuthState(
+        authStatus: AuthenticationStatus.unauthenticated,
+      ),
     );
   }
 }

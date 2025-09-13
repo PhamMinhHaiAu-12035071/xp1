@@ -44,4 +44,9 @@ sealed class AuthEvent with _$AuthEvent {
   ///
   /// Validates both fields and submits if valid
   const factory AuthEvent.formSubmitted() = FormSubmitted;
+
+  /// Clear authentication state event to reset to initial state
+  ///
+  /// Clears all tokens and resets authentication state
+  const factory AuthEvent.clearAuthState() = ClearAuthState;
 }
