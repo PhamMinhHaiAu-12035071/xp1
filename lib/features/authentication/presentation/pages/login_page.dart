@@ -4,6 +4,7 @@ import 'dart:ui' as ui;
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
+import 'package:xp1/core/constants/design_constants.dart';
 import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 import 'package:xp1/features/authentication/presentation/widgets/login_carousel.dart';
 import 'package:xp1/features/authentication/presentation/widgets/login_form.dart'
@@ -353,8 +354,7 @@ class _LoginFormLayout extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final screenWidth = MediaQuery.of(context).size.width;
-    const designScreenWidth = 393.0; // Design screen width
-    final scaleFactor = screenWidth / designScreenWidth;
+    final scaleFactor = screenWidth / DesignConstants.designWidth;
 
     return LayoutBuilder(
       builder: (context, constraints) {
@@ -420,12 +420,11 @@ class _LoginTopLeftAccent extends StatelessWidget {
     final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    const designScreenWidth = 393.0; // Design screen width
     const designElementWidth = 207.0; // Element width in design
     const designElementHeight = 184.0; // Element height in design
 
     // Calculate responsive scaling factor
-    final scaleFactor = screenWidth / designScreenWidth;
+    final scaleFactor = screenWidth / DesignConstants.designWidth;
     final responsiveWidth = designElementWidth * scaleFactor;
     final responsiveHeight = designElementHeight * scaleFactor;
 
@@ -453,12 +452,11 @@ class _LoginTopRightAccent extends StatelessWidget {
     final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    const designScreenWidth = 393.0; // Design screen width
     const designElementWidth = 313.0; // Element width in design
     const designElementHeight = 443.0; // Element height in design
 
     // Calculate responsive scaling factor
-    final scaleFactor = screenWidth / designScreenWidth;
+    final scaleFactor = screenWidth / DesignConstants.designWidth;
     final responsiveWidth = designElementWidth * scaleFactor;
     final responsiveHeight = designElementHeight * scaleFactor;
 
@@ -486,12 +484,11 @@ class _LoginCenterLeftAccent extends StatelessWidget {
     final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    const designScreenWidth = 393.0; // Design screen width
     const designElementWidth = 192.0; // Element width in design
     const designElementHeight = 273.0; // Element height in design
 
     // Calculate responsive scaling factor
-    final scaleFactor = screenWidth / designScreenWidth;
+    final scaleFactor = screenWidth / DesignConstants.designWidth;
     final responsiveWidth = designElementWidth * scaleFactor;
     final responsiveHeight = designElementHeight * scaleFactor;
 
@@ -519,12 +516,11 @@ class _LoginCenterLogo extends StatelessWidget {
     final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
-    const designScreenWidth = 393.0; // Design screen width
     const designElementWidth = 76.0; // Element width in design
     const designElementHeight = 76.0; // Element height in design
 
     // Calculate responsive scaling factor
-    final scaleFactor = screenWidth / designScreenWidth;
+    final scaleFactor = screenWidth / DesignConstants.designWidth;
     final responsiveWidth = designElementWidth * scaleFactor;
     final responsiveHeight = designElementHeight * scaleFactor;
 

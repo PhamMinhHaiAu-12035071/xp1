@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_screenutil/flutter_screenutil.dart';
+import 'package:xp1/core/constants/design_constants.dart';
 import 'package:xp1/features/splash/presentation/widgets/atomic/atoms/responsive_image_atom.dart';
 
 /// Positioned splash image molecule component with design ratio constraints.
@@ -9,8 +10,8 @@ import 'package:xp1/features/splash/presentation/widgets/atomic/atoms/responsive
 /// Align widget with Padding and ResponsiveImageAtom to create positioned
 /// splash screen images with responsive padding and consistent ratio.
 ///
-/// The image width is constrained to maintain the design ratio of 247px/393px
-/// (approximately 62.85% of screen width) across all iPhone and iPad devices.
+/// The image width is constrained to maintain the design ratio of 247px based
+/// on the design screen width for consistent proportions across all devices.
 class PositionedSplashImage extends StatelessWidget {
   /// Creates a positioned splash image molecule with design ratio constraints.
   ///
@@ -35,8 +36,9 @@ class PositionedSplashImage extends StatelessWidget {
 
   /// Design ratio constant based on design specifications.
   ///
-  /// Calculated as 247px (image width) / 393px (design screen width) = 0.6285
+  /// Calculated as 247px (image width) / DesignConstants.designWidth = 0.6285
   /// This ensures consistent proportions across all device sizes.
+  static const double _designImageRatio = 247 / DesignConstants.designWidth;
 
   @override
   Widget build(BuildContext context) {
@@ -49,8 +51,7 @@ class PositionedSplashImage extends StatelessWidget {
           // across all iPhone and iPad devices
           width: 1.sw,
           child: Transform.scale(
-            scale:
-                0.65, // Scale factor set to 65% for optimal visual proportion
+            scale: _designImageRatio, // Use calculated design ratio
             child: ResponsiveImageAtom(
               imagePath: imagePath,
               fit: BoxFit.contain,

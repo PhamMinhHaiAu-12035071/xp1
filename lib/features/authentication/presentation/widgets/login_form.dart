@@ -4,6 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
+import 'package:xp1/core/constants/design_constants.dart';
 import 'package:xp1/core/routing/app_router.dart';
 import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 import 'package:xp1/features/authentication/application/blocs/auth_bloc.dart';
@@ -354,13 +355,11 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   double _getResponsiveSpacing(double baseSpacing) {
     final screenSize = MediaQuery.of(context).size;
 
-    // Design base dimensions from Figma (393x852)
-    const designWidth = 393.0;
-    const designHeight = 852.0;
+    // Design base dimensions from Figma - using centralized constants
 
     // Calculate scale factors for both dimensions
-    final widthScale = screenSize.width / designWidth;
-    final heightScale = screenSize.height / designHeight;
+    final widthScale = screenSize.width / DesignConstants.designWidth;
+    final heightScale = screenSize.height / DesignConstants.designHeight;
 
     // Use the smaller scale factor to maintain proportions
     // This ensures content doesn't become too large on wide screens
