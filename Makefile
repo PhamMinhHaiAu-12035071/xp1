@@ -108,7 +108,7 @@ analyze-quick:
 # Ultra-light analysis for pre-push (errors only)
 analyze-ultra-light:
 	@echo "⚡ Ultra-light analysis (errors only)..."
-	@$(DART_CMD) analyze --no-fatal-warnings
+	@$(DART_CMD) analyze --no-fatal-warnings 
 
 analyze-strict:
 	@echo "🔍 Strict analysis..."
