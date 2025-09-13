@@ -254,6 +254,9 @@ class AuthBloc extends Bloc<AuthEvent, AuthState> {
           'Service temporarily unavailable. Please try again later.',
       tokenExpired: () => 'Your session has expired. Please log in again.',
       unauthorized: () => 'You are not authorized to access this resource.',
+      noRefreshToken: () =>
+          'Authentication session expired. Please log in again.',
+      refreshFailed: () => 'Unable to refresh session. Please log in again.',
       unknown: (message) => 'An unexpected error occurred. Please try again.',
     );
   }

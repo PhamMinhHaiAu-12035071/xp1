@@ -103,8 +103,7 @@ class AuthRepositoryImpl implements AuthRepository {
       }
 
       // Call refresh API
-      final requestBody = {'refresh_token': refreshToken};
-      final response = await _apiService.refreshToken(requestBody);
+      final response = await _apiService.refreshToken(refreshToken);
 
       // Handle HTTP response status
       if (!response.isSuccessful) {

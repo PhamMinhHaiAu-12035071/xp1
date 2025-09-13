@@ -27,6 +27,12 @@ sealed class AuthFailure with _$AuthFailure {
   /// User is not authorized to perform this action (401 error)
   const factory AuthFailure.unauthorized() = UnauthorizedFailure;
 
+  /// No refresh token available for token refresh operation
+  const factory AuthFailure.noRefreshToken() = NoRefreshTokenFailure;
+
+  /// Token refresh operation failed after retries
+  const factory AuthFailure.refreshFailed() = RefreshFailedFailure;
+
   /// Unknown error that doesn't fit other categories
   ///
   /// [message] - Description of the unknown error

@@ -29,6 +29,8 @@ void main() {
           serverError: (_) => null,
           tokenExpired: () => null,
           unauthorized: () => null,
+          noRefreshToken: () => null,
+          refreshFailed: () => null,
           unknown: (_) => null,
         ),
         equals(message),
@@ -52,6 +54,8 @@ void main() {
           serverError: (code) => code,
           tokenExpired: () => null,
           unauthorized: () => null,
+          noRefreshToken: () => null,
+          refreshFailed: () => null,
           unknown: (_) => null,
         ),
         equals(statusCode),
@@ -76,6 +80,24 @@ void main() {
       expect(failure, isA<AuthFailure>());
     });
 
+    test('should create NoRefreshTokenFailure', () {
+      // Act
+      const failure = AuthFailure.noRefreshToken();
+
+      // Assert
+      expect(failure, isA<NoRefreshTokenFailure>());
+      expect(failure, isA<AuthFailure>());
+    });
+
+    test('should create RefreshFailedFailure', () {
+      // Act
+      const failure = AuthFailure.refreshFailed();
+
+      // Assert
+      expect(failure, isA<RefreshFailedFailure>());
+      expect(failure, isA<AuthFailure>());
+    });
+
     test('should create UnknownFailure with message', () {
       // Arrange
       const message = 'An unexpected error occurred';
@@ -93,6 +115,8 @@ void main() {
           serverError: (_) => null,
           tokenExpired: () => null,
           unauthorized: () => null,
+          noRefreshToken: () => null,
+          refreshFailed: () => null,
           unknown: (msg) => msg,
         ),
         equals(message),
@@ -118,6 +142,8 @@ void main() {
           serverError: (_) => 'server-error',
           tokenExpired: () => 'token-expired',
           unauthorized: () => 'unauthorized',
+          noRefreshToken: () => 'no-refresh-token',
+          refreshFailed: () => 'refresh-failed',
           unknown: (_) => 'unknown',
         );
 

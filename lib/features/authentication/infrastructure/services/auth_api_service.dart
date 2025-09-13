@@ -22,7 +22,7 @@ abstract class AuthApiService extends ChopperService {
   /// Returns authentication tokens and user data on success.
   ///
   /// [body] - JSON request body containing login credentials
-  @POST(path: '/api/v2.5/login')
+  @POST(path: '/login')
   Future<Response<Map<String, dynamic>>> login(
     @Body() Map<String, dynamic> body,
   );
@@ -32,9 +32,9 @@ abstract class AuthApiService extends ChopperService {
   /// Exchanges existing refresh token for new access/refresh token pair.
   /// Used to maintain user session without re-authentication.
   ///
-  /// [body] - JSON request body containing refresh token
-  @POST(path: '/refresh')
+  /// [refreshToken] - The refresh token to exchange for new tokens
+  @GET(path: '/refreshtoken')
   Future<Response<Map<String, dynamic>>> refreshToken(
-    @Body() Map<String, dynamic> body,
+    @Query('t') String refreshToken,
   );
 }
