@@ -1,0 +1,9 @@
+# Exclude docs directory from pub.dev publishing
+/docs
+/docs/
+
+# Optionally exclude other directories
+/screenshots
+/assets/screenshots
+*.png
+*.gif

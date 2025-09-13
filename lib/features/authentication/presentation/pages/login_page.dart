@@ -4,9 +4,6 @@ import 'dart:ui' as ui;
 import 'package:auto_route/auto_route.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_keyboard_visibility/flutter_keyboard_visibility.dart';
-import 'package:get_it/get_it.dart';
-import 'package:xp1/core/assets/app_icons.dart';
-import 'package:xp1/core/services/svg_icon_service.dart';
 import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 import 'package:xp1/features/authentication/presentation/widgets/login_carousel.dart';
 import 'package:xp1/features/authentication/presentation/widgets/login_form.dart'
@@ -419,8 +416,8 @@ class _LoginTopLeftAccent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconService = GetIt.instance<SvgIconService>();
-    final appIcons = GetIt.instance<AppIcons>();
+    final iconService = context.iconService;
+    final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
     const designScreenWidth = 393.0; // Design screen width
@@ -452,8 +449,8 @@ class _LoginTopRightAccent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconService = GetIt.instance<SvgIconService>();
-    final appIcons = GetIt.instance<AppIcons>();
+    final iconService = context.iconService;
+    final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
     const designScreenWidth = 393.0; // Design screen width
@@ -485,8 +482,8 @@ class _LoginCenterLeftAccent extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconService = GetIt.instance<SvgIconService>();
-    final appIcons = GetIt.instance<AppIcons>();
+    final iconService = context.iconService;
+    final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
     const designScreenWidth = 393.0; // Design screen width
@@ -518,8 +515,8 @@ class _LoginCenterLogo extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final iconService = GetIt.instance<SvgIconService>();
-    final appIcons = GetIt.instance<AppIcons>();
+    final iconService = context.iconService;
+    final appIcons = context.appIcons;
     final screenWidth = MediaQuery.of(context).size.width;
 
     const designScreenWidth = 393.0; // Design screen width

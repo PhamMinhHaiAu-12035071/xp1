@@ -4,10 +4,7 @@ import 'package:auto_route/auto_route.dart';
 import 'package:flutter/foundation.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
-import 'package:get_it/get_it.dart';
-import 'package:xp1/core/assets/app_icons.dart';
 import 'package:xp1/core/routing/app_router.dart';
-import 'package:xp1/core/services/svg_icon_service.dart';
 import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 import 'package:xp1/features/authentication/application/blocs/auth_bloc.dart';
 import 'package:xp1/features/authentication/application/blocs/auth_event.dart';
@@ -423,7 +420,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
 
   /// Builds a prefix icon with consistent styling.
   Widget _buildPrefixIcon(String iconPath, String semanticLabel) {
-    final iconService = GetIt.instance<SvgIconService>();
+    final iconService = context.iconService;
 
     return Container(
       padding: EdgeInsets.all(context.sizes.r12),
@@ -524,8 +521,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   /// Builds the eye visibility toggle icon using SVG service with ripple
   /// effect.
   Widget _buildEyeIcon() {
-    final iconService = GetIt.instance<SvgIconService>();
-    final appIcons = GetIt.instance<AppIcons>();
+    final iconService = context.iconService;
+    final appIcons = context.appIcons;
 
     // Sử dụng Material + InkWell để ripple là hình chữ nhật thay vì hình tròn
     return Material(
@@ -747,7 +744,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
   }
 
   Widget _buildLoginForm(bool isLoading) {
-    final appIcons = GetIt.instance<AppIcons>();
+    final appIcons = context.appIcons;
 
     // Update local loading state to match AuthBloc state
     _isLoading = isLoading;
