@@ -52,7 +52,7 @@ pre-push:
       run: npm test
     # Quick pre-push checks (optimized for speed)
     quick-checks:
-      run: make pre-push-ci
+      run: ./scripts/quick-analyze.sh && make test && make license-check
     # Full dependency validation before push
     validate-dependencies:
       run: make validate-deps
