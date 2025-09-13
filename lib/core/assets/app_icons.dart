@@ -58,6 +58,9 @@ abstract class AppIcons {
   /// Password security icon path
   String get password;
 
+  /// Email communication icon path
+  String get email;
+
   // Brand Assets
   /// Company logo icon path
   String get logo;

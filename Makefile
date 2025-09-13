@@ -295,7 +295,10 @@ pre-commit:
 		echo "❌ Code formatting required."; \
 		exit 1; \
 	fi
+	echo "🔍 Analyzing code..."
 	@$(DART_CMD) analyze --fatal-infos
+
+	echo "🧪 Running tests..."
 	@make test
 
 # Setup commands

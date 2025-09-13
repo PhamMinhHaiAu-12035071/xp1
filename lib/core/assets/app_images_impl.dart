@@ -38,6 +38,10 @@ class AppImagesImpl implements AppImages {
   String get employeeBadge => 'assets/images/employee/badge.png';
 
   @override
+  String get forgotPasswordImage =>
+      'assets/images/forgot_password/forgot_password.png';
+
+  @override
   List<String> get criticalAssets => [splashLogo, loginLogo];
 
   @override

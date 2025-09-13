@@ -80,9 +80,12 @@
     },
     "forgotPassword": {
       "title": "Quên mật khẩu",
-      "welcomeMessage": "Chào mừng đến với {pageName}",
-      "comingSoon": "Sắp ra mắt",
-      "description": "Tính năng khôi phục mật khẩu sẽ sớm có mặt."
+      "emailInstruction": "Vui lòng nhập địa chỉ email của bạn, hệ thống sẽ tự động gửi mã xác thực về email",
+      "emailLabel": "Email của bạn",
+      "sendButton": "Gửi",
+      "semantic": {
+        "emailIcon": "Email communication icon"
+      }
     }
   },
   "auth": {

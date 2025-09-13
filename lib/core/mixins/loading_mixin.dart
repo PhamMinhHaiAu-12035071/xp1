@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:xp1/core/widgets/loading_overlay.dart';
+import 'package:xp1/core/widgets/molecules/loading_overlay.dart';
 
 /// Mixin for BLoCs to easily manage loading overlay display
 ///

@@ -2,6 +2,7 @@ import 'package:flutter/material.dart';
 import 'package:get_it/get_it.dart';
 import 'package:xp1/core/assets/app_icons.dart';
 import 'package:xp1/core/assets/app_images.dart';
+import 'package:xp1/core/services/asset_image_service.dart';
 import 'package:xp1/core/services/svg_icon_service.dart';
 import 'package:xp1/core/sizes/app_sizes.dart';
 import 'package:xp1/core/styles/app_text_styles.dart';
@@ -21,6 +22,9 @@ extension AppThemeContext on BuildContext {
 
   /// Access to image assets
   AppImages get images => GetIt.I<AppImages>();
+
+  /// Access to asset image rendering service
+  AssetImageService get imageService => GetIt.I<AssetImageService>();
 
   /// Access to SVG icon rendering service
   SvgIconService get iconService => GetIt.I<SvgIconService>();

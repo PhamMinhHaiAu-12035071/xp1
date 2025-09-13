@@ -80,9 +80,12 @@
     },
     "forgotPassword": {
       "title": "Forgot Password",
-      "welcomeMessage": "Welcome to {pageName}",
-      "comingSoon": "Coming Soon",
-      "description": "Password recovery feature will be available soon."
+      "emailInstruction": "Please enter your email address, the system will automatically send a verification code to your email",
+      "emailLabel": "Email Address",
+      "sendButton": "Send",
+      "semantic": {
+        "emailIcon": "Email communication icon"
+      }
     }
   },
   "auth": {

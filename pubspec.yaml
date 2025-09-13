@@ -166,6 +166,7 @@ flutter:
     # Feature-specific directories
     - assets/images/splash/
     - assets/images/login/
+    - assets/images/forgot_password/
     - assets/images/employee/
 
     # Error handling and placeholders

@@ -62,6 +62,9 @@ class AppIconsImpl implements AppIcons {
   String get password => 'assets/icons/password.svg';
 
   @override
+  String get email => 'assets/icons/email.svg';
+
+  @override
   String get logo => 'assets/icons/brand/logo.svg';
 
   @override

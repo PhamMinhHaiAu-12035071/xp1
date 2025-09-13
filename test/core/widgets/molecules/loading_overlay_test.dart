@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_spinkit/flutter_spinkit.dart';
 import 'package:flutter_test/flutter_test.dart';
-import 'package:xp1/core/widgets/loading_overlay.dart';
+import 'package:xp1/core/widgets/molecules/loading_overlay.dart';
 
 void main() {
   group('LoadingOverlay', () {

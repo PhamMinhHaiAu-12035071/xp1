@@ -34,6 +34,10 @@ abstract class AppImages {
   /// Employee badge image path
   String get employeeBadge;
 
+  // Forgot Password Assets
+  /// Forgot password illustration image path
+  String get forgotPasswordImage;
+
   // Critical assets for preloading
   /// List of critical image paths for preloading
   List<String> get criticalAssets;
