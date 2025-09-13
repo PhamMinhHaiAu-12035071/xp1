@@ -69,12 +69,4 @@ abstract class AppTextStyles {
   ///
   /// [color] Optional text color to override the default.
   TextStyle caption({Color? color});
-
-  /// Button text typography style (14px).
-  ///
-  /// Used for button text with bold weight and 100% line height.
-  /// Uses Public Sans Bold (700) with 0% letter spacing.
-  ///
-  /// [color] Optional text color to override the default (defaults to white).
-  TextStyle buttonText({Color? color});
 }

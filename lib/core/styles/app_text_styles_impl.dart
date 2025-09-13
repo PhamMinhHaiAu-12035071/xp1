@@ -163,13 +163,4 @@ class AppTextStylesImpl implements AppTextStyles {
     letterSpacing: 0,
     color: color,
   );
-
-  @override
-  TextStyle buttonText({Color? color}) => _base(
-    fontSize: 14,
-    fontWeight: FontWeight.w700,
-    color: color ?? Colors.white,
-    height: 1, // 100% line height
-    letterSpacing: 0, // 0% letter spacing
-  );
 }

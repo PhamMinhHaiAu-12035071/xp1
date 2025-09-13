@@ -67,6 +67,7 @@ make test
 - No `print()` statements - use `logger` package instead
 - Cascade operators (..) for 2+ method calls on same object
 - Alphabetical import sorting within categories
+- Use `withValues(alpha: value)` instead of deprecated `withOpacity()`
 
 ### Common Patterns to Generate
 

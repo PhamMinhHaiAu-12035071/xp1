@@ -76,13 +76,4 @@ class WidgetbookTextStyles implements AppTextStyles {
     fontSize: 10,
     color: color,
   );
-
-  @override
-  TextStyle buttonText({Color? color}) => GoogleFonts.publicSans(
-    fontSize: 14, // No .sp scaling for accurate showcase
-    fontWeight: FontWeight.w700,
-    color: color ?? Colors.white,
-    height: 1, // 100% line height
-    letterSpacing: 0, // 0% letter spacing
-  );
 }

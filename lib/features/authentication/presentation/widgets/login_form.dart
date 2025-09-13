@@ -684,9 +684,11 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                           config.controller.text.isNotEmpty)
                       ? context.textStyles.bodySmall().copyWith(
                           color: context.colors.amberNormal,
+                          fontWeight: FontWeight.w300,
                         )
-                      : context.textStyles.bodySmall().copyWith(
+                      : context.textStyles.bodyMedium().copyWith(
                           color: context.colors.blueNormal,
+                          fontWeight: FontWeight.w500,
                         ),
                   child: Text(config.label),
                 ),
@@ -910,7 +912,8 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
                         : AnimatedDefaultTextStyle(
                             duration: const Duration(milliseconds: 300),
                             curve: Curves.easeInOut,
-                            style: context.textStyles.buttonText().copyWith(
+                            style: context.textStyles.bodyMedium().copyWith(
+                              fontWeight: FontWeight.w700,
                               color: isButtonDisabled
                                   ? Colors.white.withValues(alpha: 0.6)
                                   : Colors.white,
