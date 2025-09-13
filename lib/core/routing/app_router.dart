@@ -1,6 +1,7 @@
 import 'package:auto_route/auto_route.dart';
 
 import '../../features/attendance/presentation/pages/attendance_page.dart';
+import '../../features/authentication/presentation/pages/forgot_password_page.dart';
 import '../../features/authentication/presentation/pages/login_page.dart';
 import '../../features/features/presentation/pages/features_page.dart';
 import '../../features/home/presentation/pages/home_page.dart';
@@ -32,12 +33,18 @@ class AppRouter extends RootStackRouter {
     /// Splash Route - NEW: Initial route for app startup
     AutoRoute(
       page: SplashRoute.page,
-      path: '/splash',
+      path: '/${RouteConstants.splash}',
       initial: true, // Make splash the initial route
     ),
 
     /// Login Route - No longer initial
     AutoRoute(page: LoginRoute.page, path: '/${RouteConstants.login}'),
+
+    /// Forgot Password Route
+    AutoRoute(
+      page: ForgotPasswordRoute.page,
+      path: '/${RouteConstants.forgotPassword}',
+    ),
 
     /// Main App Routes with Bottom Navigation
     AutoRoute(

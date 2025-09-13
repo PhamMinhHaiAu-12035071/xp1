@@ -77,6 +77,12 @@
       "editProfile": "Chỉnh sửa hồ sơ",
       "settings": "Cài đặt",
       "preferences": "Tùy chọn"
+    },
+    "forgotPassword": {
+      "title": "Quên mật khẩu",
+      "welcomeMessage": "Chào mừng đến với {pageName}",
+      "comingSoon": "Sắp ra mắt",
+      "description": "Tính năng khôi phục mật khẩu sẽ sớm có mặt."
     }
   },
   "auth": {

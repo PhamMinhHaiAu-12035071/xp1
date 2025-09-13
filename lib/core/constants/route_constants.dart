@@ -18,8 +18,14 @@ abstract final class RouteConstants {
   // Private constructor to prevent instantiation
   const RouteConstants._();
 
+  /// Splash route path.
+  static const String splash = 'splash';
+
   /// Login route path.
   static const String login = 'login';
+
+  /// Forgot password route path.
+  static const String forgotPassword = 'forgot-password';
 
   /// Main navigation route path.
   static const String mainWrapper = 'main';

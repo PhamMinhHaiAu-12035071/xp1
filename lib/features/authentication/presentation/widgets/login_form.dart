@@ -6,6 +6,7 @@ import 'package:flutter/material.dart';
 import 'package:flutter_bloc/flutter_bloc.dart';
 import 'package:formz/formz.dart';
 import 'package:xp1/core/constants/design_constants.dart';
+import 'package:xp1/core/constants/route_constants.dart';
 import 'package:xp1/core/routing/app_router.dart';
 import 'package:xp1/core/themes/extensions/app_theme_extension.dart';
 import 'package:xp1/core/widgets/loading_overlay.dart';
@@ -815,7 +816,7 @@ class _LoginFormState extends State<LoginForm> with TickerProviderStateMixin {
             alignment: Alignment.centerRight,
             child: TextButton(
               onPressed: () {
-                // Handle forgot password
+                context.router.pushPath('/${RouteConstants.forgotPassword}');
               },
               style: TextButton.styleFrom(
                 padding: EdgeInsets.symmetric(

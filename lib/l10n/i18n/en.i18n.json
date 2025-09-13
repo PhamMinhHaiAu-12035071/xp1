@@ -77,6 +77,12 @@
       "editProfile": "Edit Profile",
       "settings": "Settings",
       "preferences": "Preferences"
+    },
+    "forgotPassword": {
+      "title": "Forgot Password",
+      "welcomeMessage": "Welcome to {pageName}",
+      "comingSoon": "Coming Soon",
+      "description": "Password recovery feature will be available soon."
     }
   },
   "auth": {
