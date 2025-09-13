@@ -102,10 +102,7 @@ class AuthAppBarExample extends StatelessWidget {
             child: Column(
               mainAxisAlignment: MainAxisAlignment.center,
               children: [
-                Text(
-                  title,
-                  style: context.textStyles.headingMedium(),
-                ),
+                Text(title, style: context.textStyles.headingMedium()),
                 const SizedBox(height: 16),
                 Text(
                   'This is an example page demonstrating the AuthAppBar '
